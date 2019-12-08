@@ -1,0 +1,23 @@
+<ActorFrame InitCommand = "%function(self)
+	_G.xero = { foreground = self }
+	self:sleep(9e9)
+end">
+	<children>
+		
+		<!-- Std library -->
+		<Code File = "std.xml" />
+		
+		<!-- Load the actual template -->
+		<Code File = "template.xml" />
+		
+		<!-- Load the Eases -->
+		<Code File = "ease.xml" />
+		
+		<!-- Load the Plugins -->
+		<Code File = "../plugins/plugins.xml" />
+		
+		<!-- Load the User's code -->
+		<Code File = "../lua/mods.xml" />
+		
+	</children>
+</ActorFrame>

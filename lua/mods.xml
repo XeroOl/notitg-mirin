@@ -1,0 +1,117 @@
+<Mods LoadCommand = "%xero(function()
+	-- on beat 0
+	--[[func {0, function()
+		-- for both players
+		for pn = 1, 2 do
+			-- if that player is playing
+			if P[pn] then
+				-- Hide the original player
+				P[pn]:hidden(1)
+				P[pn]:xy(0, 0);
+				-- Grab the combo and judgments
+				local field = P[pn]:GetChild('NoteField')
+				local combo = P[pn]:GetChild('Combo')
+				local judge = P[pn]:GetChild('Judgment')
+				-- Proxy the combo and judgments
+				actors.field_proxy[pn]:SetTarget(field)
+				actors.judge_proxy[pn]:SetTarget(judge)
+				actors.combo_proxy[pn]:SetTarget(combo)
+				-- Move to the correct spot
+				actors.field_proxy[pn]:xy(scx * (pn - 0.5), scy)
+				actors.judge_proxy[pn]:xy(scx * (pn - 0.5), scy)
+				actors.combo_proxy[pn]:xy(scx * (pn - 0.5), scy)
+
+			end
+		end
+	end}
+	]]
+	-- your lua code here
+	--[[ease {5, 1, outCirc, 360, 'rotationz'}
+	ease
+	{5, 1, outCirc, 100, 'invert'}
+	{6, 1, outCirc, 0, 'invert'}
+	ease {5, 1, outCirc, 360, 'rotationz', -628, 'confusionoffset'}
+	ease {5, 3, linear,
+	    30, 'bumpy',
+	    10, 'dizzy',
+	    5000, 'beat',
+	    500, 'digital',
+	    100, 'tipsy',
+	    100, 'drunk',
+	}
+	ease {10, 2, outQuad, 100, 'drunk', plr = 1}
+	ease {10, 2, outQuad, 100, 'drunk', plr = {1, 3, 5, 7}}
+	plr = 1
+	ease
+	{10, 2, inExpo, 250, 'movex'}
+	{10, 2, linear, 100, 'drunk'}
+
+	plr = 2
+	ease
+	{10, 2, outExpo, -250, 'movex'}
+	{10, 2, linear, -100, 'drunk'}
+
+	-- Putting an inline `plr` overrides the global `plr`
+	{15, 0, instant, 100, 'flip', plr = 1}
+
+	-- Set plr back to normal
+	plr = nil
+	local function wiggle_around(beat)
+	    ease
+	    {beat, 1, pop, 100, 'drunk'}
+	    {beat, 1, tap, 100, 'tipsy'}
+	end
+		-- control which player is affected:
+	plr = 1
+	wiggle_around(10)
+
+	plr = 2
+	wiggle_around(20)
+
+	plr = nil]]
+	ease
+	-- `mode = 'end'` makes this one last 1 beat instead of 21.
+	{20, 22, mode = 'end', outExpo, 100, 'invert'}
+
+	-- `m=e` is just shorthand for `mode = 'end'`.
+	-- It has the same effect as in the previous example,
+	-- which means that this effect lasts from beat 21 to 22.
+	{21, 23, m=e, outExpo, 0, 'invert'}
+		
+
+	-- set the speed mod to 3x
+	ease {0, 0, instant, 3, xmod}
+
+	-- create a function to change the x position of the quad
+	local function quad_x(percent, pn)
+	    if pn == 1 then
+	        my_quad:x(percent)
+	    end
+	end
+
+	-- make the quad start at the center
+	ease {0, 0, instant, scx, quad_x}
+
+	-- On beat 10, change to scx / 2.
+	{10, 5, outExpo, scx / 2, quad_x}
+	
+end)"
+Type = "ActorFrame"
+><children>
+	<Layer
+	Type = "Quad"
+	OnCommand = "zoomto,50,50;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y"
+	Name = "my_quad"
+	/>
+
+
+	<Layer Type = "ActorProxy" Name = "combo_proxy[1]" />
+	<Layer Type = "ActorProxy" Name = "combo_proxy[2]" />
+	<Layer Type = "ActorProxy" Name = "judge_proxy[1]" />
+	<Layer Type = "ActorProxy" Name = "judge_proxy[2]" />
+	<Layer Type = "ActorFrame" OnCommand = "fov,45" > <children>
+		<Layer Type = "ActorProxy" Name = "field_proxy[1]" />
+		<Layer Type = "ActorProxy" Name = "field_proxy[2]" />
+	</children> </Layer>
+	
+</children></Mods>
