@@ -14,7 +14,7 @@ end">
 		<Code File = "ease.xml" />
 		
 		<!-- Load the Plugins -->
-		<Code File = "../plugins/plugins.xml" />
+		<Code File = "plugins.xml" />
 		
 		<!-- Load the User's code -->
 		<Code File = "../lua/mods.xml" />

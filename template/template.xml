@@ -5,7 +5,7 @@
 	max_pn = 8 -- default: `8`
 	local debug_print_applymodifier_input = false -- default: `false`
 
-	local function copy(src)
+	function copy(src)
 		local dest = {}
 		for k, v in pairs(src) do
 			dest[k] = v
