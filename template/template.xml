@@ -23,12 +23,10 @@
 	tostring = tostring
 	math = copy(math)
 	table = copy(table)
-
-
+	
 	dw = DISPLAY:GetDisplayWidth()
 	dh = DISPLAY:GetDisplayHeight()
-
-
+	
 	scx = SCREEN_CENTER_X
 	scy = SCREEN_CENTER_Y
 	sw = SCREEN_WIDTH
@@ -59,7 +57,6 @@
 		local _, err = pcall(error, name and (name .. ':' .. output) or output, depth)
 		SCREENMAN:SystemMessage(err)
 	end
-
 
 	local function push(self, obj)
 		self.n = self.n + 1
@@ -101,7 +98,7 @@
 			end
 			i = i + 2
 		end
-		self.n = i - 2
+		self.n = i - 1
 
 		local result = self[3](1)
 		if type(result) ~= 'number' then
@@ -137,12 +134,41 @@
 		local depth = 1 + (depth or 0)
 		local name = name or 'add'
 		self.relative = true
-		ease(self, depth + 1, name)
+		ease(self, depth, name)
 		return add
 	end
-
+	
+	function set(self, depth, name)
+		local depth = 1 + (depth or 0)
+		local a, b, i = 0, instant, 1
+		while a do
+			a, self[i] = self[i], a
+			b, self[i + 1] = self[i + 1], b
+		end
+		ease(self, depth, name)
+		return set
+	end
+	
+	-- mod aliases, or ease vars
+	local aliases = {}
+	
+	-- alias a mod (useful if you want string names for function-eases)
+	function alias(key, value)
+		-- accept {} syntax
+		if type(key) == 'table' then
+			key, value = key[1], key[2]
+		end
+		
+		-- make the alias
+		aliases[key] = value or function() end
+		
+		-- return for chain calls
+		return alias
+	end
+	
+	-- the table of scheduled functions and perframes
 	local funcs = {n = 0}
-
+	
 	function func(self, depth, name)
 		local depth = 1 + (depth or 0)
 		local name = name or 'func'
@@ -153,11 +179,13 @@
 		
 		local a, b, c = self[1], self[2], self[3]
 		
-		-- two possible valid configurations
+		-- three possible valid configurations
 		if type(a) == 'number' and type(b) == 'function' then
 			a, b, c = a, nil, b
 		elseif type(a) == 'number' and type(b) == 'number' and type(c) == 'function' then
 			-- a, b, c = a, b, c
+		elseif type(a) == 'string' then
+			return func
 		else
 			screen_error('invalid arguments', depth, name)
 			return func
@@ -186,57 +214,56 @@
 
 	function on_command(self)
 		
+		local mt = {}
+		 function mt.__index(self, k)
+			self[k] = setmetatable({}, mt)
+			return self[k]
+		end
 		
-local mt = {}
- function mt.__index(self, k)
-	self[k] = setmetatable({}, mt)
-	return self[k]
-end
-
-local actors = setmetatable({}, mt)
-
-local list = {n = 0}
-local code = {n = 0}
-
-local function sweep(actor)
-	if actor.GetNumChildren then
-		for i = 0, actor:GetNumChildren() - 1 do
-			sweep(actor:GetChildAt(i))
+		local actors = setmetatable({}, mt)
+		
+		local list = {n = 0}
+		local code = {n = 0}
+		
+		local function sweep(actor)
+			if actor.GetNumChildren then
+				for i = 0, actor:GetNumChildren() - 1 do
+					sweep(actor:GetChildAt(i))
+				end
+			end
+			local name = actor:GetName()
+			if name ~= '' then
+				push(list, actor)
+				local n = code.n
+				code[n + 1], code[n + 2], code[n + 3], code[n + 4], code[n + 5] = '\tactors.', name, ' = list[', list.n, ']\n'
+				code.n = code.n + 5
+			end
 		end
-	end
-	local name = actor:GetName()
-	if name ~= '' then
-		push(list, actor)
-		local n = code.n
-		code[n + 1], code[n + 2], code[n + 3], code[n + 4], code[n + 5] = '\tactors.', name, ' = list[', list.n, ']\n'
-		code.n = code.n + 5
-	end
-end
 
 
-push(code, 'return function(list, actors)\n')
-sweep(foreground)
-push(code, 'end')
+		push(code, 'return function(list, actors)\n')
+		sweep(foreground)
+		push(code, 'end')
 
-local code = table.concat(code)
+		local code = table.concat(code)
 
-local load_actors = xero(assert(loadstring(code)))()
+		local load_actors = xero(assert(loadstring(code)))()
 
-load_actors(list, actors)
+		load_actors(list, actors)
 
-local function clear_metatables(tab)
-	setmetatable(tab, nil)
-	for _, obj in pairs(tab) do
-		if type(obj) == 'table' then
-			clear_metatables(obj)
+		local function clear_metatables(tab)
+			setmetatable(tab, nil)
+			for _, obj in pairs(tab) do
+				if type(obj) == 'table' then
+					clear_metatables(obj)
+				end
+			end
 		end
-	end
-end
-clear_metatables(actors)
+		clear_metatables(actors)
 
-for name, actor in pairs(actors) do
-	xero[name] = actor
-end
+		for name, actor in pairs(actors) do
+			xero[name] = actor
+		end
 		
 		self:queuecommand('BeginUpdate')
 		
@@ -267,7 +294,7 @@ end
 			P[pn] = player
 		end
 		
-	foreground:playcommand('Load')
+		foreground:playcommand('Load')
 		
 		stable_sort(eases, function(a, b) return a[1] < b[1] end)
 		stable_sort(funcs, function(a, b)
@@ -278,14 +305,27 @@ end
 				return a[1] < b[1]
 			end
 		end)
-
-
+		
+		-- de-alias the alias table
+		for key, value in pairs(aliases) do
+			while aliases[value] do
+				value = aliases[value]
+			end
+			aliases[key] = value
+		end
+		
+		-- de-alias the ease table
+		for _, entry in ipairs(eases) do
+			for i = 5, entry.n, 2 do
+				entry[i] = aliases[entry[i]] or entry[i]
+			end
+		end
+		
 		self:luaeffect('Update')
 
 	end
 
 	local targets_mt = {__index = function() return 0 end}
-
 
 	local targets = {}
 	for pn = 1, max_pn do
@@ -311,8 +351,11 @@ end
 		local pn = pn
 		local mods_pn = mods[pn]
 		local mt = {
-			__index = mods_pn,
+			__index = function(self, k)
+				return mods_pn[aliases[k] or k]
+			end,
 			__newindex = function(self, k, v)
+				k = aliases[k] or k
 				mods_pn[k] = v
 				if v then
 					poptions_logging_target[pn][k] = true
@@ -335,10 +378,12 @@ end
 	end)
 
 	GAMESTATE:ApplyModifiers('clearall,*0 0x,*-1 overhead')
+	-- default eases
 	function xmod(x) return '*-1 ' .. x .. 'x' end
 	function cmod(c) return '*-1 c' .. c end
-	ease {0, 0, function() return 1 end, 100, 'zoom', 100, 'zoomx', 100, 'zoomy', 100, 'zoomz', 1, xmod}
-
+	alias {'xmod', xmod} {'cmod', cmod}
+	ease {0, 0, function() return 1 end, 100, 'zoom', 100, 'zoomx', 100, 'zoomy', 100, 'zoomz'}
+	
 	local oldbeat = 0
 	function update_command(self)
 
@@ -382,7 +427,6 @@ end
 				active_eases_index = active_eases_index + 1
 			else
 				for i = 4, e.n, 2 do
-
 					local mod = e[i + 1]
 					mods[plr][mod] = mods[plr][mod] + 0
 				end
@@ -422,30 +466,31 @@ end
 
 
 		for pn = 1, max_pn do
-			local modifiers = {n = 0}
-			for mod, percent in pairs(mods[pn]) do
-				local modstring
-				if type(mod) == 'function' then
-					modstring = mod(percent, pn)
-					if modstring then
+			if P[pn] and P[pn]:IsAwake() then
+				local modifiers = {n = 0}
+				for mod, percent in pairs(mods[pn]) do
+					local modstring
+					if type(mod) == 'function' then
+						modstring = mod(percent, pn)
+						if modstring then
+							push(modifiers, modstring)
+						end
+					else
+						modstring = '*-1 ' .. percent .. ' ' .. mod
 						push(modifiers, modstring)
 					end
-				else
-					modstring = '*-1 ' .. percent .. ' ' .. mod
-					push(modifiers, modstring)
+					mods[pn][mod] = nil
 				end
-				mods[pn][mod] = nil
-			end
-			if modifiers.n ~= 0 and P[pn]:IsAwake() then
-				local str = table.concat(modifiers, ',')
-				if debug_print_applymodifier_input then
-					print('PLAYER ' .. pn .. ': ' .. str)
+				if modifiers.n ~= 0 then
+					local str = table.concat(modifiers, ',')
+					if debug_print_applymodifier_input then
+						print('PLAYER ' .. pn .. ': ' .. str)
+					end
+					GAMESTATE:ApplyModifiers(str, pn)
 				end
-				GAMESTATE:ApplyModifiers(str, pn)
 			end
 		end
 	end
-
 	return true
 end)()"
 Type = "ActorFrame"
