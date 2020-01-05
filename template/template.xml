@@ -4,7 +4,7 @@
 
 	max_pn = 8 -- default: `8`
 	local debug_print_applymodifier_input = false -- default: `false`
-	local debug_print_mod_targets = 16 -- default: `false`
+	local debug_print_mod_targets = false -- default: `false`
 	function copy(src)
 		local dest = {}
 		for k, v in pairs(src) do
