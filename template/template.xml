@@ -4,7 +4,7 @@
 
 	max_pn = 8 -- default: `8`
 	local debug_print_applymodifier_input = false -- default: `false`
-
+	local debug_print_mod_targets = 16 -- default: `false`
 	function copy(src)
 		local dest = {}
 		for k, v in pairs(src) do
@@ -152,6 +152,9 @@
 	-- mod aliases, or ease vars
 	local aliases = {}
 	
+	-- reverse aliases, looks up the name of functions
+	local reverse_aliases = {}
+	
 	-- alias a mod (useful if you want string names for function-eases)
 	function alias(key, value)
 		-- accept {} syntax
@@ -159,8 +162,19 @@
 			key, value = key[1], key[2]
 		end
 		
+		if type(key) ~= 'string' then
+			screen_error('unexpected argument 1' , 1, 'alias')
+		end
+			
+		if type(value) ~= 'string' and type(value) ~= 'function' and type(value) ~= 'nil' then
+			screen_error('unexpected argument 2' , 1, 'alias')
+		end
+		
 		-- make the alias
 		aliases[key] = value or function() end
+		
+		-- mark the reverse alias
+		reverse_aliases[aliases[key]] = key
 		
 		-- return for chain calls
 		return alias
@@ -384,6 +398,23 @@
 	alias {'xmod', xmod} {'cmod', cmod}
 	ease {0, 0, function() return 1 end, 100, 'zoom', 100, 'zoomx', 100, 'zoomy', 100, 'zoomz'}
 	
+	local function apply_modifiers(str, pn)
+		GAMESTATE:ApplyModifiers(str, pn)
+	end
+	
+	if debug_print_applymodifier_input then
+		local old_apply_modifiers = apply_modifiers
+		apply_modifiers = function(str, pn)
+			if debug_print_mod_targets == true or debug_print_mod_targets < beat then
+				print('PLAYER ' .. pn .. ': ' .. str)
+				if debug_print_mod_targets ~= true then
+					apply_modifiers = old_apply_modifiers
+				end 
+			end
+			old_apply_modifiers(str, pn)
+		end
+	end
+	
 	local oldbeat = 0
 	function update_command(self)
 
@@ -464,7 +495,6 @@
 			end
 		end
 
-
 		for pn = 1, max_pn do
 			if P[pn] and P[pn]:IsAwake() then
 				local modifiers = {n = 0}
@@ -483,11 +513,27 @@
 				end
 				if modifiers.n ~= 0 then
 					local str = table.concat(modifiers, ',')
-					if debug_print_applymodifier_input then
-						print('PLAYER ' .. pn .. ': ' .. str)
-					end
-					GAMESTATE:ApplyModifiers(str, pn)
+					apply_modifiers(str, pn)
 				end
+			end
+		end
+		
+		if debug_print_mod_targets then
+			if debug_print_mod_targets == true or debug_print_mod_targets < beat then
+				for pn = 1, max_pn do
+					if P[pn] and P[pn]:IsAwake() then
+						local outputs = {}
+						local i = 0
+						for k, v in pairs(targets[pn]) do
+							if v ~= 0 then
+								i = i + 1
+								outputs[i] = reverse_aliases[k] or tostring(k) .. ': ' .. tostring(v)
+							end
+						end
+						print('Player ' .. pn .. ' at beat ' .. beat .. ' --> ' .. table.concat(outputs, ', '))
+					end
+				end
+				debug_print_mod_targets = (debug_print_mod_targets == true)
 			end
 		end
 	end
