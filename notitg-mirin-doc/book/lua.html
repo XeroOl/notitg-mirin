@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Getting Started</a></li><li class="expanded "><a href="lua.html" class="active"><strong aria-hidden="true">2.</strong> Lua Functions</a></li><li class="expanded "><a href="xml.html"><strong aria-hidden="true">3.</strong> XML Features</a></li><li class="expanded "><a href="eases.html"><strong aria-hidden="true">4.</strong> Built in Eases</a></li><li class="expanded "><a href="vars.html"><strong aria-hidden="true">5.</strong> Variables</a></li><li class="expanded "><a href="addons.html"><strong aria-hidden="true">6.</strong> Addons</a></li><li class="expanded "><a href="appendix_a.html"><strong aria-hidden="true">7.</strong> Appendix</a></li></ol>
+                <ol class="chapter"><li class="expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Getting Started</a></li><li class="expanded "><a href="lua.html" class="active"><strong aria-hidden="true">2.</strong> Lua Functions</a></li><li class="expanded "><a href="xml.html"><strong aria-hidden="true">3.</strong> XML Features</a></li><li class="expanded "><a href="eases.html"><strong aria-hidden="true">4.</strong> Built in Eases</a></li><li class="expanded "><a href="vars.html"><strong aria-hidden="true">5.</strong> Variables</a></li><li class="expanded "><a href="plugins.html"><strong aria-hidden="true">6.</strong> Plugins</a></li><li class="expanded "><a href="appendix_a.html"><strong aria-hidden="true">7.</strong> Appendix</a></li><li class="expanded "><a href="debug.html"><strong aria-hidden="true">8.</strong> Debug</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -149,7 +149,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1><a class="header" href="#lua-functions" id="lua-functions">Lua Functions</a></h1>
-<p>Lua code allows you to control the behavior of mods and actors in your modfile. In the Mirin Template, you can write your Lua code in the file <code>lua/mods.xml</code>. Look for the comment: <code>-- your lua code here</code> to find the location for you to write code. There are three lua functions provided by the Mirin Template: <code>ease</code>, <code>ease_relative</code>, and <code>func</code>.</p>
+<p>Lua code allows you to control the behavior of mods and actors in your modfile. In the Mirin Template, you can write your Lua code in the file <code>lua/mods.xml</code>. Look for the comment: <code>-- your lua code here</code> to find the location for you to write code. There are two main lua functions provided by the Mirin Template: <code>ease</code> and <code>func</code>.</p>
 <h2><a class="header" href="#eases" id="eases">Eases</a></h2>
 <p>In the Mirin Template, mods are controlled through eases, which are transitions that change the value of mods. Unless otherwise specified, mods will keep the value that was prevously assigned to them. Because of this, if you want a mod to be on for a certain range of time, you need to put two ease transitions; one to turn the mod &quot;on&quot; at the beginning, and one to turn the mod &quot;off&quot; at the end.</p>
 <h3><a class="header" href="#differences-from-other-templates" id="differences-from-other-templates">Differences from other Templates</a></h3>
@@ -251,9 +251,9 @@ plr = nil
 {21, 22, m=e, outCirc, 0, 'invert'}
 </code></pre>
 <h3><a class="header" href="#setting-the-speed-mod-with-ease" id="setting-the-speed-mod-with-ease">Setting the speed mod with <code>ease</code></a></h3>
-<p>Usually, when you make a modfile, you want to specify the speed mod that the game runs at. With the Mirin Template, there is a special mod that you can use to change the speed mod: <code>xmod</code>. Unlike the other mods, when you use <code>xmod</code>, you don't put quotes around the name of the mod:</p>
+<p>Usually, when you make a modfile, you want to specify the speed mod that the game runs at. With the Mirin Template, there is a special mod that you can use to change the speed mod: <code>xmod</code>.</p>
 <pre><code class="language-lua">-- set the speed mod to 3x
-ease {0, 0, instant, 3, xmod}
+ease {0, 0, instant, 3, 'xmod'}
 </code></pre>
 <h3><a class="header" href="#function-eases" id="function-eases">Function Eases</a></h3>
 <p>Function eases are for when you want something to ease that isn't a mod. To use function eases, you provide a function instead of the name of a mod. Your function's signature has to be one of these:</p>
@@ -280,6 +280,8 @@ ease {0, 0, instant, scx, quad_x}
 -- On beat 10, change to scx / 2.
 {10, 5, outExpo, scx / 2, quad_x}
 </code></pre>
+<h3><a class="header" href="#aliases-and-the-alias-function" id="aliases-and-the-alias-function">Aliases and the <code>alias</code> function</a></h3>
+<p>Sometimes, it is easier to give a string name to your functions, so that you can ease them just like other mods. In order to do that, this template has a TODO</p>
 <h3><a class="header" href="#relative-eases-and-the-add-function" id="relative-eases-and-the-add-function">Relative Eases and the <code>add</code> Function</a></h3>
 <p>The function <code>ease</code> has a sister function, called <code>add</code>. This other function works exactly the same as <code>ease</code>, except for one important difference: Any percentages used with <code>add</code> are interpreted as offsets to the current percent. This is important because it is different behavior than <code>ease</code>, where percentages are interpreted as target percentages. Here's an example of some code that uses <code>add</code>:</p>
 <pre><code class="language-lua">add

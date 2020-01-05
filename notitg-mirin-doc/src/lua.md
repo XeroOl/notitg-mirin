@@ -1,6 +1,6 @@
 # Lua Functions
 
-Lua code allows you to control the behavior of mods and actors in your modfile. In the Mirin Template, you can write your Lua code in the file `lua/mods.xml`. Look for the comment: `-- your lua code here` to find the location for you to write code. There are three lua functions provided by the Mirin Template: `ease`, `ease_relative`, and `func`.
+Lua code allows you to control the behavior of mods and actors in your modfile. In the Mirin Template, you can write your Lua code in the file `lua/mods.xml`. Look for the comment: `-- your lua code here` to find the location for you to write code. There are two main lua functions provided by the Mirin Template: `ease` and `func`.
 
 ## Eases
 
@@ -141,10 +141,10 @@ ease
 {21, 22, m=e, outCirc, 0, 'invert'}
 ```
 ### Setting the speed mod with `ease`
-Usually, when you make a modfile, you want to specify the speed mod that the game runs at. With the Mirin Template, there is a special mod that you can use to change the speed mod: `xmod`. Unlike the other mods, when you use `xmod`, you don't put quotes around the name of the mod:
+Usually, when you make a modfile, you want to specify the speed mod that the game runs at. With the Mirin Template, there is a special mod that you can use to change the speed mod: `xmod`.
 ```lua
 -- set the speed mod to 3x
-ease {0, 0, instant, 3, xmod}
+ease {0, 0, instant, 3, 'xmod'}
 ```
 ### Function Eases
 Function eases are for when you want something to ease that isn't a mod. To use function eases, you provide a function instead of the name of a mod. Your function's signature has to be one of these:
@@ -171,6 +171,10 @@ ease {0, 0, instant, scx, quad_x}
 -- On beat 10, change to scx / 2.
 {10, 5, outExpo, scx / 2, quad_x}
 ```
+
+### Aliases and the `alias` function
+
+Sometimes, it is easier to give a string name to your functions, so that you can ease them just like other mods. In order to do that, this template has a TODO
 
 ### Relative Eases and the `add` Function
 The function `ease` has a sister function, called `add`. This other function works exactly the same as `ease`, except for one important difference: Any percentages used with `add` are interpreted as offsets to the current percent. This is important because it is different behavior than `ease`, where percentages are interpreted as target percentages. Here's an example of some code that uses `add`:
