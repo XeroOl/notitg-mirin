@@ -5,4 +5,4 @@ A Template for NotITG.
 * Custom Ease Engine which lets all mods act like aux vars!
 * Edit which mods are applying on the fly from perframes, using a custom `poptions` system!
 * Much much more!
-Read the (documentation)[./notitg-mirin-doc/src/overview.md] for more details.
+Read the [documentation](./notitg-mirin-doc/src/SUMMARY.md) for more details.
