@@ -1,27 +1,31 @@
 <Template Condition = "(function() --ease.xml
 	xero()
-	local function cache(func) return setmetatable({}, {__index = function(self, k)
-		self[k] = func(k)
-		return self[k]
-	end}) end
-
+	local function cache(func)
+		return setmetatable({}, {
+			__index = function(self, k)
+				self[k] = func(k)
+				return self[k]
+			end
+		})
+	end
+	
 	local sqrt = math.sqrt
 	local sin = math.sin
 	local cos = math.cos
 	local pow = math.pow
 	local exp = math.exp
 	local pi = math.pi
-
+	
 	function bounce(t) return 4 * t * (1 - t) end
 	function tri(t) return 1 - abs(2 * t - 1) end
 	function bell(t) return inOutQuint(tri(t)) end
 	function pop(t) return 3.5 * (1 - t) * (1 - t) * sqrt(t) end
 	function tap(t) return 3.5 * t * t * sqrt(1 - t) end
 	function pulse(t) return t < .5 and tap(t * 2) or -pop(t * 2 - 1) end
-
+	
 	function spike(t) return exp(-10 * abs(2 * t - 1)) end
 	function inverse(t) return t * t * (1 - t) * (1 - t) / (0.5 - t) end
-
+	
 	popElastic = cache(function(damp)
 		return cache(function(count)
 			return function(t)
@@ -45,14 +49,14 @@
 			end
 		end)
 	end)
-
+	
 	impulse = cache(function(damp)
 		return function(t)
 			t = t ^ damp
 			return t * (1000 ^ -t - 0.001) * 18.6
 		end
 	end)
-
+	
 	function instant() return 1 end
 	function linear(t) return t end
 	function inQuad(t) return t * t end
@@ -116,7 +120,7 @@
 			return 0.5 + 0.5 * sqrt(1 - t * t)
 		end
 	end
-
+	
 	function inElastic(t)
 		t = t - 1
 		return -(pow(2, 10 * t) * sin((t - 0.075) * (2 * pi) / 0.3))

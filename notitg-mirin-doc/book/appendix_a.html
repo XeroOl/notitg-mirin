@@ -150,13 +150,16 @@
                     <main>
                         <h1><a class="header" href="#appendix" id="appendix">Appendix</a></h1>
 <h2><a class="header" href="#appendix-a-functions" id="appendix-a-functions">Appendix A: Functions</a></h2>
-<pre><code class="language-lua">
-ease {beat, len [, mode = 'end'], fn, percent1, mod1 [, percent2, mod2 ...] [, plr = pn]}
+<pre><code class="language-lua">ease {beat, len [, mode = 'end'], fn, percent1, mod1 [, percent2, mod2 ...] [, plr = pn]}
 
 add {beat, len [, mode = 'end'], fn, percent1, mod1 [, percent2, mod2 ...] [, plr = pn]}
 
+set {beat, percent1, mod1 [, percent2, mod2 ...] [, plr = pn]}
+
 func {beat [, len [, mode = 'end']], function(beat, poptions) ... end [, defer = true]}
 
+alias {name [, value]}
+alias (name [, value])
 </code></pre>
 <h2><a class="header" href="#appendix-b-aft-setup" id="appendix-b-aft-setup">Appendix B: AFT Setup</a></h2>
 <pre><code class="language-xml">&lt;Layer InitCommand = &quot;%xero.sprite&quot; Name = &quot;aftsprite&quot; /&gt;

@@ -174,7 +174,39 @@ ease {0, 0, instant, scx, quad_x}
 
 ### Aliases and the `alias` function
 
-Sometimes, it is easier to give a string name to your functions, so that you can ease them just like other mods. In order to do that, this template has a TODO
+Sometimes, it is easier to give a string name to your functions, so that you can ease them just like other mods. In order to do that, this template has a function called `alias`. This function lets you assign a name to a mod. So, if you have a function ease, you can assign it a name:
+
+```lua
+local function my_function_ease(percent, pn)
+	--[[ ... ]]
+end
+
+alias('custom_name', my_function_ease)
+```
+
+You can use either curly braces `{}`, or parentheses `()` for `alias`. If you use curly braces `{}`, then you can chain calls to alias like you can with the other functions.
+
+Then, whenever you want to ease the function, you can use its name instead:
+```lua
+ease {0, 0, instant, 100, 'custom_name'}
+```
+The alias also lets you use the new name to index into `poptions` in a perframe. We'll cover perframes later in this document.
+
+Aliases aren't only for function eases: Sometimes, there's two names for the same mod, and you want to use both names interchangeably to refer to the same mod.
+```lua
+alias('longboy', 'longholds')
+```
+
+There's one more use for `alias`. Sometimes, when working with perframes, it's nice to have a value to ease that is only meant to be read from perframes. If you've done modding before, you might have heard of "aux vars". The idea is that you want a value that you can apply eases to that you can read back from later. If you don't provide a second argument to `alias`, then you get a dummy value that you can read from perframes later. Check the documentation of perframes for an example use of this.
+```lua
+alias('my_mod_name')
+alias('custom_mod')
+alias('my_aux_var')
+```
+
+### Instant Eases and the `set` Function
+
+TODO
 
 ### Relative Eases and the `add` Function
 The function `ease` has a sister function, called `add`. This other function works exactly the same as `ease`, except for one important difference: Any percentages used with `add` are interpreted as offsets to the current percent. This is important because it is different behavior than `ease`, where percentages are interpreted as target percentages. Here's an example of some code that uses `add`:
@@ -259,12 +291,15 @@ Poptions acts like a temporary table that is rebuilt every frame. Each frame, th
 
 The poptions table's values are set in step 1, then modified in step 3, and then written to the game in step 4.
 
-One important thing is that you can also read the `poptions` table. Getting the current mod values is extremely helpful because you can use mods to signal the perframe and tell it what to do, instead of just making a formula based on the beat. The `poptions` table lets you see what values of mods the ease engine is about to apply, and tweak them before they are serialized into the game.
+One important thing is that you can also read the `poptions` table. Getting the current mod values is extremely helpful because you can use mods to signal the perframe and tell it what to do, instead of just making a formula based on the beat. The `poptions` table lets you see what values of mods the template is about to apply, and tweak them before they are serialized into the game.
 
 ### Advanced uses of Perframes.
-Here's an example where I also read from `poptions`:
+Here's an example that also reads from `poptions`:
 ```lua
 local sin, cos, pi = math.sin, math.cos, math.pi
+
+-- tell the template that the mod 'blacksphere' isn't real
+alias {'blacksphere'}
 
 -- Make a perframe that lasts for the entire file.
 func {0, 9e9, function(beat, poptions)
@@ -274,10 +309,6 @@ func {0, 9e9, function(beat, poptions)
 		
 		-- Read the mod 'blacksphere' from the poptions table.
 		local b = poptions[pn][blacksphere].blacksphere / 100
-		
-		-- Write back nil to the poptions table so that the game
-		-- doesn't actually apply 'blackpshere' as a real mod.
-		poptions[pn].blacksphere = nil
 		
 		-- Calculate the cosine and sine of the percentage that
 		-- was applied. Fast calcuation path if set to 0%

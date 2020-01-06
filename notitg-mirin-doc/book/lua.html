@@ -281,7 +281,28 @@ ease {0, 0, instant, scx, quad_x}
 {10, 5, outExpo, scx / 2, quad_x}
 </code></pre>
 <h3><a class="header" href="#aliases-and-the-alias-function" id="aliases-and-the-alias-function">Aliases and the <code>alias</code> function</a></h3>
-<p>Sometimes, it is easier to give a string name to your functions, so that you can ease them just like other mods. In order to do that, this template has a TODO</p>
+<p>Sometimes, it is easier to give a string name to your functions, so that you can ease them just like other mods. In order to do that, this template has a function called <code>alias</code>. This function lets you assign a name to a mod. So, if you have a function ease, you can assign it a name:</p>
+<pre><code class="language-lua">local function my_function_ease(percent, pn)
+	--[[ ... ]]
+end
+
+alias('custom_name', my_function_ease)
+</code></pre>
+<p>You can use either curly braces <code>{}</code>, or parentheses <code>()</code> for <code>alias</code>. If you use curly braces <code>{}</code>, then you can chain calls to alias like you can with the other functions.</p>
+<p>Then, whenever you want to ease the function, you can use its name instead:</p>
+<pre><code class="language-lua">ease {0, 0, instant, 100, 'custom_name'}
+</code></pre>
+<p>The alias also lets you use the new name to index into <code>poptions</code> in a perframe. We'll cover perframes later in this document.</p>
+<p>Aliases aren't only for function eases: Sometimes, there's two names for the same mod, and you want to use both names interchangeably to refer to the same mod.</p>
+<pre><code class="language-lua">alias('longboy', 'longholds')
+</code></pre>
+<p>There's one more use for <code>alias</code>. Sometimes, when working with perframes, it's nice to have a value to ease that is only meant to be read from perframes. If you've done modding before, you might have heard of &quot;aux vars&quot;. The idea is that you want a value that you can apply eases to that you can read back from later. If you don't provide a second argument to <code>alias</code>, then you get a dummy value that you can read from perframes later. Check the documentation of perframes for an example use of this.</p>
+<pre><code class="language-lua">alias('my_mod_name')
+alias('custom_mod')
+alias('my_aux_var')
+</code></pre>
+<h3><a class="header" href="#instant-eases-and-the-set-function" id="instant-eases-and-the-set-function">Instant Eases and the <code>set</code> Function</a></h3>
+<p>TODO</p>
 <h3><a class="header" href="#relative-eases-and-the-add-function" id="relative-eases-and-the-add-function">Relative Eases and the <code>add</code> Function</a></h3>
 <p>The function <code>ease</code> has a sister function, called <code>add</code>. This other function works exactly the same as <code>ease</code>, except for one important difference: Any percentages used with <code>add</code> are interpreted as offsets to the current percent. This is important because it is different behavior than <code>ease</code>, where percentages are interpreted as target percentages. Here's an example of some code that uses <code>add</code>:</p>
 <pre><code class="language-lua">add
@@ -355,10 +376,13 @@ end}
 <li>Find which mods changed, serialize them, and apply to the game. Function eases are also evaluated during this step.</li>
 </ol>
 <p>The poptions table's values are set in step 1, then modified in step 3, and then written to the game in step 4.</p>
-<p>One important thing is that you can also read the <code>poptions</code> table. Getting the current mod values is extremely helpful because you can use mods to signal the perframe and tell it what to do, instead of just making a formula based on the beat. The <code>poptions</code> table lets you see what values of mods the ease engine is about to apply, and tweak them before they are serialized into the game.</p>
+<p>One important thing is that you can also read the <code>poptions</code> table. Getting the current mod values is extremely helpful because you can use mods to signal the perframe and tell it what to do, instead of just making a formula based on the beat. The <code>poptions</code> table lets you see what values of mods the template is about to apply, and tweak them before they are serialized into the game.</p>
 <h3><a class="header" href="#advanced-uses-of-perframes" id="advanced-uses-of-perframes">Advanced uses of Perframes.</a></h3>
-<p>Here's an example where I also read from <code>poptions</code>:</p>
+<p>Here's an example that also reads from <code>poptions</code>:</p>
 <pre><code class="language-lua">local sin, cos, pi = math.sin, math.cos, math.pi
+
+-- tell the template that the mod 'blacksphere' isn't real
+alias {'blacksphere'}
 
 -- Make a perframe that lasts for the entire file.
 func {0, 9e9, function(beat, poptions)
@@ -368,10 +392,6 @@ func {0, 9e9, function(beat, poptions)
 		
 		-- Read the mod 'blacksphere' from the poptions table.
 		local b = poptions[pn][blacksphere].blacksphere / 100
-		
-		-- Write back nil to the poptions table so that the game
-		-- doesn't actually apply 'blackpshere' as a real mod.
-		poptions[pn].blacksphere = nil
 		
 		-- Calculate the cosine and sine of the percentage that
 		-- was applied. Fast calcuation path if set to 0%

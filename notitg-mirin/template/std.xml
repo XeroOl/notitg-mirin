@@ -6,9 +6,9 @@
 		setfenv(f or 2, self)
 		return f
 	end
-
+	
 	xero()
-
+	
 	local function insertion_sort(t, l, h, c)
 		for i = l + 1, h do
 			local k = l
@@ -51,9 +51,9 @@
 			i = i + 1
 		end
 	end
-
+	
 	local magic_number = 12
-
+	
 	local function merge_sort(t, b, l, h, c)
 		if h - l < magic_number then
 			insertion_sort(t, l, h, c)
@@ -64,10 +64,10 @@
 			merge(t, b, l, m, h, c)
 		end
 	end
-
+	
 	local function default_comparator(a, b) return a < b end
 	local function flip_comparator(c) return function(a, b) return c(b, a) end end
-
+	
 	function stable_sort(t, c)
 		if not t[2] then return t end
 		c = c or default_comparator
@@ -77,28 +77,28 @@
 		merge_sort(t, b, 1, n, c)
 		return t
 	end
-
+	
 	local function add(self, obj)
 		local stage = self.stage
 		self.n = self.n + 1
 		stage.n = stage.n + 1
 		stage[stage.n] = obj
 	end
-
+	
 	local function remove(self)
 		local swap = self.swap
 		swap[swap.n] = nil
 		swap.n = swap.n - 1
 		self.n = self.n - 1
 	end
-
+	
 	local function next(self)
 		if self.n == 0 then return end
-
+		
 		local swap = self.swap
 		local stage = self.stage
 		local list = self.list
-
+		
 		if swap.n == 0 then
 			stable_sort(stage, self.reverse_comparator)
 		end
@@ -138,7 +138,7 @@
 		end
 		return swap[swap.n]
 	end
-
+	
 	function perframe_data_structure(comparator)
 		return {
 			add = add,

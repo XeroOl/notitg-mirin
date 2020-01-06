@@ -1,7 +1,7 @@
 <Template Condition = "(function() --template.xml
-
+	
 	xero()
-
+	
 	max_pn = 8 -- default: `8`
 	local debug_print_applymodifier_input = false -- default: `false`
 	local debug_print_mod_targets = false -- default: `false`
@@ -12,7 +12,7 @@
 		end
 		return dest
 	end
-
+	
 	xero = xero
 	type = type
 	print = print
@@ -32,16 +32,14 @@
 	sw = SCREEN_WIDTH
 	sh = SCREEN_HEIGHT
 	e = 'end'
-
-
+	
 	function sprite(self)
 		self:basezoomx(sw / dw)
 		self:basezoomy(-sh / dh)
 		self:x(scx)
 		self:y(scy)
 	end
-
-
+	
 	function aft(self)
 		self:SetWidth(dw)
 		self:SetHeight(dh)
@@ -51,22 +49,22 @@
 		self:EnablePreserveTexture(true)
 		self:Create()
 	end
-
+	
 	local function screen_error(output, depth, name)
 		local depth = 3 + (depth or 0)
 		local _, err = pcall(error, name and (name .. ':' .. output) or output, depth)
 		SCREENMAN:SystemMessage(err)
 	end
-
+	
 	local function push(self, obj)
 		self.n = self.n + 1
 		self[self.n] = obj
 	end
-
+	
 	local default_plr = {1, 2}
-
+	
 	local eases = {n = 0}
-
+	
 	function ease(self, depth, name)
 		local depth = 1 + (depth or 0)
 		local name = name or 'ease'
@@ -99,7 +97,7 @@
 			i = i + 2
 		end
 		self.n = i - 1
-
+		
 		local result = self[3](1)
 		if type(result) ~= 'number' then
 			screen_error('invalid ease function', depth, name)
@@ -126,10 +124,10 @@
 			screen_error('invalid plr', depth, name)
 			return ease
 		end
-
+		
 		return ease
 	end
-
+	
 	function add(self, depth, name)
 		local depth = 1 + (depth or 0)
 		local name = name or 'add'
@@ -164,10 +162,12 @@
 		
 		if type(key) ~= 'string' then
 			screen_error('unexpected argument 1' , 1, 'alias')
+			return alias
 		end
 			
 		if type(value) ~= 'string' and type(value) ~= 'function' and type(value) ~= 'nil' then
 			screen_error('unexpected argument 2' , 1, 'alias')
+			return alias
 		end
 		
 		-- make the alias
@@ -213,19 +213,18 @@
 		for pn = 1, max_pn do
 			self.mods[pn] = {}
 		end
-
+		
 		push(funcs, self)
-
-
+		
 		if self.defer then
 			self.priority = -funcs.n
 		else
 			self.priority = funcs.n
 		end
-
+		
 		return func
 	end
-
+	
 	function on_command(self)
 		
 		local mt = {}
@@ -253,18 +252,16 @@
 				code.n = code.n + 5
 			end
 		end
-
-
+		
 		push(code, 'return function(list, actors)\n')
 		sweep(foreground)
 		push(code, 'end')
-
+		
 		local code = table.concat(code)
-
+		
 		local load_actors = xero(assert(loadstring(code)))()
-
 		load_actors(list, actors)
-
+		
 		local function clear_metatables(tab)
 			setmetatable(tab, nil)
 			for _, obj in pairs(tab) do
@@ -274,7 +271,7 @@
 			end
 		end
 		clear_metatables(actors)
-
+		
 		for name, actor in pairs(actors) do
 			xero[name] = actor
 		end
@@ -282,11 +279,11 @@
 		self:queuecommand('BeginUpdate')
 		
 	end
-
+	
 	function begin_update_command(self)
-
+		
 		local function get(name) return SCREENMAN:GetTopScreen():GetChild(name) end
-
+		
 		for _, element in ipairs {
 			'Overlay',
 			'Underlay',
@@ -300,7 +297,7 @@
 				child:hidden(1)
 			end
 		end
-
+		
 		P = {}
 		for pn = 1, max_pn do
 			local player = get('PlayerP' .. pn)
@@ -336,23 +333,21 @@
 		end
 		
 		self:luaeffect('Update')
-
+		
 	end
-
+	
 	local targets_mt = {__index = function() return 0 end}
-
+	
 	local targets = {}
 	for pn = 1, max_pn do
 		targets[pn] = setmetatable({}, targets_mt)
 	end
-
-
+	
 	local mods_mt = {}
 	for pn = 1, max_pn do
 		mods_mt[pn] = {__index = targets[pn]}
 	end
-
-
+	
 	local mods = {}
 	for pn = 1, max_pn do
 		mods[pn] = setmetatable({}, mods_mt[pn])
@@ -379,18 +374,16 @@
 		poptions_mt[pn] = mt
 		poptions[pn] = setmetatable({}, mt)
 	end
-
-
+	
 	local eases_index = 1
 	local funcs_index = 1
-
-
+	
 	local active_eases = {n = 0}
 	local active_funcs = perframe_data_structure(function(a, b)
 		local x, y = a.priority, b.priority
 		return x * x * y < x * y * y
 	end)
-
+	
 	GAMESTATE:ApplyModifiers('clearall,*0 0x,*-1 overhead')
 	-- default eases
 	function xmod(x) return '*-1 ' .. x .. 'x' end
@@ -417,13 +410,11 @@
 	
 	local oldbeat = 0
 	function update_command(self)
-
-
+		
 		local beat = GAMESTATE:GetSongBeat()
 		if beat == oldbeat then return end
 		oldbeat = beat
-
-
+		
 		while eases_index <= eases.n and eases[eases_index][1] < beat do
 			local e = eases[eases_index]
 			local plr = e.plr
@@ -443,8 +434,7 @@
 			push(active_eases, e)
 			eases_index = eases_index + 1
 		end
-
-
+		
 		local active_eases_index = 1
 		while active_eases_index <= active_eases.n do
 			local e = active_eases[active_eases_index]
@@ -466,8 +456,7 @@
 				active_eases.n = active_eases.n - 1
 			end
 		end
-
-
+		
 		while funcs_index <= funcs.n and funcs[funcs_index][1] < beat do
 			local e = funcs[funcs_index]
 			if not e[2] then
@@ -477,8 +466,7 @@
 			end
 			funcs_index = funcs_index + 1
 		end
-
-
+		
 		while true do
 			local e = active_funcs:next()
 			if not e then break end
@@ -494,7 +482,7 @@
 				active_funcs:remove()
 			end
 		end
-
+		
 		for pn = 1, max_pn do
 			if P[pn] and P[pn]:IsAwake() then
 				local modifiers = {n = 0}
