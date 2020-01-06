@@ -1,5 +1,6 @@
 # Plugins
 ## Installing a Plugin
+If there isn't already a `plugins/` folder, add one. It should be in the same directory as the `.sm` file.
 Just take the plugin's `.xml` file and put it in the `plugins/` folder. Congrats! You're Done!
 ## Making a Plugin
 Make an xml with a `LoadCommand`, just like `mods.xml` is done. Plugin `LoadCommand`s will be called in alphabetical order by plugin name before the `lua/mods.xml` one is called. You can do the exact same things in a plugin that you can in `mods.xml`.
