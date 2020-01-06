@@ -10,6 +10,3 @@ Unzip the template into your song's directory. Delete `Song.sm` and `Song.ogg`, 
 ;
 ```
 That's it! You're ready to get started!
-
-
-###### Copyright (c) 2019 mirin (but definitely not XeroOl)
