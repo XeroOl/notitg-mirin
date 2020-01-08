@@ -17,6 +17,7 @@ If you want an actor to be stored in the pseudo-global metatable.
 ```
 
 ## `%xero.sprite` and `%xero.aft`
-
+TODO
 
 ## `xero()`
+TODO

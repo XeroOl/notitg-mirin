@@ -150,14 +150,16 @@
                     <main>
                         <h1><a class="header" href="#plugins" id="plugins">Plugins</a></h1>
 <h2><a class="header" href="#installing-a-plugin" id="installing-a-plugin">Installing a Plugin</a></h2>
-<p>Just take the plugin's <code>.xml</code> file and put it in the <code>plugins/</code> folder. Congrats! You're Done!</p>
+<p>If there isn't already a <code>plugins/</code> folder, add one. It should be in the same directory as the <code>.sm</code> file.
+Just take the plugin's <code>.xml</code> file and put it in the <code>plugins/</code> folder. Congrats! You're Done!</p>
 <h2><a class="header" href="#making-a-plugin" id="making-a-plugin">Making a Plugin</a></h2>
 <p>Make an xml with a <code>LoadCommand</code>, just like <code>mods.xml</code> is done. Plugin <code>LoadCommand</code>s will be called in alphabetical order by plugin name before the <code>lua/mods.xml</code> one is called. You can do the exact same things in a plugin that you can in <code>mods.xml</code>.</p>
 <h2><a class="header" href="#faq" id="faq">FAQ</a></h2>
-<p>No, you can't get any plugin code to run after the user's <code>mods.xml</code> yet. This could be coming in the future. If you have any suggestions on how to do this, I'm open to ideas. So far, these are my ideas, and none of them are too great:</p>
+<p>No, you can't get any plugin code to run after the user's <code>mods.xml</code> yet. No you can't change the order that plugins are loaded.
+Support for this sort of thing will be coming in the future. If you have any suggestions on the best way to do this, I'm open to ideas. So far, these are my ideas, and none of them are too great:</p>
 <ul>
 <li>Different stages of loading. (think Load1Command, Load2Command, Load3Command)</li>
-<li>Better suppport for scheduled functions. Basically, allow <code>ease</code>, <code>func</code>, etc during functions scheduled for beat 0.</li>
+<li>Better suppport for scheduled functions. Basically, allow <code>ease</code>, <code>func</code>, etc during functions scheduled for beat 0. Maybe have it specifically exposed to </li>
 </ul>
 
                     </main>

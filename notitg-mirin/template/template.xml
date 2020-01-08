@@ -138,10 +138,11 @@
 	
 	function set(self, depth, name)
 		local depth = 1 + (depth or 0)
-		local a, b, i = 0, instant, 1
+		local a, b, i = 0, instant, 2
 		while a do
 			a, self[i] = self[i], a
 			b, self[i + 1] = self[i + 1], b
+			i = i + 2
 		end
 		ease(self, depth, name)
 		return set
