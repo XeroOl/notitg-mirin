@@ -283,8 +283,6 @@
 	
 	function begin_update_command(self)
 		
-		local function get(name) return SCREENMAN:GetTopScreen():GetChild(name) end
-		
 		for _, element in ipairs {
 			'Overlay',
 			'Underlay',
@@ -293,7 +291,7 @@
 			'LifeP1',
 			'LifeP2',
 		} do
-			local child = get(element)
+			local child = SCREENMAN(element)
 			if child then
 				child:hidden(1)
 			end
@@ -301,7 +299,7 @@
 		
 		P = {}
 		for pn = 1, max_pn do
-			local player = get('PlayerP' .. pn)
+			local player = SCREENMAN('PlayerP' .. pn)
 			xero['P' .. pn] = player
 			P[pn] = player
 		end
