@@ -14,8 +14,8 @@ alias (name [, value])
 ```
 ## Appendix B: AFT Setup
 ```xml
-<Layer InitCommand = "%xero.sprite" Name = "aftsprite" />
-<Layer InitCommand = "%xero.aft" Name = "aft" />
+<Layer InitCommand = "%xero.sprite" Name = "aftsprite" Type="Sprite" />
+<Layer InitCommand = "%xero.aft" Name = "aft" Type="ActorFrameTexture" />
 ```
 ```lua
 aftsprite:SetTexture(aft:GetTexture())
