@@ -162,8 +162,8 @@ alias {name [, value]}
 alias (name [, value])
 </code></pre>
 <h2><a class="header" href="#appendix-b-aft-setup" id="appendix-b-aft-setup">Appendix B: AFT Setup</a></h2>
-<pre><code class="language-xml">&lt;Layer InitCommand = &quot;%xero.sprite&quot; Name = &quot;aftsprite&quot; /&gt;
-&lt;Layer InitCommand = &quot;%xero.aft&quot; Name = &quot;aft&quot; /&gt;
+<pre><code class="language-xml">&lt;Layer InitCommand = &quot;%xero.sprite&quot; Name = &quot;aftsprite&quot; Type=&quot;Sprite&quot; /&gt;
+&lt;Layer InitCommand = &quot;%xero.aft&quot; Name = &quot;aft&quot; Type=&quot;ActorFrameTexture&quot; /&gt;
 </code></pre>
 <pre><code class="language-lua">aftsprite:SetTexture(aft:GetTexture())
 </code></pre>
@@ -205,21 +205,6 @@ alias (name [, value])
 
         </div>
 
-        
-        <!-- Livereload script (if served using the cli tool) -->
-        <script type="text/javascript">
-            var socket = new WebSocket("ws://localhost:3001");
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
         
 
         
