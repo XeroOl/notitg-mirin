@@ -32,6 +32,7 @@
 	sw = SCREEN_WIDTH
 	sh = SCREEN_HEIGHT
 	e = 'end'
+	plr = {1, 2}
 	
 	function sprite(self)
 		self:basezoomx(sw / dw)
@@ -66,7 +67,7 @@
 	local eases = {n = 0}
 	
 	function ease(self, depth, name)
-		local depth = 1 + (depth or 0)
+		local depth = 1 + (type(depth) == 'number' and depth or 0)
 		local name = name or 'ease'
 		if type(self) ~= 'table' then
 			screen_error('curly braces expected', depth, name)
@@ -109,7 +110,7 @@
 		if self.mode or self.m then
 			self[2] = self[2] - self[1]
 		end
-		local plr = self.plr or plr or default_plr
+		local plr = self.plr or rawget(xero, plr) or default_plr
 		if type(plr) == 'number' then
 			self.plr = plr
 			push(eases, self)
@@ -129,7 +130,7 @@
 	end
 	
 	function add(self, depth, name)
-		local depth = 1 + (depth or 0)
+		local depth = 1 + (type(depth) == 'number' and depth or 0)
 		local name = name or 'add'
 		self.relative = true
 		ease(self, depth, name)
@@ -137,7 +138,7 @@
 	end
 	
 	function set(self, depth, name)
-		local depth = 1 + (depth or 0)
+		local depth = 1 + (type(depth) == 'number' and depth or 0)
 		local a, b, i = 0, instant, 2
 		while a do
 			a, self[i] = self[i], a
@@ -185,8 +186,8 @@
 	local funcs = {n = 0}
 	
 	function func(self, depth, name)
-		local depth = 1 + (depth or 0)
 		local name = name or 'func'
+		local depth = 1 + (type(depth) == 'number' and depth or 0)
 		if type(self) ~= 'table' then
 			screen_error('curly braces expected', depth, name)
 			return func
@@ -227,8 +228,7 @@
 	end
 	
 	function on_command(self)
-		
-		local mt = {}
+				local mt = {}
 		 function mt.__index(self, k)
 			self[k] = setmetatable({}, mt)
 			return self[k]
@@ -246,7 +246,7 @@
 				end
 			end
 			local name = actor:GetName()
-			if name ~= '' then
+			if name and name ~= '' then
 				push(list, actor)
 				local n = code.n
 				code[n + 1], code[n + 2], code[n + 3], code[n + 4], code[n + 5] = '\tactors.', name, ' = list[', list.n, ']\n'
