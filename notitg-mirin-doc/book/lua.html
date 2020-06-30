@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Getting Started</a></li><li class="expanded "><a href="lua.html" class="active"><strong aria-hidden="true">2.</strong> Lua Functions</a></li><li class="expanded "><a href="xml.html"><strong aria-hidden="true">3.</strong> XML Features</a></li><li class="expanded "><a href="eases.html"><strong aria-hidden="true">4.</strong> Built in Eases</a></li><li class="expanded "><a href="vars.html"><strong aria-hidden="true">5.</strong> Variables</a></li><li class="expanded "><a href="plugins.html"><strong aria-hidden="true">6.</strong> Plugins</a></li><li class="expanded "><a href="appendix_a.html"><strong aria-hidden="true">7.</strong> Appendix</a></li><li class="expanded "><a href="debug.html"><strong aria-hidden="true">8.</strong> Debug</a></li></ol>
+                <ol class="chapter"><li class="expanded "><a href="lua.html" class="active"><strong aria-hidden="true">1.</strong> Lua Functions</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -148,38 +148,70 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#lua-functions" id="lua-functions">Lua Functions</a></h1>
-<p>Lua code allows you to control the behavior of mods and actors in your modfile. In the Mirin Template, you can write your Lua code in the file <code>lua/mods.xml</code>. Look for the comment: <code>-- your lua code here</code> to find the location for you to write code. There are two main lua functions provided by the Mirin Template: <code>ease</code> and <code>func</code>.</p>
-<h2><a class="header" href="#eases" id="eases">Eases</a></h2>
-<p>In the Mirin Template, mods are controlled through eases, which are transitions that change the value of mods. Unless otherwise specified, mods will keep the value that was prevously assigned to them. Because of this, if you want a mod to be on for a certain range of time, you need to put two ease transitions; one to turn the mod &quot;on&quot; at the beginning, and one to turn the mod &quot;off&quot; at the end.</p>
-<h3><a class="header" href="#differences-from-other-templates" id="differences-from-other-templates">Differences from other Templates</a></h3>
-<p>If you're coming from other templates, eases work slightly differently here. In other templates, it is common to see ease systems come with sustain times. This template is different because there are <strong>no sustain times</strong>. The Mirin Template automatically holds mods at the specified values until the next ease transition, which means that you don't have to worry about mods reverting to <code>0%</code> without you telling them to. This makes the Mirin Template work more like <code>.crs</code> files, and less like templates which rely on the <code>clearall</code> mod.</p>
-<p>In other templates, there's usually another way to more directly affect the values of mods, known as the mods table. This template differs from other templates in that there is <strong>no mods table</strong>. If you want a mod to transition linearly, you can use the <code>linear</code> ease, and if you want a mod to transition instantly, you can use the <code>instant</code> ease, or set the length of the transition to <code>0</code> beats.</p>
-<h3><a class="header" href="#transitioning-a-mod-with-the-ease-function" id="transitioning-a-mod-with-the-ease-function">Transitioning a Mod with the <code>ease</code> Function</a></h3>
-<p>The basic format for an ease entry is <code>ease {beat, length, func, percent, 'mod'}</code>.
-For example, to ease <code>rotationz</code> to <code>360%</code> on beat <code>5</code>, you would write:</p>
-<pre><code class="language-lua">ease {5, 1, outCirc, 360, 'rotationz'}
-</code></pre>
-<p>Let's break that down:</p>
+                        <p>DATE:    April 24, 2020</p>
+<p>TO:    Professor Fagelson</p>
+<p>FROM:    Timothy Bertotti</p>
+<p>SUBJECT:    Technical Description</p>
+<blockquote>
+<p>Disclaimer: I am aware this isn't in ECE Style guide, but I am using a program (mdbook) to render this document. I need to use this software so that the documentation can be put to use in the real world.</p>
+</blockquote>
+<h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
+<p>This technical description describes the Lua interface for the Mirin Template, which is middleware that wraps on top of the video game NotITG.</p>
+<h1><a class="header" href="#context" id="context">Context</a></h1>
+<p>NotITG is a computer version of Dance Dance Revolution with some features to create &quot;modded&quot; songs: songs with visual effects that make it more difficult to read the screen and tell what to do. Here's an example of a &quot;modded&quot; file: <a href="https://www.youtube.com/watch?v=fqf_n6sXmwk">https://www.youtube.com/watch?v=fqf_n6sXmwk</a>. NotITG only provides relatively low-level access for controlling what's being displayed on the screen. This technical report describes the interface to the Mirin Template, which wraps on top of the low-level NotITG Mods API to provide a system to smoothly animate game objects in sync with a song.</p>
+<p>Some vocabulary that is specific to this video game:</p>
 <ul>
-<li>The first item, <code>5</code>, tells the game which beat to start the transition.</li>
-<li>The second item, <code>1</code>, tells the game how many beats the transition will take. A bigger number makes the transition take longer, while a smaller number will make the transition faster. If this number is <code>0</code> or negative, the transition will be completed instantly.</li>
-<li>The third item, <code>outCirc</code>, tells the game which type of transition to use. Note that this item doesn't have <code>'</code> marks. The list of functions you can use as eases is in the <a href="./eases.html">Built-in Eases</a> section.</li>
-<li>The fourth item, <code>360</code>, is the percentage that the mod will end up on.</li>
-<li>The fifth item, <code>'rotationz'</code>, tells the game which property to transition. If the property you want to ease is a mod, then you <em>must</em> use <code>'</code> marks.</li>
+<li>&quot;mod&quot; (short for modifier): a &quot;mod&quot; is a parameter that can be tweaked over time to animate game objects. These are always continuous numbers. Mods don't just have &quot;on&quot; or &quot;off&quot; states, but a continuous number line of valid states.</li>
+<li>&quot;beat&quot;: because this game is a musical game, time is measured by song beats instead of by seconds. This makes it easier to design effects that sync with the song. </li>
+<li>&quot;modfile&quot;/&quot;file&quot;: One modder-created section of the game that corresponds to one song. The Mirin Template is a template to help create these files. A modfile uses mods to animate the player and other actors on the screen to create a visually interesting and fun-to-play song.</li>
+<li>&quot;player&quot;: The &quot;player&quot; is the in-game playfield, not the actual person playing the game. This is the convention used in the source code of the game, so this document follows the naming convention, even though it is slightly confusing.
+This vocabulary is already going to be known by people who experiment around with modfiles enough to want to make their own. I would be very surprised if a target-audience reader isn't familiar with all of these terms.</li>
 </ul>
-<p>Ease lets you put multiple entries in once call.
-So, if you want the player to rotate back to <code>0%</code>, you would write:</p>
+<blockquote>
+<p>For the technical report assignment, only the Lua Interface documentation is included. This document does not cover the entirety of the Mirin Template's API; it only covers the <code>ease</code> function. The full (but unrevised) version can be found at <a href="https://github.com/XeroOl/notitg-mirin/blob/master/notitg-mirin-doc/src/SUMMARY.md">https://github.com/XeroOl/notitg-mirin/blob/master/notitg-mirin-doc/src/SUMMARY.md</a>.</p>
+</blockquote>
+<h2><a class="header" href="#eases" id="eases">Eases</a></h2>
+<p>In the Mirin Template, mods are controlled through eases, which are transitions that change the value of mods. Lua code allows these eases to be created and played back by the game. Multiple eases can be scheduled to happen at the same time, allowing for interesting and complex movements to be created.</p>
+<h3><a class="header" href="#differences-from-previous-systems" id="differences-from-previous-systems">Differences from previous systems</a></h3>
+<p>An important concept to note is that eases only control the <em>transitions</em>. The Mirin Template automatically holds mods at their previous value until the next ease transition. Eases don't mark the entire time the mods are active, but only when the mods are <em>changing</em>. Because of this, if a mod needs to be enabled for a certain range of time, two eases are necessary: one ease to enable the mod, and another to disable it. Nothing needs to be specified to keep the mod enabled between these two eases.</p>
+<h3><a class="header" href="#transitioning-a-mod-with-the-ease-function" id="transitioning-a-mod-with-the-ease-function">Transitioning a Mod with the <code>ease</code> Function</a></h3>
+<p>An ease has 5 required properties that need to be specified. Additionally, there are two named optional arguments that aren't necessary by default.</p>
+<pre><code class="language-lua">ease {start, lenth, ease_fn, percent, modifier, plr = plr, mode = mode}
+</code></pre>
+<h4><a class="header" href="#required-properties" id="required-properties">Required Properties</a></h4>
+<p>The required properties are <code>start</code>, <code>length</code>, <code>ease_fn</code>, <code>percent</code>, and <code>modifier</code>. They must be specified in this order in each ease.</p>
+<ul>
+<li><code>start</code>: The first property that needs to be specified is the <code>start</code> beat. The ease is scheduled to activate at the <code>start</code> beat.</li>
+<li><code>length</code>: The second property is the <code>length</code>. This value is also measured in beats, but it is relative to the start beat. The <code>length</code> specifies how long the ease will take to complete its transition. A larger <code>length</code> will create a slower transition that is spread out further over time.</li>
+<li><code>ease_fn</code>: The third property is the ease function, or <code>ease_fn</code>. This is the actual transition that is used to change the mod. For example, the <code>linear</code> ease function will make the mod slide linearly from its previous value to the target value.</li>
+<li><code>percent</code>: The fourth property is the target <code>percent</code>. This is the value that the mod will be at when the transition is over. An ease doesn't store the initial value of a mod, only its target value. The initial value is assumed to be the target <code>percent</code> from the previous ease transition, or 0 if the ease is the first in the timeline.</li>
+<li><code>modifier</code>: The fifth property is the <code>modifier</code>, or the specific mod that this ease will change. For example, specifying <code>'drunk'</code> will mean that the ease will change the <code>drunk</code> modifier.</li>
+</ul>
+<h4><a class="header" href="#optional-properties" id="optional-properties">Optional Properties</a></h4>
+<p>The optional properties are <code>plr</code> and <code>mode</code>. These are named arguments, so the order they appear in doesn't matter.</p>
+<ul>
+<li><code>plr</code>: The <code>plr</code> argument specifies which player the ease affects. For example, <code>plr = 1</code> will target player 1, and <code>plr = {1, 3}</code> will target players 1 and 3. If left unspecified, it will attempt to read the <code>plr</code> variable from the environment, and if that fails, it will default to <code>{1, 2}</code>.</li>
+<li><code>mode</code>: Sometimes, it is easier to choose a start and end beat for the transition, instead of describing the ease by start and length. If the <code>mode</code> is set to <code>'end'</code>, the ease will interpret the second property to mean the end beat of the transition instead of the length of the transition. This argument is never necessary and is only provided for convenience to make some calculations simpler.</li>
+</ul>
+<pre><code class="language-lua">-- an example with only the main properties
+-- starting on beat 5, for 1 beat, change the 'rotationz' modifier to 360
+ease {5, 1, outCirc, 360, 'rotationz'}
+
+-- an example with all of the extra properties
+-- from beats 10 to 11, change the 'bumpy' modifier to 1000%
+ease {10, 11, linear, 1000, 'bumpy', mode = 'end', plr = 1}
+</code></pre>
+<p>Note that the optional arguments are specified by name.</p>
+<h3><a class="header" href="#shorthand-syntax-sugar-for-eases" id="shorthand-syntax-sugar-for-eases">Shorthand Syntax Sugar for Eases</a></h3>
+<p>Because eases are used so often, there is some shorthand to make writing many eases more simple.</p>
+<h4><a class="header" href="#chain-calls" id="chain-calls">Chain Calls</a></h4>
+<p>Multiple eases can be specified after writing the word <code>ease</code> once. This is called a chain call, because it calls the ease function with each of the eases, and only works if the eases are in a chain, ie. no other code appears in between the eases. </p>
 <pre><code class="language-lua">ease
-{5, 1, outCirc, 100, 'invert'}
-{6, 1, outCirc, 0, 'invert'}
+{5, 1, outCirc, 360, 'rotationz'}
+{6, 1, outCirc, 0, 'rotationz'}
 </code></pre>
-<p>Now, the players rotate back to <code>0%</code> on beat <code>6</code>. In the example above, there are two listed transitions, but you can actually put as many as you want in a row. One important difference between this format and other templates is that there is no comma after each line. This is because <code>ease</code> is a function, not a table.</p>
-<p>You can also ease multiple mods on the same line. If the mods you're easing all start at the same beat, last the same amount of time, and use the same transition function, they combine together nicely:</p>
-<pre><code class="language-lua">ease {5, 1, outCirc, 360, 'rotationz', -628, 'confusionoffset'}
-</code></pre>
-<p>This code will set <code>rotationz</code> to <code>360</code> <strong>and</strong> set <code>confusionoffset</code> to <code>-628</code>, where both the transitions share the same properties.</p>
-<p>The <code>ease</code> function doesn't just let you put two mods in an entry. In fact, you can add as many mods as you want in one entry:</p>
+<h4><a class="header" href="#multiple-mods" id="multiple-mods">Multiple Mods</a></h4>
+<p>If multiple mods need to be changed at the same time, multiple target/modifier pairs can be specified in an ease. Here is an example that affects many mods with only one ease:</p>
 <pre><code class="language-lua">ease {5, 3, linear,
     30, 'bumpy',
 	10, 'dizzy',
@@ -189,47 +221,30 @@ So, if you want the player to rotate back to <code>0%</code>, you would write:</
 	100, 'drunk',
 }
 </code></pre>
-<p>As you can see, the above code changes many mods starting on beat <code>5</code>.</p>
-<h3><a class="header" href="#player-specific-eases" id="player-specific-eases">Player Specific Eases</a></h3>
-<p>If you've been following along yourself, you should have noticed that all of the above examples affect both the players by default. However, sometimes, you want different mods to be applied to different players. In order to do that, you just need to set a variable called <code>plr</code>.</p>
-<p>For example, if you want Player 1 to get the <code>drunk</code> effect on beat 10, you would write something like this:</p>
-<pre><code class="language-lua">ease {10, 2, outQuad, 100, 'drunk', plr = 1}
-</code></pre>
-<p>Now, on beat 10, player 1 will become drunk. The important syntax here is the <code>plr =</code> at the end. This tells <code>ease</code> to only apply it to Player 1. Of course, if you write <code>plr = 2</code>, then it will apply to Player 2 instead.</p>
-<p>You can add use this to change any ease transition to target a specific player.</p>
-<h3><a class="header" href="#advanced-player-specific-eases" id="advanced-player-specific-eases">Advanced Player Specific Eases</a></h3>
-<p>Internally within NotITG, there are actually eight players, not just two. Because of this, if you're using more than two players in a file, you might encounter a situation where want to apply eases on more than one player at once, but not all the players. In order to do this, you set <code>plr</code> to a table of player numbers.</p>
-<p>For example, if you wanted to apply the <code>drunk</code> effect to all of the odd-numbered players, you could write:</p>
-<pre><code class="language-lua">ease {10, 2, outQuad, 100, 'drunk', plr = {1, 3, 5, 7}}
-</code></pre>
-<p>If you're following along with the template, you'll notice that you can only see Player 1 become drunk. In order to see the effect of this example on the other players, you'd first need to enable Players 3, 5, and 7.</p>
-<p>If you want to set the <code>plr</code> on many ease transitions in a row, it can get inconvenient pretty quickly. Luckily, there's an easy way to affect multiple ease transitions all at once. You can change the global <code>plr</code> before you call to <code>ease</code>:</p>
+<p>This form is only useful when multiple mods need to be changed in exactly the same way. Each target/modifier pair is eased separately.</p>
+<h4><a class="header" href="#shorthand-for-plr" id="shorthand-for-plr">Shorthand for <code>plr</code></a></h4>
+<p>The <code>plr</code> argument to eases acts differently from other arguments because if unspecified, it will check for a <code>plr</code> global variable. This is useful if many eases in sequence need to use special player numbers.
+Here is an example of some eases that all affect player 1 only:</p>
 <pre><code class="language-lua">plr = 1
-ease
-{10, 2, inExpo, 250, 'movex'}
-{10, 2, linear, 100, 'drunk'}
-
-plr = 2
-ease
-{10, 2, outExpo, -250, 'movex'}
-{10, 2, linear, -100, 'drunk'}
-
--- Putting an inline `plr` overrides the global `plr`
-{15, 0, instant, 100, 'flip', plr = 1}
-
--- Set plr back to normal
+ease {0, 1, linear, 100, 'reverse'}
+ease {1, 1, linear, 0, 'reverse'}
+ease {2, 1, linear, 100, 'reverse'}
+ease {3, 1, linear, 0, 'reverse'}
+ease {4, 1, linear, 100, 'reverse'}
+-- reset the player to normal so later eases won't be affected
 plr = nil
 </code></pre>
-<p>Now, the effects are applied to their respective players.</p>
-<p>By default, without the <code>plr</code> global set, the template uses the plr <code>{1, 2}</code>, which means that ease transitions without a specified <code>plr</code> will affect both the players.</p>
-<p>This form is convenient for when there is a helper function that you want to call. For example, if you have a function that runs a specific set of eases:</p>
+<p>This only works if the <em>global</em> <code>plr</code> is set. It is recommended that <code>pn</code> is used for local variables that refer to the player number so that the <em>global</em> <code>plr</code> can remain in scope. The optional argument will take precedence over the global if both are set.</p>
+<p>By default, if the <code>plr</code> global isn't present, the function acts on <code>{1, 2}</code>, which means that ease transitions without a specified <code>plr</code> will affect both the players.
+This way to pass the <code>plr</code> argument is especially convenient for writing and using helper functions.</p>
+<p>Here is an example helper function:</p>
 <pre><code class="language-lua">local function wiggle_around(beat)
 	ease
 	{beat, 1, pop, 100, 'drunk'}
 	{beat, 1, tap, 100, 'tipsy'}
 end
 </code></pre>
-<p>Then, you can control which players it affects:</p>
+<p>By default, this function affects both players, because the player number isn't specified in either of its eases. However, the caller can specify a player number using the <code>plr</code> global trick:</p>
 <pre><code class="language-lua">-- control which player is affected:
 plr = 1
 wiggle_around(10)
@@ -237,194 +252,24 @@ wiggle_around(10)
 plr = 2
 wiggle_around(20)
 
+-- reset so that future eases aren't affected
 plr = nil
 </code></pre>
-<p>As you can see, the <code>plr</code> global isn't just shorthand for putting the <code>plr</code> in each line; It is also extremely helpful because you can write helper functions that automatically support being applied to a specific player.</p>
-<p>Sometimes, instead of calculating the length of a transition, it is more natural to just mark the start and end beats of the transition. Luckily, there's a way to make <code>ease</code> accept end beats instead of lengths. If you add in <code>mode = 'end'</code> or <code>m=e</code> somewhere in the table, the 2nd number will be treated as an end beat instead of a length.</p>
-<pre><code class="language-lua">ease
--- `mode = 'end'` makes this one last 1 beat instead of 21.
-{20, 21, mode = 'end', outCirc, 100, 'invert'}
-
--- `m=e` is just shorthand for `mode = 'end'`.
--- It has the same effect as in the previous example,
--- which means that this effect lasts from beat 21 to 22.
-{21, 22, m=e, outCirc, 0, 'invert'}
-</code></pre>
-<h3><a class="header" href="#setting-the-speed-mod-with-ease" id="setting-the-speed-mod-with-ease">Setting the speed mod with <code>ease</code></a></h3>
-<p>Usually, when you make a modfile, you want to specify the speed mod that the game runs at. With the Mirin Template, there is a special mod that you can use to change the speed mod: <code>xmod</code>.</p>
+<p>This <code>plr</code> shorthand means that helper functions can be applied to specific players without the need for an explicit player argument to be passed around.</p>
+<h4><a class="header" href="#shorthand-for-mode" id="shorthand-for-mode">Shorthand for <code>mode</code></a></h4>
+<p>Instead of writing <code>mode = 'end'</code>, adding <code>m=e</code> does the same thing, but is shorter to type. Unlike <code>plr</code>, there is no global variable check for <code>mode</code>.</p>
+<h3><a class="header" href="#special-case-for-speed-mod" id="special-case-for-speed-mod">Special Case for Speed Mod</a></h3>
+<p>The speed-mod is a special modifier because there is no natural modifier name to assign to it, but the Mirin Template gets around that by using the name <code>xmod</code> to describe the X-Mod, and <code>cmod</code> to describe the C-Mod. This gets around the irregular format that NotITG uses to normally represent the X-Mod and C-Mod.</p>
 <pre><code class="language-lua">-- set the speed mod to 3x
 ease {0, 0, instant, 3, 'xmod'}
 </code></pre>
-<h3><a class="header" href="#function-eases" id="function-eases">Function Eases</a></h3>
-<p>Function eases are for when you want something to ease that isn't a mod. To use function eases, you provide a function instead of the name of a mod. Your function's signature has to be one of these:</p>
-<ul>
-<li><code>(float percent, int pn) =&gt; (nil)</code></li>
-<li><code>(float percent, int pn) =&gt; (string)</code></li>
-</ul>
-<pre><code class="language-xml">&lt;Layer
-	Type = &quot;Quad&quot;
-	OnCommand = &quot;zoomto,50,50;xy,SCREEN_CENTER_X,SCREEN_CENTER_Y&quot;
-	Name = &quot;my_quad&quot;
-/&gt;
-</code></pre>
-<pre><code class="language-lua">-- create a function to change the x position of the quad
-local function quad_x(percent, pn)
-	if pn == 1 then
-		my_quad:x(percent)
-	end
-end
-
--- make the quad start at the center
-ease {0, 0, instant, scx, quad_x}
-
--- On beat 10, change to scx / 2.
-{10, 5, outExpo, scx / 2, quad_x}
-</code></pre>
-<h3><a class="header" href="#aliases-and-the-alias-function" id="aliases-and-the-alias-function">Aliases and the <code>alias</code> function</a></h3>
-<p>Sometimes, it is easier to give a string name to your functions, so that you can ease them just like other mods. In order to do that, this template has a function called <code>alias</code>. This function lets you assign a name to a mod. So, if you have a function ease, you can assign it a name:</p>
-<pre><code class="language-lua">local function my_function_ease(percent, pn)
-	--[[ ... ]]
-end
-
-alias('custom_name', my_function_ease)
-</code></pre>
-<p>You can use either curly braces <code>{}</code>, or parentheses <code>()</code> for <code>alias</code>. If you use curly braces <code>{}</code>, then you can chain calls to alias like you can with the other functions.</p>
-<p>Then, whenever you want to ease the function, you can use its name instead:</p>
-<pre><code class="language-lua">ease {0, 0, instant, 100, 'custom_name'}
-</code></pre>
-<p>The alias also lets you use the new name to index into <code>poptions</code> in a perframe. We'll cover perframes later in this document.</p>
-<p>Aliases aren't only for function eases: Sometimes, there's two names for the same mod, and you want to use both names interchangeably to refer to the same mod.</p>
-<pre><code class="language-lua">alias('longboy', 'longholds')
-</code></pre>
-<p>There's one more use for <code>alias</code>. Sometimes, when working with perframes, it's nice to have a value to ease that is only meant to be read from perframes. If you've done modding before, you might have heard of &quot;aux vars&quot;. The idea is that you want a value that you can apply eases to that you can read back from later. If you don't provide a second argument to <code>alias</code>, then you get a dummy value that you can read from perframes later. Check the documentation of perframes for an example use of this.</p>
-<pre><code class="language-lua">alias('my_mod_name')
-alias('custom_mod')
-alias('my_aux_var')
-</code></pre>
-<h3><a class="header" href="#instant-eases-and-the-set-function" id="instant-eases-and-the-set-function">Instant Eases and the <code>set</code> Function</a></h3>
-<p>TODO</p>
-<h3><a class="header" href="#relative-eases-and-the-add-function" id="relative-eases-and-the-add-function">Relative Eases and the <code>add</code> Function</a></h3>
-<p>The function <code>ease</code> has a sister function, called <code>add</code>. This other function works exactly the same as <code>ease</code>, except for one important difference: Any percentages used with <code>add</code> are interpreted as offsets to the current percent. This is important because it is different behavior than <code>ease</code>, where percentages are interpreted as target percentages. Here's an example of some code that uses <code>add</code>:</p>
-<pre><code class="language-lua">add
--- turn on invert
-{20, 1, outExpo, 100, 'invert'}
--- with `add`, you have to subtract 100 to bring invert back down to 0.
-{22, 1, outExpo, -100, 'invert'}
-
-
--- add is useful for rotations, where you want to add an amount over and over.
--- spin once
-{24, 1, outExpo, 360, 'rotationz'}
--- spin again
-{25, 1, outExpo, 360, 'rotationz'}
--- spin for a third time
-{26, 1, outExpo, 360, 'rotationz'}
--- After beat 27, rotationz is at 360 * 3, aka 1080.
-</code></pre>
-<p>As you can see, the syntax is very similar to <code>ease</code>. Note that we used <code>-100</code> to turn off <code>invert</code>, instead of using <code>0</code>.</p>
-<h3><a class="header" href="#example-with-a-transient-ease" id="example-with-a-transient-ease">Example with a Transient Ease</a></h3>
-<p>Transient Eases are a type of ease function that doesn't actually permenantly change the percentage of a mod; it only makes the change temporarily. An example of such an ease function is the <code>pop</code> ease. You can see the full list of which ease functions are marked as <code>transient</code> on the <a href="easing.html">List of Built in Eases</a>.</p>
-<pre><code class="language-lua">ease
-{30, 1, pop, -500, 'tiny'}
-</code></pre>
-<p>If you're not sure what I'm trying to show here, try testing this in your game. You should notice that unlike all the previous examples, even though the transition specifies <code>-1000</code>, the game doesn't leave the <code>tiny</code> mod on.</p>
-<h3><a class="header" href="#example-with-overlapped-eases" id="example-with-overlapped-eases">Example with Overlapped Eases</a></h3>
-<pre><code class="language-lua">add
-{0, 3, outExpo, 100, 'invert'}
-{2, 3, outExpo, -100, 'invert'}
-</code></pre>
-<p>These two ease lines might seem like a mistake at first, but they actually demonstrate one of the most advanced features of this template. The reason they appear to be a mistake is that the ranges of beats overlap: The first line ends on beat 3, but the second line starts on beat 2. Which one will actually get to set the <code>invert</code> mod? It's a trick question: Both the lines share the invert mod at the same time! The two transitions blend together into one clean motion that incorporates everything. The template doesn't just work with two lines: no matter how many eases are happening at the same time, the template will be able to play them all at the same time. Play around with overlapping effects and see what you can do. This feature makes it easy to have good looking eases where the transitions blend into eachother, making one smooth motion. This feature works with both <code>ease</code> and <code>add</code>, or any combination of the two, so try it out!</p>
-<h3><a class="header" href="#making-your-own-ease-function" id="making-your-own-ease-function">Making Your Own Ease Function</a></h3>
-<p>Although the Mirin Template has a decent collection of <a href="easing.html">Built in Eases</a>, you can also make your own ease transitions. Eases are just lua functions take in a number from 0 to 1, and output a number from 0 to 1. For example, <code>inQuad</code> is defined as:</p>
-<pre><code class="language-lua">function inQuad(t) return t * t end
-</code></pre>
-<p>So, instead of writing <code>inQuad</code> in an ease, you could write an ease with a function instead:</p>
-<pre><code class="language-lua">ease {0, 1, function(t) return t * t end, 100, 'bumpy'}
-</code></pre>
-<p>The template will determine if the ease is transient by checking <code>fn(1) &lt;= 0.5</code>.</p>
-<h3><a class="header" href="#scheduled-functions-aka-mod-actions" id="scheduled-functions-aka-mod-actions">Scheduled Functions (aka. Mod Actions)</a></h3>
-<p>Sometimes, you want code to run at a certain beat during a file. To do this, you need to schedule a function. The basic format for a scheduled function is <code>func {beat, fn}</code>. For example, if you want to have a system message play at beat 50, you could write this code:</p>
-<pre><code class="language-lua">func {50, function(beat)
-	SCREENMAN:SystemMessage 'Hello World!'
-end}
-</code></pre>
-<p>If you start the file in the editor some time past the given beat, the template will play the scheduled function in an attempt to catch up the game. If you don't want this to happen, you can check the <code>beat</code> that's passed in to see if its near the expected value before you run the code in the scheduled function.</p>
-<h3><a class="header" href="#perframes-and-applying-mods-from-perframes" id="perframes-and-applying-mods-from-perframes">Perframes and Applying Mods from Perframes</a></h3>
-<p>Perframes are functions that get called every frame. The basic form for a perframe is <code>func {beat, len, fn}</code>.
-For example, if you want to use a perframe to make a blacksphere effect.</p>
-<pre><code class="language-lua">func {32, 64, function(beat, poptions)
-
-	-- I want to know how long this perframe has been going,
-	-- so I subtract 32 from the current beat
-	local time_since_start = beat - 32
-	
-	-- I want my invert effect to apply on both the players
-	for pn = 1, 2 do
-		
-		-- set the amount of invert for the player
-		poptions[pn].drunk = 50 - 50 * math.cos(time_since_start * math.pi)
-		
-	end
-	
-end}
-</code></pre>
-<p>Poptions acts like a temporary table that is rebuilt every frame. Each frame, the template follows 4 steps:</p>
-<ol>
-<li>Run the eases to figure out what values every mod has.</li>
-<li>Run any scheduled functions for the beat.</li>
-<li>Run all the perframes that are currently active.</li>
-<li>Find which mods changed, serialize them, and apply to the game. Function eases are also evaluated during this step.</li>
-</ol>
-<p>The poptions table's values are set in step 1, then modified in step 3, and then written to the game in step 4.</p>
-<p>One important thing is that you can also read the <code>poptions</code> table. Getting the current mod values is extremely helpful because you can use mods to signal the perframe and tell it what to do, instead of just making a formula based on the beat. The <code>poptions</code> table lets you see what values of mods the template is about to apply, and tweak them before they are serialized into the game.</p>
-<h3><a class="header" href="#advanced-uses-of-perframes" id="advanced-uses-of-perframes">Advanced uses of Perframes.</a></h3>
-<p>Here's an example that also reads from <code>poptions</code>:</p>
-<pre><code class="language-lua">local sin, cos, pi = math.sin, math.cos, math.pi
-
--- tell the template that the mod 'blacksphere' isn't real
-alias {'blacksphere'}
-
--- Make a perframe that lasts for the entire file.
-func {0, 9e9, function(beat, poptions)
-	
-	-- For all the players:
-	for pn = 1, max_pn do
-		
-		-- Read the mod 'blacksphere' from the poptions table.
-		local b = poptions[pn][blacksphere].blacksphere / 100
-		
-		-- Calculate the cosine and sine of the percentage that
-		-- was applied. Fast calcuation path if set to 0%
-		local c = b == 0 and 1 or cos(b * pi)
-		local s = b == 0 and 0 or sin(b * pi)
-		
-		-- Apply mods to the players every frame through poptions
-		poptions[pn].invert = poptions[pn].invert + 50 - 50 * c
-		poptions[pn].reverse = poptions[pn].reverse + 12.5 * s
-		poptions[pn].alternate = poptions[pn].alternate + 25 * s
-		
-	end
-	
-	-- defer = true makes this perframe run after others, so other
-	-- perframes can act as if there is a mod named 'blacksphere'
-end, defer = true}
-</code></pre>
-<p>You can also use <code>mode = 'end'</code> for <code>func</code>.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="overview.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                                <i class="fa fa-angle-left"></i>
-                            </a>
-                        
 
-                        
-                            <a rel="next" href="xml.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -434,15 +279,7 @@ end, defer = true}
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a href="overview.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
-                        <i class="fa fa-angle-left"></i>
-                    </a>
-                
 
-                
-                    <a href="xml.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
                 
             </nav>
 

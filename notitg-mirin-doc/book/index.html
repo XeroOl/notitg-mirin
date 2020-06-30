@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Getting Started - The Mirin Template</title>
+        <title>Lua Functions - The Mirin Template</title>
         
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded "><a href="overview.html"><strong aria-hidden="true">1.</strong> Getting Started</a></li><li class="expanded "><a href="lua.html"><strong aria-hidden="true">2.</strong> Lua Functions</a></li><li class="expanded "><a href="xml.html"><strong aria-hidden="true">3.</strong> XML Features</a></li><li class="expanded "><a href="eases.html"><strong aria-hidden="true">4.</strong> Built in Eases</a></li><li class="expanded "><a href="vars.html"><strong aria-hidden="true">5.</strong> Variables</a></li><li class="expanded "><a href="plugins.html"><strong aria-hidden="true">6.</strong> Plugins</a></li><li class="expanded "><a href="appendix_a.html"><strong aria-hidden="true">7.</strong> Appendix</a></li><li class="expanded "><a href="debug.html"><strong aria-hidden="true">8.</strong> Debug</a></li></ol>
+                <ol class="chapter"><li class="expanded "><a href="lua.html"><strong aria-hidden="true">1.</strong> Lua Functions</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -148,17 +148,121 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#getting-started" id="getting-started">Getting Started</a></h1>
-<p>This book is an overview for how to use the Mirin Template. It will cover all of the features of the Mirin Template with examples. This chapter will describe how to use the template to create a new file, and how to add the template to an existing file. Future chapters will cover how to use the template once you have a file prepared.</p>
-<h2><a class="header" href="#making-a-new-file" id="making-a-new-file">Making a New File</a></h2>
-<p>Unzip the template and it should work out of the box. Change the contents of the <code>.sm</code> to set the metadata of the song, and replace the audio with your own song.</p>
-<h2><a class="header" href="#add-to-an-existing-simfile" id="add-to-an-existing-simfile">Add to an Existing Simfile</a></h2>
-<p>Unzip the template into your song's directory. Delete <code>Song.sm</code> and <code>Song.ogg</code>, and instead modify your <code>.sm</code> file so that <code>FGCHANGES</code> is set to the following value:</p>
-<pre><code>//The majority of simfile scripts and visual effects are stored here.
-#FGCHANGES:0.000=template/main.xml=1.000=0=0=1=====,
-;
+                        <p>DATE:    April 24, 2020</p>
+<p>TO:    Professor Fagelson</p>
+<p>FROM:    Timothy Bertotti</p>
+<p>SUBJECT:    Technical Description</p>
+<blockquote>
+<p>Disclaimer: I am aware this isn't in ECE Style guide, but I am using a program (mdbook) to render this document. I need to use this software so that the documentation can be put to use in the real world.</p>
+</blockquote>
+<h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
+<p>This technical description describes the Lua interface for the Mirin Template, which is middleware that wraps on top of the video game NotITG.</p>
+<h1><a class="header" href="#context" id="context">Context</a></h1>
+<p>NotITG is a computer version of Dance Dance Revolution with some features to create &quot;modded&quot; songs: songs with visual effects that make it more difficult to read the screen and tell what to do. Here's an example of a &quot;modded&quot; file: <a href="https://www.youtube.com/watch?v=fqf_n6sXmwk">https://www.youtube.com/watch?v=fqf_n6sXmwk</a>. NotITG only provides relatively low-level access for controlling what's being displayed on the screen. This technical report describes the interface to the Mirin Template, which wraps on top of the low-level NotITG Mods API to provide a system to smoothly animate game objects in sync with a song.</p>
+<p>Some vocabulary that is specific to this video game:</p>
+<ul>
+<li>&quot;mod&quot; (short for modifier): a &quot;mod&quot; is a parameter that can be tweaked over time to animate game objects. These are always continuous numbers. Mods don't just have &quot;on&quot; or &quot;off&quot; states, but a continuous number line of valid states.</li>
+<li>&quot;beat&quot;: because this game is a musical game, time is measured by song beats instead of by seconds. This makes it easier to design effects that sync with the song. </li>
+<li>&quot;modfile&quot;/&quot;file&quot;: One modder-created section of the game that corresponds to one song. The Mirin Template is a template to help create these files. A modfile uses mods to animate the player and other actors on the screen to create a visually interesting and fun-to-play song.</li>
+<li>&quot;player&quot;: The &quot;player&quot; is the in-game playfield, not the actual person playing the game. This is the convention used in the source code of the game, so this document follows the naming convention, even though it is slightly confusing.
+This vocabulary is already going to be known by people who experiment around with modfiles enough to want to make their own. I would be very surprised if a target-audience reader isn't familiar with all of these terms.</li>
+</ul>
+<blockquote>
+<p>For the technical report assignment, only the Lua Interface documentation is included. This document does not cover the entirety of the Mirin Template's API; it only covers the <code>ease</code> function. The full (but unrevised) version can be found at <a href="https://github.com/XeroOl/notitg-mirin/blob/master/notitg-mirin-doc/src/SUMMARY.md">https://github.com/XeroOl/notitg-mirin/blob/master/notitg-mirin-doc/src/SUMMARY.md</a>.</p>
+</blockquote>
+<h2><a class="header" href="#eases" id="eases">Eases</a></h2>
+<p>In the Mirin Template, mods are controlled through eases, which are transitions that change the value of mods. Lua code allows these eases to be created and played back by the game. Multiple eases can be scheduled to happen at the same time, allowing for interesting and complex movements to be created.</p>
+<h3><a class="header" href="#differences-from-previous-systems" id="differences-from-previous-systems">Differences from previous systems</a></h3>
+<p>An important concept to note is that eases only control the <em>transitions</em>. The Mirin Template automatically holds mods at their previous value until the next ease transition. Eases don't mark the entire time the mods are active, but only when the mods are <em>changing</em>. Because of this, if a mod needs to be enabled for a certain range of time, two eases are necessary: one ease to enable the mod, and another to disable it. Nothing needs to be specified to keep the mod enabled between these two eases.</p>
+<h3><a class="header" href="#transitioning-a-mod-with-the-ease-function" id="transitioning-a-mod-with-the-ease-function">Transitioning a Mod with the <code>ease</code> Function</a></h3>
+<p>An ease has 5 required properties that need to be specified. Additionally, there are two named optional arguments that aren't necessary by default.</p>
+<pre><code class="language-lua">ease {start, lenth, ease_fn, percent, modifier, plr = plr, mode = mode}
 </code></pre>
-<p>That's it! You're ready to get started!</p>
+<h4><a class="header" href="#required-properties" id="required-properties">Required Properties</a></h4>
+<p>The required properties are <code>start</code>, <code>length</code>, <code>ease_fn</code>, <code>percent</code>, and <code>modifier</code>. They must be specified in this order in each ease.</p>
+<ul>
+<li><code>start</code>: The first property that needs to be specified is the <code>start</code> beat. The ease is scheduled to activate at the <code>start</code> beat.</li>
+<li><code>length</code>: The second property is the <code>length</code>. This value is also measured in beats, but it is relative to the start beat. The <code>length</code> specifies how long the ease will take to complete its transition. A larger <code>length</code> will create a slower transition that is spread out further over time.</li>
+<li><code>ease_fn</code>: The third property is the ease function, or <code>ease_fn</code>. This is the actual transition that is used to change the mod. For example, the <code>linear</code> ease function will make the mod slide linearly from its previous value to the target value.</li>
+<li><code>percent</code>: The fourth property is the target <code>percent</code>. This is the value that the mod will be at when the transition is over. An ease doesn't store the initial value of a mod, only its target value. The initial value is assumed to be the target <code>percent</code> from the previous ease transition, or 0 if the ease is the first in the timeline.</li>
+<li><code>modifier</code>: The fifth property is the <code>modifier</code>, or the specific mod that this ease will change. For example, specifying <code>'drunk'</code> will mean that the ease will change the <code>drunk</code> modifier.</li>
+</ul>
+<h4><a class="header" href="#optional-properties" id="optional-properties">Optional Properties</a></h4>
+<p>The optional properties are <code>plr</code> and <code>mode</code>. These are named arguments, so the order they appear in doesn't matter.</p>
+<ul>
+<li><code>plr</code>: The <code>plr</code> argument specifies which player the ease affects. For example, <code>plr = 1</code> will target player 1, and <code>plr = {1, 3}</code> will target players 1 and 3. If left unspecified, it will attempt to read the <code>plr</code> variable from the environment, and if that fails, it will default to <code>{1, 2}</code>.</li>
+<li><code>mode</code>: Sometimes, it is easier to choose a start and end beat for the transition, instead of describing the ease by start and length. If the <code>mode</code> is set to <code>'end'</code>, the ease will interpret the second property to mean the end beat of the transition instead of the length of the transition. This argument is never necessary and is only provided for convenience to make some calculations simpler.</li>
+</ul>
+<pre><code class="language-lua">-- an example with only the main properties
+-- starting on beat 5, for 1 beat, change the 'rotationz' modifier to 360
+ease {5, 1, outCirc, 360, 'rotationz'}
+
+-- an example with all of the extra properties
+-- from beats 10 to 11, change the 'bumpy' modifier to 1000%
+ease {10, 11, linear, 1000, 'bumpy', mode = 'end', plr = 1}
+</code></pre>
+<p>Note that the optional arguments are specified by name.</p>
+<h3><a class="header" href="#shorthand-syntax-sugar-for-eases" id="shorthand-syntax-sugar-for-eases">Shorthand Syntax Sugar for Eases</a></h3>
+<p>Because eases are used so often, there is some shorthand to make writing many eases more simple.</p>
+<h4><a class="header" href="#chain-calls" id="chain-calls">Chain Calls</a></h4>
+<p>Multiple eases can be specified after writing the word <code>ease</code> once. This is called a chain call, because it calls the ease function with each of the eases, and only works if the eases are in a chain, ie. no other code appears in between the eases. </p>
+<pre><code class="language-lua">ease
+{5, 1, outCirc, 360, 'rotationz'}
+{6, 1, outCirc, 0, 'rotationz'}
+</code></pre>
+<h4><a class="header" href="#multiple-mods" id="multiple-mods">Multiple Mods</a></h4>
+<p>If multiple mods need to be changed at the same time, multiple target/modifier pairs can be specified in an ease. Here is an example that affects many mods with only one ease:</p>
+<pre><code class="language-lua">ease {5, 3, linear,
+    30, 'bumpy',
+	10, 'dizzy',
+	5000, 'beat',
+	500, 'digital',
+	100, 'tipsy',
+	100, 'drunk',
+}
+</code></pre>
+<p>This form is only useful when multiple mods need to be changed in exactly the same way. Each target/modifier pair is eased separately.</p>
+<h4><a class="header" href="#shorthand-for-plr" id="shorthand-for-plr">Shorthand for <code>plr</code></a></h4>
+<p>The <code>plr</code> argument to eases acts differently from other arguments because if unspecified, it will check for a <code>plr</code> global variable. This is useful if many eases in sequence need to use special player numbers.
+Here is an example of some eases that all affect player 1 only:</p>
+<pre><code class="language-lua">plr = 1
+ease {0, 1, linear, 100, 'reverse'}
+ease {1, 1, linear, 0, 'reverse'}
+ease {2, 1, linear, 100, 'reverse'}
+ease {3, 1, linear, 0, 'reverse'}
+ease {4, 1, linear, 100, 'reverse'}
+-- reset the player to normal so later eases won't be affected
+plr = nil
+</code></pre>
+<p>This only works if the <em>global</em> <code>plr</code> is set. It is recommended that <code>pn</code> is used for local variables that refer to the player number so that the <em>global</em> <code>plr</code> can remain in scope. The optional argument will take precedence over the global if both are set.</p>
+<p>By default, if the <code>plr</code> global isn't present, the function acts on <code>{1, 2}</code>, which means that ease transitions without a specified <code>plr</code> will affect both the players.
+This way to pass the <code>plr</code> argument is especially convenient for writing and using helper functions.</p>
+<p>Here is an example helper function:</p>
+<pre><code class="language-lua">local function wiggle_around(beat)
+	ease
+	{beat, 1, pop, 100, 'drunk'}
+	{beat, 1, tap, 100, 'tipsy'}
+end
+</code></pre>
+<p>By default, this function affects both players, because the player number isn't specified in either of its eases. However, the caller can specify a player number using the <code>plr</code> global trick:</p>
+<pre><code class="language-lua">-- control which player is affected:
+plr = 1
+wiggle_around(10)
+
+plr = 2
+wiggle_around(20)
+
+-- reset so that future eases aren't affected
+plr = nil
+</code></pre>
+<p>This <code>plr</code> shorthand means that helper functions can be applied to specific players without the need for an explicit player argument to be passed around.</p>
+<h4><a class="header" href="#shorthand-for-mode" id="shorthand-for-mode">Shorthand for <code>mode</code></a></h4>
+<p>Instead of writing <code>mode = 'end'</code>, adding <code>m=e</code> does the same thing, but is shorter to type. Unlike <code>plr</code>, there is no global variable check for <code>mode</code>.</p>
+<h3><a class="header" href="#special-case-for-speed-mod" id="special-case-for-speed-mod">Special Case for Speed Mod</a></h3>
+<p>The speed-mod is a special modifier because there is no natural modifier name to assign to it, but the Mirin Template gets around that by using the name <code>xmod</code> to describe the X-Mod, and <code>cmod</code> to describe the C-Mod. This gets around the irregular format that NotITG uses to normally represent the X-Mod and C-Mod.</p>
+<pre><code class="language-lua">-- set the speed mod to 3x
+ease {0, 0, instant, 3, 'xmod'}
+</code></pre>
 
                     </main>
 
@@ -166,10 +270,6 @@
                         <!-- Mobile navigation buttons -->
                         
 
-                        
-                            <a rel="next" href="lua.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -180,10 +280,6 @@
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
 
-                
-                    <a href="lua.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
                 
             </nav>
 
