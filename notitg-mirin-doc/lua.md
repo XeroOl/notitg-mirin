@@ -1,53 +1,51 @@
-# Lua Functions
-
-Lua code allows you to control the behavior of mods and actors in your modfile. In the Mirin Template, you can write your Lua code in the file `lua/mods.xml`. Look for the comment: `-- your lua code here` to find the location for you to write code. There are two main lua functions provided by the Mirin Template: `ease` and `func`.
-
 ## Eases
+In the Mirin Template, mods are controlled through eases, which are transitions that change the value of mods. Lua code allows these eases to be created and played back by the game. Multiple eases can be scheduled to happen at the same time, allowing for interesting and complex movements to be created.
 
-In the Mirin Template, mods are controlled through eases, which are transitions that change the value of mods. Unless otherwise specified, mods will keep the value that was prevously assigned to them. Because of this, if you want a mod to be on for a certain range of time, you need to put two ease transitions; one to turn the mod "on" at the beginning, and one to turn the mod "off" at the end.
-
-### Differences from other Templates
-
-If you're coming from other templates, eases work slightly differently here. In other templates, it is common to see ease systems come with sustain times. This template is different because there are **no sustain times**. The Mirin Template automatically holds mods at the specified values until the next ease transition, which means that you don't have to worry about mods reverting to `0%` without you telling them to. This makes the Mirin Template work more like `.crs` files, and less like templates which rely on the `clearall` mod.
-
-In other templates, there's usually another way to more directly affect the values of mods, known as the mods table. This template differs from other templates in that there is **no mods table**. If you want a mod to transition linearly, you can use the `linear` ease, and if you want a mod to transition instantly, you can use the `instant` ease, or set the length of the transition to `0` beats.
+### Differences from previous systems
+An important concept to note is that eases only control the *transitions*. The Mirin Template automatically holds mods at their previous value until the next ease transition. Eases don't mark the entire time the mods are active, but only when the mods are *changing*. Because of this, if a mod needs to be enabled for a certain range of time, two eases are necessary: one ease to enable the mod, and another to disable it. Nothing needs to be specified to keep the mod enabled between these two eases.
 
 ### Transitioning a Mod with the `ease` Function
-
-The basic format for an ease entry is `ease {beat, length, func, percent, 'mod'}`.
-For example, to ease `rotationz` to `360%` on beat `5`, you would write:
+An ease has 5 required properties that need to be specified. Additionally, there are two named optional arguments that aren't necessary by default.
+```lua
+ease {start, lenth, ease_fn, percent, modifier, plr = plr, mode = mode}
+```
+#### Required Properties
+The required properties are `start`, `length`, `ease_fn`, `percent`, and `modifier`. They must be specified in this order in each ease.
+* `start`: The first property that needs to be specified is the `start` beat. The ease is scheduled to activate at the `start` beat.
+* `length`: The second property is the `length`. This value is also measured in beats, but it is relative to the start beat. The `length` specifies how long the ease will take to complete its transition. A larger `length` will create a slower transition that is spread out further over time.
+* `ease_fn`: The third property is the ease function, or `ease_fn`. This is the actual transition that is used to change the mod. For example, the `linear` ease function will make the mod slide linearly from its previous value to the target value.
+* `percent`: The fourth property is the target `percent`. This is the value that the mod will be at when the transition is over. An ease doesn't store the initial value of a mod, only its target value. The initial value is assumed to be the target `percent` from the previous ease transition, or 0 if the ease is the first in the timeline.
+* `modifier`: The fifth property is the `modifier`, or the specific mod that this ease will change. For example, specifying `'drunk'` will mean that the ease will change the `drunk` modifier.
+#### Optional Properties
+The optional properties are `plr` and `mode`. These are named arguments, so the order they appear in doesn't matter.
+* `plr`: The `plr` argument specifies which player the ease affects. For example, `plr = 1` will target player 1, and `plr = {1, 3}` will target players 1 and 3. If left unspecified, it will attempt to read the `plr` variable from the environment, and if that fails, it will default to `{1, 2}`.
+* `mode`: Sometimes, it is easier to choose a start and end beat for the transition, instead of describing the ease by start and length. If the `mode` is set to `'end'`, the ease will interpret the second property to mean the end beat of the transition instead of the length of the transition. This argument is never necessary and is only provided for convenience to make some calculations simpler.
 
 ```lua
+-- an example with only the main properties
+-- starting on beat 5, for 1 beat, change the 'rotationz' modifier to 360
 ease {5, 1, outCirc, 360, 'rotationz'}
+
+-- an example with all of the extra properties
+-- from beats 10 to 11, change the 'bumpy' modifier to 1000%
+ease {10, 11, linear, 1000, 'bumpy', mode = 'end', plr = 1}
 ```
+Note that the optional arguments are specified by name.
 
-Let's break that down:
-* The first item, `5`, tells the game which beat to start the transition.
-* The second item, `1`, tells the game how many beats the transition will take. A bigger number makes the transition take longer, while a smaller number will make the transition faster. If this number is `0` or negative, the transition will be completed instantly.
-* The third item, `outCirc`, tells the game which type of transition to use. Note that this item doesn't have `'` marks. The list of functions you can use as eases is in the [Built-in Eases](./eases.md) section.
-* The fourth item, `360`, is the percentage that the mod will end up on.
-* The fifth item, `'rotationz'`, tells the game which property to transition. If the property you want to ease is a mod, then you *must* use `'` marks.
+### Shorthand Syntax Sugar for Eases
 
-Ease lets you put multiple entries in once call.
-So, if you want the player to rotate back to `0%`, you would write:
+Because eases are used so often, there is some shorthand to make writing many eases more simple.
 
+#### Chain Calls
+Multiple eases can be specified after writing the word `ease` once. This is called a chain call, because it calls the ease function with each of the eases, and only works if the eases are in a chain, ie. no other code appears in between the eases. 
 ```lua
 ease
-{5, 1, outCirc, 100, 'invert'}
-{6, 1, outCirc, 0, 'invert'}
+{5, 1, outCirc, 360, 'rotationz'}
+{6, 1, outCirc, 0, 'rotationz'}
 ```
 
-Now, the players rotate back to `0%` on beat `6`. In the example above, there are two listed transitions, but you can actually put as many as you want in a row. One important difference between this format and other templates is that there is no comma after each line. This is because `ease` is a function, not a table.
-
-You can also ease multiple mods on the same line. If the mods you're easing all start at the same beat, last the same amount of time, and use the same transition function, they combine together nicely:
-
-```lua
-ease {5, 1, outCirc, 360, 'rotationz', -628, 'confusionoffset'}
-```
-
-This code will set `rotationz` to `360` **and** set `confusionoffset` to `-628`, where both the transitions share the same properties.
-
-The `ease` function doesn't just let you put two mods in an entry. In fact, you can add as many mods as you want in one entry:
+#### Multiple Mods
+If multiple mods need to be changed at the same time, multiple target/modifier pairs can be specified in an ease. Here is an example that affects many mods with only one ease:
 ```lua
 ease {5, 3, linear,
     30, 'bumpy',
@@ -58,57 +56,28 @@ ease {5, 3, linear,
 	100, 'drunk',
 }
 ```
+This form is only useful when multiple mods need to be changed in exactly the same way. Each target/modifier pair is eased separately.
 
-As you can see, the above code changes many mods starting on beat `5`.
+#### Shorthand for `plr`
 
-### Player Specific Eases
-If you've been following along yourself, you should have noticed that all of the above examples affect both the players by default. However, sometimes, you want different mods to be applied to different players. In order to do that, you just need to set a variable called `plr`.
-
-For example, if you want Player 1 to get the `drunk` effect on beat 10, you would write something like this:
-
-```lua
-ease {10, 2, outQuad, 100, 'drunk', plr = 1}
-```
-
-Now, on beat 10, player 1 will become drunk. The important syntax here is the `plr =` at the end. This tells `ease` to only apply it to Player 1. Of course, if you write `plr = 2`, then it will apply to Player 2 instead.
-
-You can add use this to change any ease transition to target a specific player.
-
-### Advanced Player Specific Eases
-
-Internally within NotITG, there are actually eight players, not just two. Because of this, if you're using more than two players in a file, you might encounter a situation where want to apply eases on more than one player at once, but not all the players. In order to do this, you set `plr` to a table of player numbers.
-
-For example, if you wanted to apply the `drunk` effect to all of the odd-numbered players, you could write:
-
-```lua
-ease {10, 2, outQuad, 100, 'drunk', plr = {1, 3, 5, 7}}
-```
-
-If you're following along with the template, you'll notice that you can only see Player 1 become drunk. In order to see the effect of this example on the other players, you'd first need to enable Players 3, 5, and 7.
-
-If you want to set the `plr` on many ease transitions in a row, it can get inconvenient pretty quickly. Luckily, there's an easy way to affect multiple ease transitions all at once. You can change the global `plr` before you call to `ease`:
+The `plr` argument to eases acts differently from other arguments because if unspecified, it will check for a `plr` global variable. This is useful if many eases in sequence need to use special player numbers.
+Here is an example of some eases that all affect player 1 only:
 ```lua
 plr = 1
-ease
-{10, 2, inExpo, 250, 'movex'}
-{10, 2, linear, 100, 'drunk'}
-
-plr = 2
-ease
-{10, 2, outExpo, -250, 'movex'}
-{10, 2, linear, -100, 'drunk'}
-
--- Putting an inline `plr` overrides the global `plr`
-{15, 0, instant, 100, 'flip', plr = 1}
-
--- Set plr back to normal
+ease {0, 1, linear, 100, 'reverse'}
+ease {1, 1, linear, 0, 'reverse'}
+ease {2, 1, linear, 100, 'reverse'}
+ease {3, 1, linear, 0, 'reverse'}
+ease {4, 1, linear, 100, 'reverse'}
+-- reset the player to normal so later eases won't be affected
 plr = nil
 ```
-Now, the effects are applied to their respective players.
+This only works if the *global* `plr` is set. It is recommended that `pn` is used for local variables that refer to the player number so that the *global* `plr` can remain in scope. The optional argument will take precedence over the global if both are set.
 
-By default, without the `plr` global set, the template uses the plr `{1, 2}`, which means that ease transitions without a specified `plr` will affect both the players.
+By default, if the `plr` global isn't present, the function acts on `{1, 2}`, which means that ease transitions without a specified `plr` will affect both the players.
+This way to pass the `plr` argument is especially convenient for writing and using helper functions.
 
-This form is convenient for when there is a helper function that you want to call. For example, if you have a function that runs a specific set of eases:
+Here is an example helper function:
 ```lua
 local function wiggle_around(beat)
 	ease
@@ -116,7 +85,7 @@ local function wiggle_around(beat)
 	{beat, 1, tap, 100, 'tipsy'}
 end
 ```
-Then, you can control which players it affects:
+By default, this function affects both players, because the player number isn't specified in either of its eases. However, the caller can specify a player number using the `plr` global trick:
 ```lua
 -- control which player is affected:
 plr = 1
@@ -125,23 +94,16 @@ wiggle_around(10)
 plr = 2
 wiggle_around(20)
 
+-- reset so that future eases aren't affected
 plr = nil
 ```
-As you can see, the `plr` global isn't just shorthand for putting the `plr` in each line; It is also extremely helpful because you can write helper functions that automatically support being applied to a specific player.
+This `plr` shorthand means that helper functions can be applied to specific players without the need for an explicit player argument to be passed around.
 
-Sometimes, instead of calculating the length of a transition, it is more natural to just mark the start and end beats of the transition. Luckily, there's a way to make `ease` accept end beats instead of lengths. If you add in `mode = 'end'` or `m=e` somewhere in the table, the 2nd number will be treated as an end beat instead of a length.
-```lua
-ease
--- `mode = 'end'` makes this one last 1 beat instead of 21.
-{20, 21, mode = 'end', outCirc, 100, 'invert'}
+#### Shorthand for `mode`
+Instead of writing `mode = 'end'`, adding `m=e` does the same thing, but is shorter to type. Unlike `plr`, there is no global variable check for `mode`.
 
--- `m=e` is just shorthand for `mode = 'end'`.
--- It has the same effect as in the previous example,
--- which means that this effect lasts from beat 21 to 22.
-{21, 22, m=e, outCirc, 0, 'invert'}
-```
-### Setting the speed mod with `ease`
-Usually, when you make a modfile, you want to specify the speed mod that the game runs at. With the Mirin Template, there is a special mod that you can use to change the speed mod: `xmod`.
+### Special Case for Speed Mod
+The speed-mod is a special modifier because there is no natural modifier name to assign to it, but the Mirin Template gets around that by using the name `xmod` to describe the X-Mod, and `cmod` to describe the C-Mod. This gets around the irregular format that NotITG uses to normally represent the X-Mod and C-Mod.
 ```lua
 -- set the speed mod to 3x
 ease {0, 0, instant, 3, 'xmod'}
@@ -206,7 +168,7 @@ alias('my_aux_var')
 
 ### Instant Eases and the `set` Function
 
-TODO
+The `set` function is just like `ease`, except the duration is 0, and the ease is `instant`.
 
 ### Relative Eases and the `add` Function
 The function `ease` has a sister function, called `add`. This other function works exactly the same as `ease`, except for one important difference: Any percentages used with `add` are interpreted as offsets to the current percent. This is important because it is different behavior than `ease`, where percentages are interpreted as target percentages. Here's an example of some code that uses `add`:

@@ -2,7 +2,22 @@
 	
 	local xero = setmetatable(xero, xero)
 	xero.__index = _G
-	function xero:__call(f)
+	
+	local function noop() end
+	
+	function xero:__call(f, name)
+		
+		if type(f) == 'string' then
+			-- if xero is called with a string, we need to load the string as code
+			local err
+			-- try compiling the code
+			f, err = loadstring( 'return function(self)' .. f .. '\nend', name)
+			if err then SCREENMAN:SystemMessage(err) return noop end
+			-- grab the function
+			f, err = pcall(f)
+			if err then SCREENMAN:SystemMessage(err) return noop end
+		end
+		
 		setfenv(f or 2, self)
 		return f
 	end
