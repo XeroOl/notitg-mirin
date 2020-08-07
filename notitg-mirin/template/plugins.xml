@@ -35,15 +35,15 @@ Type = "ActorFrame">
 		<Layer Condition = "xero.__PLUGINS:condition()" File = "@xero.__PLUGINS:file()" />
 		
 		<Layer Condition = "xero.__PLUGINS:increment()" />
-			<Layer Condition = "xero.__PLUGINS:recursion()" File = "recursive.xml" />
-			<Layer Condition = "xero.__PLUGINS:recursion()" File = "recursive.xml" />
-			<Layer Condition = "xero.__PLUGINS:recursion()" File = "recursive.xml" />
-			<Layer Condition = "xero.__PLUGINS:recursion()" File = "recursive.xml" />
-			<Layer Condition = "xero.__PLUGINS:recursion()" File = "recursive.xml" />
-			<Layer Condition = "xero.__PLUGINS:recursion()" File = "recursive.xml" />
-			<Layer Condition = "xero.__PLUGINS:recursion()" File = "recursive.xml" />
-			<Layer Condition = "xero.__PLUGINS:recursion()" File = "recursive.xml" />
-			<Layer Condition = "xero.__PLUGINS:recursion()" File = "recursive.xml" />
+			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
+			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
+			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
+			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
+			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
+			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
+			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
+			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
+			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
 		<Layer Condition = "xero.__PLUGINS:decrement()" />
 		
 	</children>
