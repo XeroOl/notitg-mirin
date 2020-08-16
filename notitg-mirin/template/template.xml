@@ -110,7 +110,7 @@
 		if self.mode or self.m then
 			self[2] = self[2] - self[1]
 		end
-		local plr = self.plr or rawget(xero, plr) or default_plr
+		local plr = self.plr or rawget(xero, 'plr') or default_plr
 		if type(plr) == 'number' then
 			self.plr = plr
 			push(eases, self)
