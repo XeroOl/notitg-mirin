@@ -6,7 +6,7 @@
 			child:hidden(1)
 			child:sleep(9e9)
 			proxy:SetTarget(child)
-			proxy:xy(scx * (pn - 0.5), scy)
+			proxy:xy(scx * (((pn - 1) % 2) + 0.5), scy)
 		end
 		temp(proxy.notefield[pn], P[pn]:GetChild'NoteField')
 		temp(proxy.judge[pn], P[pn]:GetChild'Judgment')
