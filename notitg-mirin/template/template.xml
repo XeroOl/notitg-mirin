@@ -259,7 +259,9 @@
 			table.insert(out, aliases[self[i]] or self[i])
 			i = i + 1
 		end
-		push(nodes, {inputs, out, fn}) --, children, parents, real_fn, func_outputs
+		local result = {inputs, out, fn}
+		result.priority = self.defer and -nodes.n or nodes.n
+		push(nodes, result)  --, children, parents, real_fn, func_outputs
 		return node
 	end
 	
@@ -481,7 +483,10 @@
 				return a[1] < b[1]
 			end
 		end)
-		-- TODO sort nodes
+		stable_sort(nodes, function(a, b)
+			local x, y = a.priority, b.priority
+			return x * x * y < x * y * y
+		end)
 		
 		compile_nodes()
 		
@@ -498,8 +503,8 @@
 			return m * x, m * y
 		end,
 		'zoomx', 'zoomy',
+		defer = true,
 	}
-	set {-9e9, 100, 'zoom', 100, 'zoomx', 100, 'zoomy', 100, 'zoomz', 1, 'xmod'}
 	for _, a in ipairs {'x', 'y', 'z'} do
 		aux {'move' .. a}
 		node {
@@ -509,6 +514,7 @@
 			end,
 			'move'..a..'0', 'move'..a..'1', 'move'..a..'2', 'move'..a..'3',
 			'move'..a..'4', 'move'..a..'5', 'move'..a..'6', 'move'..a..'7',
+			defer = true,
 		}
 	end
 	aux 'xmod' 'cmod'
@@ -521,8 +527,9 @@
 				GAMESTATE:ApplyModifiers('*-1 ' .. string.format('%f', xmod) .. 'x,*-1 c' .. cmod)
 			end
 		end,
+		defer = true,
 	}
-	
+	set {-9e9, 100, 'zoom', 100, 'zoomx', 100, 'zoomy', 100, 'zoomz', 1, 'xmod'}
 	
 	local targets_mt = {__index = function() return 0 end}
 	
