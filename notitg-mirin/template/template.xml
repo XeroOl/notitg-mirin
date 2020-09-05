@@ -52,6 +52,10 @@
 		self:Create()
 	end
 	
+	function aftsprite(aft, sprite)
+		sprite:SetTexture(aft:GetTexture())
+	end
+	
 	function screen_error(output, depth, name)
 		local depth = 3 + (depth or 0)
 		local _, err = pcall(error, name and (name .. ':' .. output) or output, depth)
@@ -83,9 +87,15 @@
 			screen_error('unexpected argument 2' , depth, name)
 			return alias
 		end
+		a, b = string.lower(a), string.lower(b)
 		while aliases[b] do b = aliases[b] end
 		aliases[a] = b
 		return alias
+	end
+	
+	function normalize_mod(name)
+		name = string.lower(name)
+		return aliases[name] or name
 	end
 	
 	local default_plr = {1, 2}
@@ -121,7 +131,7 @@
 				screen_error('invalid mod', depth, name)
 				return ease
 			end
-			self[i + 1] = aliases[self[i + 1]] or self[i + 1]
+			self[i + 1] = normalize_mod(self[i + 1])
 			i = i + 2
 		end
 		self.n = i - 1
@@ -161,6 +171,7 @@
 		return add
 	end
 	
+	-- eases are loaded after the template, so this needs to be declared early
 	local function instant() return 1 end
 	
 	function set(self, depth, name)
@@ -242,7 +253,7 @@
 		local inputs = {}
 		local reverse_in = {}
 		while type(self[i]) == 'string' do
-			table.insert(inputs, aliases[self[i]] or self[i])
+			table.insert(inputs, normalize_mod(self[i]))
 			set({-9e9, 0, self[i]}, depth, name)
 			i = i + 1
 		end
@@ -256,7 +267,7 @@
 		i = i + 1
 		local out = {}
 		while type(self[i]) == 'string' do
-			table.insert(out, aliases[self[i]] or self[i])
+			table.insert(out, normalize_mod(self[i]))
 			i = i + 1
 		end
 		local result = {inputs, out, fn}
@@ -268,12 +279,6 @@
 	local mods = {}
 	
 	function compile_nodes()
-		local function escapestr(s)
-			return '\'' .. string.gsub(s, '[\\\']', '\\%1') .. '\''
-		end
-		local function list(code, i, sep)
-			if i ~= 1 then code(sep) end
-		end
 		local terminators = {}
 		for _, nd in ipairs(nodes) do
 			for _, mod in ipairs(nd[2]) do
@@ -338,6 +343,14 @@
 					table.insert(last[v], nd)
 				end
 			end
+			
+			local function escapestr(s)
+				return '\'' .. string.gsub(s, '[\\\']', '\\%1') .. '\''
+			end
+			local function list(code, i, sep)
+				if i ~= 1 then code(sep) end
+			end
+			
 			local code = stringbuilder()
 			local function emit_inputs()
 				for i, mod in ipairs(inputs) do
@@ -392,7 +405,7 @@
 		local depth = 1 + (type(depth) == 'number' and depth or 0)
 		local name = name or 'aux'
 		if type(self) == 'string' then
-			local v = aliases[self] or self
+			local v = normalize_mod(self)
 			auxes[v] = true
 		elseif type(self) == 'table' then
 			for i = 1, #self do
@@ -505,6 +518,9 @@
 		'zoomx', 'zoomy',
 		defer = true,
 	}
+	set {-9e9, 100, 'zoom', 100, 'zoomx', 100, 'zoomy'}
+	
+	-- movex
 	for _, a in ipairs {'x', 'y', 'z'} do
 		aux {'move' .. a}
 		node {
@@ -517,6 +533,8 @@
 			defer = true,
 		}
 	end
+	
+	-- xmod
 	aux 'xmod' 'cmod'
 	node {
 		'xmod', 'cmod',
@@ -529,7 +547,7 @@
 		end,
 		defer = true,
 	}
-	set {-9e9, 100, 'zoom', 100, 'zoomx', 100, 'zoomy', 100, 'zoomz', 1, 'xmod'}
+	set {-9e9, 1, 'xmod'}
 	
 	local targets_mt = {__index = function() return 0 end}
 	
@@ -556,10 +574,10 @@
 		local mods_pn = mods[pn]
 		local mt = {
 			__index = function(self, k)
-				return mods_pn[aliases[k] or k]
+				return mods_pn[normalize_mod(k)]
 			end,
 			__newindex = function(self, k, v)
-				k = aliases[k] or k
+				k = normalize_mod(k)
 				mods_pn[k] = v
 				if v then
 					poptions_logging_target[pn][k] = true
