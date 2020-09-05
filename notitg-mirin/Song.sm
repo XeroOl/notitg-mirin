@@ -12,11 +12,12 @@
 #CDTITLE:;
 #MUSIC:Song.ogg;
 #OFFSET:0.029;
-#SAMPLESTART:7.448;
+#SAMPLESTART:7.117;
 #SAMPLELENGTH:12.000;
 #SELECTABLE:YES;
 #BPMS:0.000=129.948;
 #STOPS:;
+#TIMESIGNATURES:0.000=4=4;
 #BGCHANGES:;
 
 //The majority of simfile scripts and visual effects are stored here.
@@ -31,7 +32,7 @@
      :
      Challenge:
      1:
-     0.615,0.485,0.000,1.000,0.168:
+     0.615,0.484,0.000,1.000,0.168:
 2000
 3200
 0320

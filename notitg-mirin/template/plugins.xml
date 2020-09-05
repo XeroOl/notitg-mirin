@@ -11,6 +11,11 @@
 		recursion = function(p) return p.r <= p.m and p.i < p.n end,
 		GAMESTATE:GetFileStructure(path_to_plugins)
 	}
+	for i = #p, 1, -1 do
+		if string.sub(p[i], -4, -4) ~= '.xml' then
+			table.remove(p, i)
+		end
+	end
 	p.n = table.getn(p)
 	p.m = math.log10(p.n) -- max depth
 	stable_sort(p)

@@ -167,4 +167,18 @@
 			n = 0,
 		}
 	end
+	
+	local stringbuilder_mt =  {
+		__index = { build = table.concat },
+		__tostring = table.concat,
+		__call = function(self, a)
+			table.insert(self, tostring(a))
+			return self
+		end,
+	}
+	
+	function stringbuilder()
+		return setmetatable({}, stringbuilder_mt)
+	end
+	
 end)()" />
