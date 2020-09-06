@@ -1,5 +1,5 @@
 <Plugins Condition = "xero(function()
-	if __PLUGINS then return true end
+	if rawget(xero, '__PLUGINS') then return true end
 	local path_to_plugins = GAMESTATE:GetCurrentSong():GetSongDir() .. 'plugins/'
 	local p = {
 		i = 0, -- the current one we're on
