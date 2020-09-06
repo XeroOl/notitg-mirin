@@ -378,7 +378,7 @@
 					if terminator then
 						code'mods[pn]['(escapestr(inputs[1]))'] = ' emit_inputs() code'\n'
 					else
-						if emit_outputs() then code' = ' end code 'fn(' emit_inputs() code')\n'
+						if emit_outputs() then code' = ' end code 'fn(' emit_inputs() code', pn)\n'
 					end
 					code
 				'end\n'
