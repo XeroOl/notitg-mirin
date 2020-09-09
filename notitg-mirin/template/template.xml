@@ -719,12 +719,15 @@
 			if P[pn] and P[pn]:IsAwake() then
 				seen = seen + 1
 				for k in pairs(mods[pn]) do
-					propagateAll(node_start[k], active_nodes)
+					-- identify all nodes to execute this frame
+					propagateAll(node_start[k])
 				end
 				for i = 1, #active_nodes do
+					-- run all the nodes
 					table.remove(active_nodes)[6](pn)
 				end
 				for i = 1, #active_terminators do
+					-- run all the nodes marked as 'terminator'
 					table.remove(active_terminators)[6](pn)
 				end
 				local modifiers = stringbuilder()
