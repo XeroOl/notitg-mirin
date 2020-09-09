@@ -12,7 +12,7 @@
 		GAMESTATE:GetFileStructure(path_to_plugins)
 	}
 	for i = #p, 1, -1 do
-		if string.sub(p[i], -4, -4) ~= '.xml' then
+		if string.sub(p[i], -4, -1) ~= '.xml' then
 			table.remove(p, i)
 		end
 	end
