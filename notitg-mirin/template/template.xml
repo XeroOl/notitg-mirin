@@ -74,7 +74,7 @@
 	function alias(self, depth, name)
 		local depth = 1 + (type(depth) == 'number' and depth or 0)
 		local name = name or 'alias'
-		if type(key) ~= 'table' then
+		if type(self) ~= 'table' then
 			screen_error('curly braces expected', depth, name)
 			return alias
 		end
@@ -293,15 +293,15 @@
 		local last = {}
 		for _, nd in ipairs(nodes) do
 			-- struct node {
-			-- 	list<string> inputs;
-			-- 	list<string> out;
-			-- 	lua_function fn;
-			-- 	list<struct node> children;
-			-- 	list<list<struct node>> parents; // the inner lists also have a [0] field that is a boolean
-			-- 	lua_function real_fn;
-			-- 	list<map<string, float>> outputs;
-			--	bool terminator;
-			--	int seen;
+			--     list<string> inputs;
+			--     list<string> out;
+			--     lua_function fn;
+			--     list<struct node> children;
+			--     list<list<struct node>> parents; // the inner lists also have a [0] field that is a boolean
+			--     lua_function real_fn;
+			--     list<map<string, float>> outputs;
+			--     bool terminator;
+			--     int seen;
 			-- }
 			local terminator = nd[8]
 			if not terminator then
