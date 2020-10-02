@@ -1,8 +1,12 @@
-A Template for NotITG.
-* Never think about sustain times ever again!
-* High performance backend that doesn't use `clearall`!
-* Elegant ease system makes it easy to write custom eases!
-* Custom Ease Engine which lets all mods act like aux vars!
-* Edit which mods are applying on the fly from perframes, using a custom `poptions` system!
-* Much much more!
-Read the [documentation](./notitg-mirin-doc/SUMMARY.md) for more details.
+# Mirin Template
+[NotITG](https://notitg.heysora.net) is a fork of OpenITG designed to make it easier for mod file creators to implement their ideas. The [Mirin Template](https://www.github.com/XeroOl/notitg-mirin) provides functions that allow creators to use NotITG express their mod ideas and bring them to life in the game.
+
+The Mirin Template is designed to make easing as simple as possible, while remaining incredibly powerful. Eases are the basic building blocks used to make a mod file.
+
+```lua
+-- turn on invert
+ease {0, 1, outExpo, 100, 'invert'}
+-- turn off invert
+ease {7, 1, outExpo, 0, 'invert'}
+```
+Read the documentation at https://xerool.github.io/notitg-mirin
