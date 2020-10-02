@@ -1,3 +1,4 @@
+[back](/)
 # Ease
 ```lua
 ease {beat, len, ease_fn, percent, mod}
