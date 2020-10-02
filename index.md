@@ -18,7 +18,7 @@ Planned Documentation:
 * for loop examples
 * function examples
 * actors examples
-* extra players examples
+* [extra players](docs/players.md)
 * aux+node examples
 * func examples
 * poptions examples

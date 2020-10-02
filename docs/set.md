@@ -1,4 +1,4 @@
-[back](/)
+[main](..)
 # Set
 ```lua
 set {beat, percent, mod}
