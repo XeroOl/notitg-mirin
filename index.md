@@ -10,12 +10,11 @@ ease {0, 1, outExpo, 100, 'invert'}
 ease {7, 1, outExpo, 0, 'invert'}
 ```
 
-
 Planned Documentation:
 * How to set up the template (Installation instructions)
-* set examples
-* ease examples
-* add examples
+* [set](docs/set.md)
+* [ease](docs/ease.md)
+* [add](docs/ease.md#add)
 * for loop examples
 * function examples
 * actors examples
