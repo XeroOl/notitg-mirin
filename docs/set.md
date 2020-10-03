@@ -6,7 +6,7 @@ set {beat, percent, mod}
 Use the `set` function to set a mod to a specific value at a specific beat in the song.
 
 Arguments:
-| | |
+| a | b |
 | -------------- | ---------- |
 | `beat: float` | The song beat when the mod applies. |
 | `percent: float` | The target amount to set the mod to. |
