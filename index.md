@@ -7,17 +7,11 @@ Join the [NotITG Discord](https://uksrt.heysora.net/discord) to learn more about
 
 The Mirin Template is designed to make easing as simple as possible, while remaining incredibly powerful.
 
-```lua
--- turn on invert
-ease {0, 1, outExpo, 100, 'invert'}
--- turn off invert
-ease {7, 1, outExpo, 0, 'invert'}
-```
 
 ## Planned Documentation:
 <div style="display:flex">
-<div style="flex:50%">
-* How to set up the template (Installation instructions)
+<div style="flex:50%" markdown="1">
+How to set up the template (Installation instructions)
 * [set](docs/set.md)
 * [ease](docs/ease.md)
 * [add](docs/ease.md#add)
@@ -27,7 +21,7 @@ ease {7, 1, outExpo, 0, 'invert'}
 * [extra players](docs/players.md)
 * aux+node examples
 </div>
-<div style="flex:50%">
+<div style="flex:50%" markdown="1">
 * alias examples
 * func examples
 * function ease examples (when it gets implemented)
@@ -39,3 +33,10 @@ ease {7, 1, outExpo, 0, 'invert'}
 </div>
 </div>
 
+
+```lua
+-- turn on invert
+ease {0, 1, outExpo, 100, 'invert'}
+-- turn off invert
+ease {7, 1, outExpo, 0, 'invert'}
+```
