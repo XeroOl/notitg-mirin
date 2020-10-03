@@ -46,6 +46,7 @@ node creates a function that takes in mod values and outputs mod values.
 | `modname: 1 or more strings` | The mods to take as input to the function |
 | `function: modnames => void or modname_out` | The function to run. |
 | `modname_out (optional): 0 or more strings` | The name of the mods to write back to. |
+
 <br>
 ## Examples
 Node is a very general function that can be used in different ways. These examples explore some of the ways in which node can be used.
@@ -107,7 +108,9 @@ node {
 Here's an example of how powerful `node` can be:
 This node makes the confusionoffset mods be independent of the rotation mods.
 ```lua
-local sin, cos, atan2, asin, pi = math.sin, math.cos, math.atan2, math.asin, math.pi
+local sin, cos = math.sin, math.cos
+local asin, atan2 = math.sin, math.atan2
+local pi = math.pi
 node {
     'rotationx', 'rotationy', 'rotationz',
     'confusionxoffset', 'confusionyoffset', 'confusionzoffset',
