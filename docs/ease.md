@@ -11,7 +11,7 @@ Arguments:
 | -------------- | ---------- |
 | `beat: float` | The song beat when the mod begins to apply. |
 | `len: float` | The amount of beats before the ease is complete. |
-| `ease_fn: `[`function`](eases.md) |
+| `ease_fn: `[`function`](eases.md) | The comfyness vibes of the effect. |
 | `percent: float` | The target amount to set the mod to. |
 | `mod: string` | The mod to apply. |
 
