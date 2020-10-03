@@ -3,12 +3,14 @@
 ```lua
 set {beat, percent, mod}
 ```
-Use the`set`function to set a mod to a specific value at a specific beat in the song.
+Use the `set` function to set a mod to a specific value at a specific beat in the song.
 
 Arguments:
-* `beat: float`: The song beat to apply the
-* `percent: float`: The amount of 
+* `beat: float` The song beat when the mod applies.
+* `percent: float`: The target amount to set the mod to.
 * `mod: string`: The mod to apply.
+
+Examples:
 ```lua
 set {0, 1.5, 'xmod'}
 set {10, 100, 'invert'}
@@ -23,3 +25,6 @@ set {
 	100, 'bumpy',
 }
 ```
+
+
+Set can also be [player specific](players.md)
