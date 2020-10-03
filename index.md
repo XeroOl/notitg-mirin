@@ -19,17 +19,18 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * actors
 * [aux](docs/aux.md)
 * [node](docs/aux.md#node)
+* alias
 </div>
 <div style="flex:50%" markdown="1">
 * [extra players](docs/players.md)
-* alias
+* mode='end'
 * func
-* function ease (later)
+* function eases
 * poptions
 * [aft](docs/aft.md)
 * shader
-* mod list
-* ease list
+* [list of mods](docs/mods.md)
+* [list of ease functions](docs/eases.md)
 </div>
 </div>
 ```lua
