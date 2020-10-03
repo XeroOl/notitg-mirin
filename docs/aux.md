@@ -87,5 +87,55 @@ node {
 Here's an example of how powerful `node` can be:
 This node makes the confusionoffset mods be independent of the rotation mods.
 ```lua
--- TODO add node for reverse rotation
+local sin, cos, atan2, asin, pi = math.sin, math.cos, math.atan2, math.asin, math.pi
+node {
+	'rotationx', 'rotationy', 'rotationz', 'confusionxoffset', 'confusionyoffset', 'confusionzoffset',
+	function(rx, ry, rz, cx, cy, cz)
+		-- transform axes
+		rx, rz = rz, rx
+		cx, cz = cz, cx
+		
+		-- helpers for r
+		local rcosx, rcosy, rcosz, rsinx, rsiny, rsinz =
+			cos(rx / 360 * pi), cos(ry / 360 * pi), cos(rz / 360 * pi),
+			sin(rx / 360 * pi), sin(ry / 360 * pi), sin(rz / 360 * pi)
+		
+		-- r to quaternion
+		local ra, rb, rc, rd =
+			rcosx*rcosy*rcosz-rsinx*rsiny*rsinz,
+			rsinx*rsiny*rcosz+rcosx*rcosy*rsinz,
+			rsinx*rcosy*rcosz+rcosx*rsiny*rsinz,
+			rcosx*rsiny*rcosz-rsinx*rcosy*rsinz
+		
+		-- helpers for c
+		local ccosx, ccosy, ccosz, csinx, csiny, csinz =
+			cos(cx/200), cos(cy/200), cos(cz/200),
+			sin(cx/200), sin(cy/200), sin(cz/200)
+		
+		-- c to quaternion
+		local ca, cb, cc, cd =
+			ccosx*ccosy*ccosz-csinx*csiny*csinz,
+			csinx*csiny*ccosz+ccosx*ccosy*csinz,
+			csinx*ccosy*ccosz+ccosx*csiny*csinz,
+			ccosx*csiny*ccosz-csinx*ccosy*csinz
+		
+		-- o = c * inverse(r)
+		local oa, ob, oc, od =
+			ca*ra+cb*rb+cc*rc+cd*rd,
+			-ca*rb+cb*ra-cc*rd+cd*rc,
+			-ca*rc+cb*rd+cc*ra-cd*rb,
+			-ca*rd-cb*rc+cc*rb+cd*ra
+		
+		-- o to euler angles
+		local ox, oy, oz =
+			100 * atan2(2*oc*oa-2*ob*od, 1-2*oc*oc-2*od*od),
+			100 * asin(2*ob*oc+2*od*oa),
+			100 * atan2(2*ob*oa-2*oc*od, 1-2*ob*ob-2*od*od)
+		
+		-- transform axes
+		ox, oz = oz, ox
+		return ox, oy, oz
+	end,
+	'confusionxoffset', 'confusionyoffset', 'confusionzoffset',
+}
 ```
