@@ -64,21 +64,26 @@ node {
 	'invert', 'alternate', 'reverse',
 }
 ```
-Firstly, the `aux` function marks the mod `blacksphere` as an auxiliary mod. Then, the `node` function reads the value stored in `'blacksphere'`, and calculates and returns the amount of `invert`, `alternate`, and `reverse` to apply.
+Firstly, the `aux` function marks the mod `'blacksphere'` as an auxiliary mod. Then, the `node` function reads the value stored in `'blacksphere'`, and calculates and returns the amount of `'invert'`, `'alternate'`, and `'reverse'` to apply.
 
-Then, the `blacksphere` auxiliary mod can be used:
+Then, the `'blacksphere'` auxiliary mod can be used:
 ```lua
 ease {0, 1, outExpo, 180, 'blacksphere'}
 ease {4, 1, outExpo, 0, 'blacksphere'}
 ```
 <br><br>
 ### Rotate BG
+Another use of `node` is to bind properties of actors to auxiliary mods. In this example, the mod `'rotatebg'` is is set up to control the angle of an actor.
 ```lua
+-- mark 'rotatebg' as an aux mod
 aux {'rotatebg'}
+-- read 'rotatebg' and write it to the actor's rotation
 node {'rotatebg', function(p)
 	my_bg_actor:rotationz(p)
 end}
--- Assuming this is in the XML
+
+
+-- In the XML
 <Layer Name = "my_bg_actor" File = "my_background_file.png">
 ```
 <br><br>
