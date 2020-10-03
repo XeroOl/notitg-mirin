@@ -72,6 +72,10 @@ Then, the `'blacksphere'` auxiliary mod can be used:
 ease {0, 1, outExpo, 180, 'blacksphere'}
 ease {4, 1, outExpo, 0, 'blacksphere'}
 ```
+Although `'blacksphere'` uses `'invert'`, `'alternate'`, and `'reverse'`, those mods can still be used.
+```lua
+ease {0, 10, linear, 360, 'blacksphere', 100, 'reverse'}
+```
 <br><br>
 ### Rotate BG
 `node` can be used to bind properties of actors to auxiliary mods. In this example, the mod `'rotatebg'` is is set up to control the angle of an actor.
@@ -85,6 +89,7 @@ end}
 -- In the XML
 <Layer Name = "my_bg_actor" File = "my_background_file.png">
 ```
+Then, the `'rotatebg'` mod controls the rotation of the actor.
 <br><br>
 ### Tornado scaled by Flip
 If a node reads and writes to the same mod, then that mod is overwritten instead of added.

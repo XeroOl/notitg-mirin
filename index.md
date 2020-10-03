@@ -39,4 +39,6 @@ ease {0, 1, outExpo, 100, 'invert'}
 ease {7, 1, outExpo, 0, 'invert'}
 ```
 
+Bonus: [gradients](docs/gradients.md) [splines](docs/splines.md)
+
 Documentation by XeroOl, Chegg, Kirby5464
