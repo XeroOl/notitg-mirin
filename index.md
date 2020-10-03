@@ -1,7 +1,7 @@
 # Mirin Template
-[NotITG](https://notitg.heysora.net) is a fork of OpenITG designed to make it easier for mod file creators to implement their ideas. The [Mirin Template](https://www.github.com/XeroOl/notitg-mirin) provides functions that allow creators to use NotITG express their mod ideas and bring them to life in the game.
+[NotITG](https://notitg.heysora.net) is a fork of OpenITG designed to make it easier for mod file creators to implement their ideas. The [Mirin Template](https://www.github.com/XeroOl/notitg-mirin) provides functions that allow creators to use NotITG express their mod ideas and bring them to life in the game. Join the (NotITG Discord)[https://uksrt.heysora.net/discord] to learn more about NotITG.
 
-The Mirin Template is designed to make easing as simple as possible, while remaining incredibly powerful. Eases are the basic building blocks used to make a mod file.
+The Mirin Template is designed to make easing as simple as possible, while remaining incredibly powerful.
 
 ```lua
 -- turn on invert
@@ -20,7 +20,9 @@ Planned Documentation:
 * actors examples
 * [extra players](docs/players.md)
 * aux+node examples
+* alias examples
 * func examples
+* function ease examples (when it gets implemented)
 * poptions examples
 * aft examples
 * shader examples

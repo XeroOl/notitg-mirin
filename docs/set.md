@@ -1,15 +1,13 @@
-[main](..)
+[Back to main page](..)
 # Set
 ```lua
 set {beat, percent, mod}
 ```
-Use the `set` function to set a mod to a specific value at a specific beat in the song.
+Use the`set`function to set a mod to a specific value at a specific beat in the song.
 
 Examples:
 ```lua
 set {0, 1.5, 'xmod'}
-```
-```lua
 set {10, 100, 'invert'}
 ```
 

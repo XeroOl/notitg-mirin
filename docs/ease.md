@@ -1,4 +1,4 @@
-[main](..)
+[Back to main page](..)
 # Ease
 ```lua
 ease {beat, len, ease_fn, percent, mod}
