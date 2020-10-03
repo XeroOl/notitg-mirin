@@ -7,11 +7,13 @@ Use the `ease` function to animate a mod to a specific value at a specific beat 
 The animation lasts `len` beats, and animates using the selected `ease_fn`.
 
 Arguments:
-* 
-*
-*
-*
-*
+
+| -------------- | ---------- |
+| `beat: float` | The song beat when the mod begins to apply. |
+| `len: float` | The amount of beats before the ease is complete. |
+| `ease_fn: `[`function`](eases.md) |
+| `percent: float` | The target amount to set the mod to. |
+| `mod: string` | The mod to apply. |
 
 Examples:
 ```lua
