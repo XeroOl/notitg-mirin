@@ -1,4 +1,4 @@
- Aux
+# Aux
 ```lua
 aux {modname}
 ```
@@ -38,7 +38,6 @@ node {
 }
 ```
 
-
 `node` creates a function that transforms the values of mods before they are applied every frame.
 node creates a function that takes in mod values and outputs mod values.
 
@@ -47,7 +46,9 @@ node creates a function that takes in mod values and outputs mod values.
 | `function: modnames => void or modname_out` | The function to run. |
 | `modname_out (optional): 0 or more strings` | The name of the mods to write back to. |
 
-
+## Examples
+Node is a very general function that can be used in different ways. Because of this, there are lots of fully-functional examples that should be simple to modify.
+<br><br>
 ### Blacksphere
 This example shows how to encode the "blacksphere" effect into a node.
 ```lua
@@ -70,7 +71,17 @@ Then, the `blacksphere` auxiliary mod can be used:
 ease {0, 1, outExpo, 180, 'blacksphere'}
 ease {4, 1, outExpo, 0, 'blacksphere'}
 ```
-
+<br><br>
+### Rotate BG
+```lua
+aux {'rotatebg'}
+node {'rotatebg', function(p)
+	my_bg_actor:rotationz(p)
+end}
+-- Assuming this is in the XML
+<Layer Name = "my_bg_actor" File = "my_background_file.png">
+```
+<br><br>
 ### Tornado scaled by Flip
 If a node reads and writes to the same mod, then that mod is overwritten instead of added.
 ```lua
@@ -82,7 +93,7 @@ node {
 	'tornado',
 }
 ```
-
+<br><br>
 ### Superpowered Counter Rotation
 Here's an example of how powerful `node` can be:
 This node makes the confusionoffset mods be independent of the rotation mods.
@@ -140,3 +151,4 @@ node {
 	'confusionxoffset', 'confusionyoffset', 'confusionzoffset',
 }
 ```
+<br><br>
