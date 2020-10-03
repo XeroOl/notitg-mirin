@@ -15,8 +15,8 @@ ease {7, 1, outExpo, 0, 'invert'}
 ```
 
 ## Planned Documentation:
-<div class="row">
-<div class="col-med-6">
+<div style="display:flex">
+<div style="flex:50%>
 * How to set up the template (Installation instructions)
 * [set](docs/set.md)
 * [ease](docs/ease.md)
@@ -27,7 +27,7 @@ ease {7, 1, outExpo, 0, 'invert'}
 * [extra players](docs/players.md)
 * aux+node examples
 </div>
-<div class="col-med-6">
+<div style="flex:50%>
 * alias examples
 * func examples
 * function ease examples (when it gets implemented)
