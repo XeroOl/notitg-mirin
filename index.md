@@ -15,28 +15,28 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * [set](docs/set.md)
 * [ease](docs/ease.md)
 * [add](docs/ease.md#add)
-* for loop examples
-* function examples (plugins??)
-* actors examples
-* [extra players](docs/players.md)
-* aux+node examples
+* for loop
+* actors
+* [aux](docs/aux.md)
+* [node](docs/aux.md#node)
 </div>
 <div style="flex:50%" markdown="1">
-* alias examples
-* func examples
-* function ease examples (later)
-* poptions examples
-* aft examples
-* shader examples
+* [extra players](docs/players.md)
+* alias
+* func
+* function ease (later)
+* poptions
+* [aft](docs/aft.md)
+* shader
 * mod list
 * ease list
 </div>
 </div>
-
-
 ```lua
 -- turn on invert
 ease {0, 1, outExpo, 100, 'invert'}
 -- turn off invert
 ease {7, 1, outExpo, 0, 'invert'}
 ```
+
+Documentation by XeroOl, Chegg, Kirby5464
