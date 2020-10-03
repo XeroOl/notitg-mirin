@@ -11,15 +11,13 @@ Arguments:
 | -------------- | ---------- |
 | `beat: float` | The song beat when the mod begins to apply. |
 | `len: float` | The amount of beats before the ease is complete. |
-| [`ease_fn: function`](eases.md) | The comfyness vibes of the effect. |
+| [`ease_fn: function`](eases.md) | The way to approach the target value. |
 | `percent: float` | The target amount to set the mod to. |
 | `mod: string` | The mod to apply. |
 
 Examples:
 ```lua
 ease {0, 1, outExpo, 100, 'invert'}
-```
-```lua
 ease {0, 2, outBack, 100, 'movex'}
 ```
 
@@ -41,11 +39,13 @@ add {beat, len, ease_fn, relative_percent, mod}
 The `add` function works like `ease`, except it is relative. The `add` function will add to the old value of the mod instead of overriding the old value of the mod with a new value. So, for example, if a mod is currently at `200`, and an `add` runs with the value of `100`, the result would be `300`.
 
 Arguments:
-*
-*
-*
-*
-*
+
+| -------------- | ---------- |
+| `beat: float` | The song beat when the mod begins to apply. |
+| `len: float` | The amount of beats before the ease is complete. |
+| [`ease_fn: function`](eases.md) | The way to approach the target value. |
+| `percent: float` | The amount to add to the mod. |
+| `mod: string` | The mod to apply. |
 
 Example:
 ```lua
