@@ -1,3 +1,4 @@
+[Back to main page](..)
 # Aux
 ```lua
 aux {modname}
@@ -47,10 +48,10 @@ node creates a function that takes in mod values and outputs mod values.
 | `modname_out (optional): 0 or more strings` | The name of the mods to write back to. |
 
 ## Examples
-Node is a very general function that can be used in different ways. Because of this, there are lots of fully-functional examples that should be simple to modify.
+Node is a very general function that can be used in different ways. These examples explore some of the ways in which node can be used.
 <br><br>
 ### Blacksphere
-This example shows how to encode the "blacksphere" effect into a node.
+This example shows how to create a `'blacksphere'` mod with `node`.
 ```lua
 aux {'blacksphere'}
 node {
@@ -73,15 +74,13 @@ ease {4, 1, outExpo, 0, 'blacksphere'}
 ```
 <br><br>
 ### Rotate BG
-Another use of `node` is to bind properties of actors to auxiliary mods. In this example, the mod `'rotatebg'` is is set up to control the angle of an actor.
+`node` can be used to bind properties of actors to auxiliary mods. In this example, the mod `'rotatebg'` is is set up to control the angle of an actor.
 ```lua
--- mark 'rotatebg' as an aux mod
+-- In the Lua
 aux {'rotatebg'}
--- read 'rotatebg' and write it to the actor's rotation
 node {'rotatebg', function(p)
 	my_bg_actor:rotationz(p)
 end}
-
 
 -- In the XML
 <Layer Name = "my_bg_actor" File = "my_background_file.png">
@@ -153,7 +152,6 @@ node {
 		ox, oz = oz, ox
 		return ox, oy, oz
 	end,
-	'confusionxoffset', 'confusionyoffset', 'confusionzoffset',
 }
 ```
 <br><br>
