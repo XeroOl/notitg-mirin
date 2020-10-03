@@ -8,10 +8,10 @@ Join the [NotITG Discord](https://uksrt.heysora.net/discord) to learn more about
 The Mirin Template is designed to make easing as simple as possible, while remaining incredibly powerful.
 
 
-## Planned Documentation:
+## Documentation:
 <div style="display:flex">
 <div style="flex:50%" markdown="1">
-How to set up the template (Installation instructions)
+* How to set up the template
 * [set](docs/set.md)
 * [ease](docs/ease.md)
 * [add](docs/ease.md#add)
@@ -24,7 +24,7 @@ How to set up the template (Installation instructions)
 <div style="flex:50%" markdown="1">
 * alias examples
 * func examples
-* function ease examples (when it gets implemented)
+* function ease examples (later)
 * poptions examples
 * aft examples
 * shader examples
