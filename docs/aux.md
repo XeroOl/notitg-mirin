@@ -1,4 +1,4 @@
-# Aux
+ Aux
 ```lua
 aux {modname}
 ```
@@ -37,8 +37,10 @@ node {
 	modname_out
 }
 ```
-Oh boy, welcome to node. This is probably the most complicated function in the Mirin Template, but it is also the most powerful.
 
+
+`node` creates a function that transforms the values of mods before they are applied every frame.
+node creates a function that takes in mod values and outputs mod values.
 
 | -------------- | ---------- |
 | `modname: 1 or more strings` | The mods to take as input to the function |
@@ -61,14 +63,13 @@ node {
 	'invert', 'alternate', 'reverse',
 }
 ```
-Firstly, the `aux` function marks the mod `blacksphere` as an auxiliary mod. Then, the `node` function reads that mod, calculates the amount of `invert`, `alternate`, and `reverse` to apply, and applies them by returning them from the node.
+Firstly, the `aux` function marks the mod `blacksphere` as an auxiliary mod. Then, the `node` function reads the value stored in `'blacksphere'`, and calculates and returns the amount of `invert`, `alternate`, and `reverse` to apply.
 
 Then, the `blacksphere` auxiliary mod can be used:
 ```lua
 ease {0, 1, outExpo, 180, 'blacksphere'}
 ease {4, 1, outExpo, 0, 'blacksphere'}
 ```
-
 
 ### Tornado scaled by Flip
 If a node reads and writes to the same mod, then that mod is overwritten instead of added.
@@ -82,14 +83,14 @@ node {
 }
 ```
 
-
 ### Superpowered Counter Rotation
 Here's an example of how powerful `node` can be:
 This node makes the confusionoffset mods be independent of the rotation mods.
 ```lua
 local sin, cos, atan2, asin, pi = math.sin, math.cos, math.atan2, math.asin, math.pi
 node {
-	'rotationx', 'rotationy', 'rotationz', 'confusionxoffset', 'confusionyoffset', 'confusionzoffset',
+	'rotationx', 'rotationy', 'rotationz',
+	'confusionxoffset', 'confusionyoffset', 'confusionzoffset',
 	function(rx, ry, rz, cx, cy, cz)
 		-- transform axes
 		rx, rz = rz, rx
