@@ -1,6 +1,6 @@
 [Back to main page](..)
-<br>
-Here is a list of mods that are useful for making mod files. There may be some missing mods or duplicates or aliases, but it's relatively complete.
+# Mod List
+Here is a list of mods that are useful for making mod files. There may be some missing mods or duplicates or aliases, but the list is relatively complete.
 ```
 xmod
 cmod

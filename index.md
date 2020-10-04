@@ -19,7 +19,7 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * actors
 * [aux](docs/aux.md)
 * [node](docs/aux.md#node)
-* alias
+* [alias](docs/alias.md)
 </div>
 <div style="flex:50%" markdown="1">
 * [extra players](docs/players.md)
