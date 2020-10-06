@@ -439,7 +439,7 @@
 	-- replaces aliases with their respective mods
 	local function resolve_aliases()
 		-- ease
-		for _, ease_entry in ipairs(eases) do
+		for _, e in ipairs(eases) do
 			for i = 5, e.n, 2 do e[i] = normalize_mod(e[i]) end
 		end
 		-- aux
