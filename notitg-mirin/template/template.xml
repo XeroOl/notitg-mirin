@@ -69,6 +69,7 @@
 	
 	-- mod aliases, or ease vars
 	local aliases = {}
+	local reverse_aliases = {}
 	
 	-- alias a mod
 	function alias(self, depth, name)
@@ -88,8 +89,21 @@
 			return alias
 		end
 		a, b = string.lower(a), string.lower(b)
-		while aliases[b] do b = aliases[b] end
-		aliases[a] = b
+		local collection = {a}
+		while aliases[b] do
+			if reverse_aliases[b] then
+				for _, item in ipairs(reverse_aliases[b]) do
+					table.insert(collection, item)
+				end
+				reverse_aliases[b] = nil
+			end
+			b = aliases[b]
+		end
+		reverse_aliases[b] = reverse_aliases[b] or {}
+		for _, name in ipairs(collection) do
+			aliases[name] = b
+			table.insert(reverse_aliases[b], name)
+		end
 		return alias
 	end
 	
@@ -100,6 +114,7 @@
 	
 	local default_plr = {1, 2}
 	
+	-- the table of eases/add/set
 	local eases = {n = 0}
 	
 	function ease(self, depth, name)
@@ -131,7 +146,6 @@
 				screen_error('invalid mod', depth, name)
 				return ease
 			end
-			self[i + 1] = normalize_mod(self[i + 1])
 			i = i + 2
 		end
 		self.n = i - 1
@@ -235,7 +249,30 @@
 		else
 			self.priority = funcs.n
 		end
+		-- todo make this clearer and less terrifying
+		if d then
+			func  {a + b, function() c(a + b) end}
+		end
 		return func
+	end
+	
+	-- auxilliary variables
+	local auxes = {}
+	
+	function aux(self, depth, name)
+		local depth = 1 + (type(depth) == 'number' and depth or 0)
+		local name = name or 'aux'
+		if type(self) == 'string' then
+			local v = self
+			auxes[v] = true
+		elseif type(self) == 'table' then
+			for i = 1, #self do
+				aux(self[i], depth, name)
+			end
+		else
+			screen_error('aux var name must be a string', depth, name)
+		end
+		return aux
 	end
 	
 	-- the table of nodes
@@ -253,7 +290,7 @@
 		local inputs = {}
 		local reverse_in = {}
 		while type(self[i]) == 'string' do
-			table.insert(inputs, normalize_mod(self[i]))
+			table.insert(inputs, self[i])
 			set({-9e9, 0, self[i]}, depth, name)
 			i = i + 1
 		end
@@ -267,7 +304,7 @@
 		i = i + 1
 		local out = {}
 		while type(self[i]) == 'string' do
-			table.insert(out, normalize_mod(self[i]))
+			table.insert(out, self[i])
 			i = i + 1
 		end
 		local result = {inputs, out, fn}
@@ -398,37 +435,38 @@
 		node_start = start
 	end
 	
-	-- auxilliary variables
-	local auxes = {}
-	
-	function aux(self, depth, name)
-		local depth = 1 + (type(depth) == 'number' and depth or 0)
-		local name = name or 'aux'
-		if type(self) == 'string' then
-			local v = normalize_mod(self)
-			auxes[v] = true
-		elseif type(self) == 'table' then
-			for i = 1, #self do
-				aux(self[i], depth, name)
-			end
-		else
-			screen_error('aux var name must be a string', depth, name)
+	-- scans through all the tables
+	-- replaces aliases with their respective mods
+	local function resolve_aliases()
+		-- ease
+		for _, ease_entry in ipairs(eases) do
+			for i = 5, e.n, 2 do e[i] = normalize_mod(e[i]) end
 		end
-		return aux
+		-- aux
+		local new_auxes = {}
+		for mod, _ in pairs(auxes) do
+			new_auxes[normalize_mod(mod)] = true
+		end
+		auxes = new_auxes
+		-- node
+		for _, node_entry in ipairs(nodes) do
+			local input = node_entry[1]
+			local output = node_entry[2]
+			for i = 1, #input do input[i] = normalize_mod(input[i]) end
+			for i = 1, #output do output[i] = normalize_mod(output[i]) end
+		end
 	end
 	
-	function on_command(self)
+	-- takes every actor with a Name= and places it in the xero table
+	local function scan_named_actors()
 		local mt = {}
 		function mt.__index(self, k)
 			self[k] = setmetatable({}, mt)
 			return self[k]
 		end
-		
 		local actors = setmetatable({}, mt)
-		
 		local list = {n = 0}
 		local code = stringbuilder()
-		
 		local function sweep(actor)
 			if actor.GetNumChildren then
 				for i = 0, actor:GetNumChildren() - 1 do
@@ -452,7 +490,7 @@
 		local function clear_metatables(tab)
 			setmetatable(tab, nil)
 			for _, obj in pairs(tab) do
-				if type(obj) == 'table' then
+				if type(obj) == 'table' and not getmetatable(obj) then
 					clear_metatables(obj)
 				end
 			end
@@ -463,8 +501,11 @@
 			xero[name] = actor
 		end
 		
+	end
+	
+	function on_command(self)
+		scan_named_actors()
 		self:queuecommand('BeginUpdate')
-		
 	end
 	
 	function begin_update_command(self)
@@ -500,7 +541,7 @@
 			local x, y = a.priority, b.priority
 			return x * x * y < x * y * y
 		end)
-		
+		resolve_aliases()
 		compile_nodes()
 		
 		self:luaeffect('Update')
