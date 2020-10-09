@@ -56,6 +56,13 @@
 		sprite:SetTexture(aft:GetTexture())
 	end
 	
+	function setupJudgeProxy(proxy, target, pn)
+		proxy:SetTarget(target)
+		proxy:xy(scx * (pn-.5), scy)
+		target:hidden(1)
+		target:sleep(9e9)
+	end
+	
 	function screen_error(output, depth, name)
 		local depth = 3 + (depth or 0)
 		local _, err = pcall(error, name and (name .. ':' .. output) or output, depth)
@@ -81,14 +88,15 @@
 		end
 		local a, b = self[1], self[2]
 		if type(a) ~= 'string' then
-			screen_error('unexpected argument 1' , depth, name)
+			screen_error('unexpected argument 1', depth, name)
 			return alias
 		end
 		if type(b) ~= 'string' then
-			screen_error('unexpected argument 2' , depth, name)
+			screen_error('unexpected argument 2', depth, name)
 			return alias
 		end
 		a, b = string.lower(a), string.lower(b)
+		-- TODO make alias logic clearer
 		local collection = {a}
 		while aliases[b] do
 			if reverse_aliases[b] then
@@ -113,6 +121,10 @@
 	end
 	
 	local default_plr = {1, 2}
+	
+	function get_plr()
+		return rawget(xero, 'plr') or default_plr
+	end
 	
 	-- the table of eases/add/set
 	local eases = {n = 0}
@@ -160,7 +172,7 @@
 		if self.mode or self.m then
 			self[2] = self[2] - self[1]
 		end
-		local plr = self.plr or rawget(xero, 'plr') or default_plr
+		local plr = self.plr or get_plr()
 		if type(plr) == 'number' then
 			self.plr = plr
 			push(eases, self)
@@ -233,7 +245,7 @@
 		elseif type(a) == 'number' and type(b) == 'function' then
 			a, b, c = a, nil, b
 		else
-			screen_error('invalid arguments', depth, name)
+			screen_error('invalid arguments: overload resolution failed', depth, name)
 			return func
 		end
 		self[1], self[2], self[3], self[4], self[5], self[6] = a, b, c
@@ -249,9 +261,10 @@
 		else
 			self.priority = funcs.n
 		end
-		-- todo make this clearer and less terrifying
+		-- if it's a function-ease variant then make it persist
 		if d then
-			func  {a + b, function() c(a + b) end}
+			local end_beat = a + b
+			func  {end_beat, function() c(end_beat) end}
 		end
 		return func
 	end
@@ -324,7 +337,7 @@
 		end
 		for k, _ in pairs(terminators) do
 			push(nodes, {{k}, {}, nil, nil, nil, nil, nil, true})
-		end	
+		end
 		local start = {}
 		local locked = {}
 		local last = {}
@@ -392,7 +405,7 @@
 			local function emit_inputs()
 				for i, mod in ipairs(inputs) do
 					list(code, i, ',')
-					 for j = 1, #parents[i] do
+					for j = 1, #parents[i] do
 						list(code, j, '+')
 						code'parents['(i)']['(j)'][pn]['(escapestr(mod))']'
 					end

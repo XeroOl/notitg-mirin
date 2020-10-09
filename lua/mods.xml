@@ -1,40 +1,24 @@
 <Mods LoadCommand = "%xero(function(self)
-	self:SetVanishPoint(scx, scy)
-	self:fov(45)
-	P1:hidden(1)
-	P2:hidden(1)
-	
-	local function setupProxy(proxy, target, pn)
-		proxy:SetTarget(target)
-		proxy:xy(scx * (((pn-1)%2)+0.5), scy)
-		target:hidden(1)
-		target:sleep(9e9)
-	end
-	
-	-- notefield proxies
-	for pn = 1, #PP do
-		setupProxy(PP[pn], P[(pn-1)%2+1]:GetChild('NoteField'), pn)
-	end
-	
 	-- judgment / combo proxies
 	for pn = 1, 2 do
-		setupProxy(PC[pn], P[pn]:GetChild('Combo'), pn)
-		setupProxy(PJ[pn], P[pn]:GetChild('Judgment'), pn)
+		setupJudgeProxy(PJ[pn], P[pn]:GetChild('Judgment'), pn)
+		setupJudgeProxy(PC[pn], P[pn]:GetChild('Combo'), pn)
 	end
-	
+	-- player proxies
+	for pn = 1, #PP do
+		PP[pn]:SetProxy(P[pn])
+		P[pn]:hidden(1)
+	end
 	-- your code goes here here:
-	
 	
 	
 end)"
 Type = "ActorFrame"
 ><children>
-
 	<Layer Type = "ActorProxy" Name = "PC[1]" />
 	<Layer Type = "ActorProxy" Name = "PC[2]" />
 	<Layer Type = "ActorProxy" Name = "PJ[1]" />
 	<Layer Type = "ActorProxy" Name = "PJ[2]" />
 	<Layer Type = "ActorProxy" Name = "PP[1]" />
 	<Layer Type = "ActorProxy" Name = "PP[2]" />
-	
 </children></Mods>
