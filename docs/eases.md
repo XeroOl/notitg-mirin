@@ -1,63 +1,96 @@
 [Back to main page](..)
 # Ease List
 The following eases are not transient:
-![instant](eases/instant.png)
-![linear](eases/linear.png)
+<style>
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 4px;
+}
 
-![inQuad](eases/inQuad.png)
-![outQuad](eases/outQuad.png)
-![inOutQuad](eases/inOutQuad.png)
+/* Create four equal columns that sits next to each other */
+.column {
+  flex: 25%;
+  max-width: 25%;
+  padding: 0 4px;
+}
 
-![inCubic](eases/inCubic.png)
-![outCubic](eases/outCubic.png)
-![inOutCubic](eases/inOutCubic.png)
+.column img {
+  margin-top: 8px;
+  vertical-align: middle;
+  width: 100%;
+}
 
-![inQuart](eases/inQuart.png)
-![outQuart](eases/outQuart.png)
-![inOutQuart](eases/inOutQuart.png)
+/* Responsive layout - makes a two column-layout instead of four columns */
+@media screen and (max-width: 800px) {
+  .column {
+    flex: 50%;
+    max-width: 50%;
+  }
+}
 
-![inQuint](eases/inQuint.png)
-![outQuint](eases/outQuint.png)
-![inOutQuint](eases/inOutQuint.png)
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+  .column {
+    flex: 100%;
+    max-width: 100%;
+  }
+}
+</style>
+<div class="row">
+	<div class="column">
+		<img src="eases/instant.png"/>
+		<img src="eases/inQuad.png"/>
+		<img src="eases/outQuad.png"/>
+		<img src="eases/inOutQuad.png"/>
+		<img src="eases/inCubic.png"/>
+		<img src="eases/outCubic.png"/>
+		<img src="eases/inOutCubic.png"/>
+		<img src="eases/inQuart.png"/>
+		<img src="eases/outQuart.png"/>
+		<img src="eases/inOutQuart.png"/>
+	</div>
+	<div class="column">
+		<img src="eases/linear.png"/>
+		<img src="eases/inQuint.png"/>
+		<img src="eases/outQuint.png"/>
+		<img src="eases/inOutQuint.png"/>
+		<img src="eases/inExpo.png"/>
+		<img src="eases/outExpo.png"/>
+		<img src="eases/inOutExpo.png"/>
+		<img src="eases/inCirc.png"/>
+		<img src="eases/outCirc.png"/>
+		<img src="eases/inOutCirc.png"/>
 
-![inExpo](eases/inExpo.png)
-![outExpo](eases/outExpo.png)
-![inOutExpo](eases/inOutExpo.png)
-
-![inCirc](eases/inCirc.png)
-![outCirc](eases/outCirc.png)
-![inOutCirc](eases/inOutCirc.png)
-
-![inElastic](eases/inElastic.png)
-![outElastic](eases/outElastic.png)
-![inOutElastic](eases/inOutElastic.png)
-
-![inBack](eases/inBack.png)
-![outBack](eases/outBack.png)
-![inOutBack](eases/inOutBack.png)
-
-![inBounce](eases/inBounce.png)
-![outBounce](eases/outBounce.png)
-![inOutBounce](eases/inOutBounce.png)
-
-![inSine](eases/inSine.png)
-![outSine](eases/outSine.png)
-![inOutSine](eases/inOutSine.png)
-```
-Transient Eases are a type of ease function that doesn't actually permanently change the percentage of a mod; it only makes the change temporarily.
-The following eases are transient eases:
-```
-![bounce](eases/bounce.png)
-![tri](eases/tri.png)
-![bell](eases/bell.png)
-![pop](eases/pop.png)
-![tap](eases/tap.png)
-![spike](eases/spike.png)
-![pulse](eases/pulse.png)
-![spike](eases/spike.png)
-![inverse](eases/inverse.png)
+	</div>
+	<div class="column">
+		<img src="eases/inBack.png"/>
+		<img src="eases/outBack.png"/>
+		<img src="eases/inOutBack.png"/>
+		<img src="eases/inBounce.png"/>
+		<img src="eases/outBounce.png"/>
+		<img src="eases/inOutBounce.png"/>
+		<img src="eases/inSine.png"/>
+		<img src="eases/outSine.png"/>
+		<img src="eases/inOutSine.png"/>
+		<img src="eases/inElastic.png"/>
+		<img src="eases/outElastic.png"/>
+		<img src="eases/inOutElastic.png"/>
+	</div>
+	<div class="column">
+		<img src="eases/bounce.png"/>
+		<img src="eases/tri.png"/>
+		<img src="eases/bell.png"/>
+		<img src="eases/pop.png"/>
+		<img src="eases/tap.png"/>
+		<img src="eases/spike.png"/>
+		<img src="eases/pulse.png"/>
+		<img src="eases/spike.png"/>
+		<img src="eases/inverse.png"/>
+	</div>
+</div>
+TODO:
 popElastic[damping_factor][oscillation_speed]
 tapElastic[damping_factor][oscillation_speed]
 pulseElastic[damping_factor][oscillation_speed]
 impulse[damp]
-```
