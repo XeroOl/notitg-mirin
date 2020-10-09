@@ -1,6 +1,6 @@
 [Back to main page](..)
 # Ease List
-The following eases are not transient:
+Here is a plot of each ease.
 <style>
 .row {
   display: flex;
