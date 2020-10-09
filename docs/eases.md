@@ -1,61 +1,61 @@
 [Back to main page](..)
 # Ease List
 The following eases are not transient:
-![instant](instant.png)
-![linear](linear.png)
+![instant](eases/instant.png)
+![linear](eases/linear.png)
 
-![inQuad](inQuad.png)
-![outQuad](outQuad.png)
-![inOutQuad](inOutQuad.png)
+![inQuad](eases/inQuad.png)
+![outQuad](eases/outQuad.png)
+![inOutQuad](eases/inOutQuad.png)
 
-![inCubic](inCubic.png)
-![outCubic](outCubic.png)
-![inOutCubic](inOutCubic.png)
+![inCubic](eases/inCubic.png)
+![outCubic](eases/outCubic.png)
+![inOutCubic](eases/inOutCubic.png)
 
-![inQuart](inQuart.png)
-![outQuart](outQuart.png)
-![inOutQuart](inOutQuart.png)
+![inQuart](eases/inQuart.png)
+![outQuart](eases/outQuart.png)
+![inOutQuart](eases/inOutQuart.png)
 
-![inQuint](inQuint.png)
-![outQuint](outQuint.png)
-![inOutQuint](inOutQuint.png)
+![inQuint](eases/inQuint.png)
+![outQuint](eases/outQuint.png)
+![inOutQuint](eases/inOutQuint.png)
 
-![inExpo](inExpo.png)
-![outExpo](outExpo.png)
-![inOutExpo](inOutExpo.png)
+![inExpo](eases/inExpo.png)
+![outExpo](eases/outExpo.png)
+![inOutExpo](eases/inOutExpo.png)
 
-![inCirc](inCirc.png)
-![outCirc](outCirc.png)
-![inOutCirc](inOutCirc.png)
+![inCirc](eases/inCirc.png)
+![outCirc](eases/outCirc.png)
+![inOutCirc](eases/inOutCirc.png)
 
-![inElastic](inElastic.png)
-![outElastic](outElastic.png)
-![inOutElastic](inOutElastic.png)
+![inElastic](eases/inElastic.png)
+![outElastic](eases/outElastic.png)
+![inOutElastic](eases/inOutElastic.png)
 
-![inBack](inBack.png)
-![outBack](outBack.png)
-![inOutBack](inOutBack.png)
+![inBack](eases/inBack.png)
+![outBack](eases/outBack.png)
+![inOutBack](eases/inOutBack.png)
 
-![inBounce](inBounce.png)
-![outBounce](outBounce.png)
-![inOutBounce](inOutBounce.png)
+![inBounce](eases/inBounce.png)
+![outBounce](eases/outBounce.png)
+![inOutBounce](eases/inOutBounce.png)
 
-![inSine](inSine.png)
-![outSine](outSine.png)
-![inOutSine](inOutSine.png)
+![inSine](eases/inSine.png)
+![outSine](eases/outSine.png)
+![inOutSine](eases/inOutSine.png)
 ```
 Transient Eases are a type of ease function that doesn't actually permanently change the percentage of a mod; it only makes the change temporarily.
 The following eases are transient eases:
 ```
-![bounce](bounce.png)
-![tri](tri.png)
-![bell](bell.png)
-![pop](pop.png)
-![tap](tap.png)
-![spike](spike.png)
-![pulse](pulse.png)
-![spike](spike.png)
-![inverse](inverse.png)
+![bounce](eases/bounce.png)
+![tri](eases/tri.png)
+![bell](eases/bell.png)
+![pop](eases/pop.png)
+![tap](eases/tap.png)
+![spike](eases/spike.png)
+![pulse](eases/pulse.png)
+![spike](eases/spike.png)
+![inverse](eases/inverse.png)
 popElastic[damping_factor][oscillation_speed]
 tapElastic[damping_factor][oscillation_speed]
 pulseElastic[damping_factor][oscillation_speed]
