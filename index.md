@@ -24,7 +24,7 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 <div style="flex:50%" markdown="1">
 * [extra players](docs/players.md)
 * mode='end'
-* func
+* [func](docs/func.md)
 * function eases
 * poptions
 * [aft](docs/aft.md)
