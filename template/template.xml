@@ -228,16 +228,19 @@
 		local can_use_poptions = false
 		local a, b, c, d, e, f = self[1], self[2], self[3], self[4], self[5], self[6]
 		if type(a) == 'number' and type(b) == 'number' and type(c) == 'function' and type(d) == 'number' and type(e) == 'number' and type(f) == 'function' then
+			local eas = c
 			a, b, c = a, b, function(beat)
-				f(d + (e - d) * c((beat - a) / b))
+				f(d + (e - d) * eas((beat - a) / b))
 			end
 		elseif type(a) == 'number' and type(b) == 'number' and type(c) == 'function' and type(d) == 'number' and type(e) == 'function' then
+			local eas = c
 			a, b, c = a, b, function(beat)
-				e(d * c((beat - a) / b))
+				e(d * eas((beat - a) / b))
 			end
 		elseif type(a) == 'number' and type(b) == 'number' and type(c) == 'function' and type(d) == 'function' then
+			local eas = c
 			a, b, c = a, b, function(beat)
-				e(c((beat - a) / b))
+				d(eas((beat - a) / b))
 			end
 		elseif type(a) == 'number' and type(b) == 'number' and type(c) == 'function' then
 			a, b, c = a, b, c
@@ -245,10 +248,10 @@
 		elseif type(a) == 'number' and type(b) == 'function' then
 			a, b, c = a, nil, b
 		else
-			screen_error('invalid arguments: overload resolution failed', depth, name)
+			screen_error('overload resolution failed: check argument types', depth, name)
 			return func
 		end
-		self[1], self[2], self[3], self[4], self[5], self[6] = a, b, c
+		self[1], self[2], self[3], self[4], self[5], self[6] = a, b, c, nil, nil, nil
 		if can_use_poptions then
 			self.mods = {}
 			for pn = 1, max_pn do
@@ -264,7 +267,7 @@
 		-- if it's a function-ease variant then make it persist
 		if d then
 			local end_beat = a + b
-			func  {end_beat, function() c(end_beat) end}
+			func {end_beat, function() c(end_beat) end}
 		end
 		return func
 	end
@@ -760,9 +763,11 @@
 				poptions_logging_target = e.mods
 				e[3](beat, poptions)
 			else
-				for pn = 1, max_pn do
-					for mod, _ in e.mods[pn] do
-						mods[pn][mod] = mods[pn][mod] + 0
+				if e.mods then
+					for pn = 1, max_pn do
+						for mod, _ in e.mods[pn] do
+							mods[pn][mod] = mods[pn][mod] + 0
+						end
 					end
 				end
 				active_funcs:remove()

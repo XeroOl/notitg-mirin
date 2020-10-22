@@ -6,7 +6,7 @@
 	end
 	-- player proxies
 	for pn = 1, #PP do
-		PP[pn]:SetProxy(P[pn])
+		PP[pn]:SetTarget(P[pn])
 		P[pn]:hidden(1)
 	end
 	-- your code goes here here:
