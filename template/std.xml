@@ -169,7 +169,14 @@
 	end
 	
 	local stringbuilder_mt =  {
-		__index = { build = table.concat },
+		__index = {
+			build = table.concat,
+			sep = function(self, sep)
+				if self[1] then
+					self(sep)
+				end
+			end,
+		},
 		__tostring = table.concat,
 		__call = function(self, a)
 			table.insert(self, tostring(a))

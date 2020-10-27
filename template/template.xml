@@ -331,6 +331,7 @@
 	end
 	
 	local mods = {}
+	mod_buffer = stringbuilder()
 	
 	function compile_nodes()
 		local terminators = {}
@@ -598,9 +599,9 @@
 		'xmod', 'cmod',
 		function(xmod, cmod)
 			if cmod == 0 then
-				GAMESTATE:ApplyModifiers('*-1 ' .. string.format('%f', xmod) .. 'x')
+				mod_buffer(string.format('*-1 %fx', xmod))
 			else
-				GAMESTATE:ApplyModifiers('*-1 ' .. string.format('%f', xmod) .. 'x,*-1 c' .. cmod)
+				mod_buffer(string.format('*-1 %fx,*-1 c%f', xmod, cmod))
 			end
 		end,
 		defer = true,
@@ -777,6 +778,7 @@
 		
 		for pn = 1, max_pn do
 			if P[pn] and P[pn]:IsAwake() then
+				mod_buffer = stringbuilder()
 				seen = seen + 1
 				for k in pairs(mods[pn]) do
 					-- identify all nodes to execute this frame
@@ -790,16 +792,14 @@
 					-- run all the nodes marked as 'terminator'
 					table.remove(active_terminators)[6](pn)
 				end
-				local modifiers = stringbuilder()
 				for mod, percent in pairs(mods[pn]) do
-					if modifiers[1] then modifiers ',' end
 					if not auxes[mod] then
-						modifiers'*-1 '(percent)' '(mod)
+						mod_buffer('*-1 '..percent..' '..mod)
 					end
 					mods[pn][mod] = nil
 				end
-				if modifiers[1] then
-					apply_modifiers(modifiers:build(), pn)
+				if mod_buffer[1] then
+					apply_modifiers(mod_buffer:build(','), pn)
 				end
 			end
 		end
