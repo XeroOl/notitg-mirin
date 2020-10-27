@@ -24,6 +24,7 @@
 	tostring = tostring
 	math = copy(math)
 	table = copy(table)
+	string = copy(string)
 	
 	dw = DISPLAY:GetDisplayWidth()
 	dh = DISPLAY:GetDisplayHeight()
@@ -499,7 +500,7 @@
 		code'return function(list, actors)\n'
 			sweep(foreground)
 		code'end'
-
+		
 		local load_actors = xero(assert(loadstring(code:build())))()
 		load_actors(list, actors)
 		
