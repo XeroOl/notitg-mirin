@@ -31,15 +31,16 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * shader
 * [list of mods](docs/mods.md)
 * [list of ease functions](docs/eases.md)
+* [list of all variables](docs/index.md)
 </div>
 </div>
+
 ```lua
 -- turn on invert
 ease {0, 1, outExpo, 100, 'invert'}
 -- turn off invert
 ease {7, 1, outExpo, 0, 'invert'}
 ```
-
 Bonus: [gradients](docs/gradients.md) [splines](docs/splines.md)
 
 Documentation by XeroOl, Chegg, Kirby5464
