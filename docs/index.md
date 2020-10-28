@@ -124,20 +124,20 @@ Sorted by `beat`
 ### active_eases
 same as `eases` table, but only ones that meet `beat <= curbeat < beat+len`
 ### funcs
-`{beat: number, len: number?, func: function(beat, poptions): void, ['mods']: {{[key: string]: number} * max_pn}?, ['priority']: number}`
+`{beat: number, len: number?, func: function(beat, poptions): void, ['mods']: {\{[key: string]: number} * max_pn}?, ['priority']: number}`
 sorted by priority, but negative priorities are placed after positive ones, so that `defer=true` funcs will be placed last.
 ### active_funcs
 same as `funcs`, but only ones that meet `len and (beat <= curbeat < beat+len)`
 ### auxes
 `{[key: string]: true}`
 ### mods
-`{{[key: string]: number} * max_pn}`
+`{\{[key: string]: number} * max_pn}`
 but only values that are going to be applied this frame
 ### targets
-`{{[key: string]: number} * max_pn}`
+`{\{[key: string]: number} * max_pn}`
 the value that the mod will arive at once all of the currently active eases complete
 ### poptions
-behaves as if it has the type `{{[key: string]: number} * max_pn}`
+behaves as if it has the type `{\{[key: string]: number} * max_pn}`
 ### nodes
 `{inputs: {...string}, out: {...string}, fn: function(?):?, ['priority']: number}`
 sorted by priority, but negative priorities are placed after positive ones, so that `defer=true` nodes will be placed last.
