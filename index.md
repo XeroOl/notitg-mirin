@@ -9,6 +9,7 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 
 
 ## Documentation:
+[Index](docs/index.md)
 <div style="display:flex">
 <div style="flex:50%" markdown="1">
 * How to set up the template
@@ -31,7 +32,6 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * shader
 * [list of mods](docs/mods.md)
 * [list of ease functions](docs/eases.md)
-* [list of all variables](docs/index.md)
 </div>
 </div>
 
