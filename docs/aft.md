@@ -5,35 +5,33 @@ ActorFrameTexture (AFT) is an Actor which captures the layers beneath it (drawn 
 
 Example of setting up an AFT layer:
 ```xml
-<Layer Type = "ActorFrameTexture" Name = "my_aft" />
+<Mods LoadCommand = "%xero(function(self)
+	-- judgment / combo proxies
+	for pn = 1, 2 do
+		setupJudgeProxy(PJ[pn], P[pn]:GetChild('Judgment'), pn)
+		setupJudgeProxy(PC[pn], P[pn]:GetChild('Combo'), pn)
+	end
+	-- player proxies
+	for pn = 1, #PP do
+		PP[pn]:SetTarget(P[pn])
+		P[pn]:hidden(1)
+	end
+	-- your code goes here here:
+	sprite(mysprite) -- set up the sprite
+	aft(myaft) -- set up the aft
+	mysprite:SetTexture(myaft:GetTexture()) -- set up the texture
+	
+end)"
+Type = "ActorFrame"
+><children>
+	<Layer Type = "Sprite" Name = "mysprite" />
+	<Layer Type = "ActorProxy" Name = "PC[1]" />
+	<Layer Type = "ActorProxy" Name = "PC[2]" />
+	<Layer Type = "ActorProxy" Name = "PJ[1]" />
+	<Layer Type = "ActorProxy" Name = "PJ[2]" />
+	<Layer Type = "ActorProxy" Name = "PP[1]" />
+	<Layer Type = "ActorProxy" Name = "PP[2]" />
+	<Layer Type = "ActorFrameTexture" Name = "myaft" />
+</children></Mods>
 ```
-
-Example of setting up an AFT sprite:
-```xml
-<Layer Type = "Sprite" Name = "my_sprite" />
-```
-
-Example of setting the texture for the AFT layer (This part goes into the lua part of the template):
-```lua
-aft(my_aft) -- set up the aft
-sprite(my_sprite) -- set up the sprite
-my_sprite:SetTexture(my_aft:GetTexture()) -- set up the texture
-```
-
-Side note, depending on the sequence on setting the AFTs, it will give different results.
-
-Example of setting up an aft sprite behind the aft layer:
-```xml
-<Layer Type = "Sprite" Name = "my_sprite" />
-<Layer Type = "ActorFrameTexture" Name = "my_aft" />
-```
-
-TODO: add a screenshot for this. ^
-
-Example of setting up an aft sprite in front the aft layer:
-```xml
-<Layer Type = "ActorFrameTexture" Name = "my_aft" />
-<Layer Type = "Sprite" Name = "my_sprite" />
-```
-
-TODO: add a screenshot for this. ^
+From here, try moving / rotating mysprite, or place the AFT and Sprite at different positions in the scene.
