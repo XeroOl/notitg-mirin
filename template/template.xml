@@ -532,7 +532,7 @@
 		local function clear_metatables(tab)
 			setmetatable(tab, nil)
 			for _, obj in pairs(tab) do
-				if type(obj) == 'table' and not getmetatable(obj) then
+				if type(obj) == 'table' and getmetatable(obj) == mt then
 					clear_metatables(obj)
 				end
 			end
