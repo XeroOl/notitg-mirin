@@ -65,8 +65,8 @@
 	end
 	
 	function screen_error(output, depth, name)
-		local depth = 3 + (depth or 0)
-		local _, err = pcall(error, name and (name .. ':' .. output) or output, depth)
+		local depth = 3 + (type(depth) == 'number' and depth or 0)
+		local _, err = pcall(error, type(name) == 'string' and (name .. ':' .. output) or output, depth)
 		SCREENMAN:SystemMessage(err)
 	end
 	
