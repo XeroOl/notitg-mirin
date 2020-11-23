@@ -517,8 +517,12 @@
 			end
 			local name = actor:GetName()
 			if name and name ~= '' then
-				push(list, actor)
-				code'actors.'(name)' = list['(list.n)']\n'
+				if loadstring('t.'..name..'=t') then
+					push(list, actor)
+					code'actors.'(name)' = list['(list.n)']\n'
+				else
+					SCREENMAN:SystemMessage('invalid actor name: \''..name..'\'')
+				end
 			end
 		end
 		
