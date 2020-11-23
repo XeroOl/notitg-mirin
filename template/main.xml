@@ -1,7 +1,12 @@
-<ActorFrame InitCommand = "%function(self)
-	_G.xero = { foreground = self }
-	self:sleep(9e9)
-end">
+<ActorFrame
+	Condition = "(function()
+		_G.xero = {}
+	end)()"
+	InitCommand = "%function(self)
+		xero.foreground = self
+		self:sleep(9e9)
+	end"
+>
 	<children>
 		
 		<!-- Std library -->
