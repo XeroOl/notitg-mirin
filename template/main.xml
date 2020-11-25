@@ -1,6 +1,7 @@
 <ActorFrame
 	Condition = "(function()
 		_G.xero = {}
+		return true
 	end)()"
 	InitCommand = "%function(self)
 		xero.foreground = self
