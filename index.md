@@ -17,7 +17,7 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * [ease](docs/ease.md)
 * [add](docs/ease.md#add)
 * for loop
-* actors
+* [actors](docs/actors.md)
 * [aux](docs/aux.md)
 * [node](docs/aux.md#node)
 * [alias](docs/alias.md)
@@ -26,10 +26,10 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * [extra players](docs/players.md)
 * mode='end'
 * [func](docs/func.md)
-* function eases
-* poptions
+* [function eases](docs/func.md#func_for_function_eases)
+* [poptions](docs/func.md#poptions)
 * [aft](docs/aft.md)
-* shader
+* shaders
 * [list of mods](docs/mods.md)
 * [list of ease functions](docs/eases.md)
 </div>

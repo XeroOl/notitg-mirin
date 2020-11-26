@@ -9,10 +9,10 @@ The animation lasts `len` beats, and animates using the selected `ease_fn`.
 Arguments:
 
 | -------------- | ---------- |
-| `beat: float` | The song beat when the mod begins to apply. |
-| `len: float` | The amount of beats before the ease is complete. |
+| `beat: number` | The song beat when the mod begins to apply. |
+| `len: number` | The amount of beats before the ease is complete. |
 | [`ease_fn: function`](eases.md) | The way to approach the target value. |
-| `percent: float` | The target amount to set the mod to. |
+| `percent: number` | The target amount to set the mod to. |
 | `mod: string` | The mod to apply. |
 
 Examples:
@@ -41,10 +41,10 @@ The `add` function works like `ease`, except it is relative. The `add` function 
 Arguments:
 
 | -------------- | ---------- |
-| `beat: float` | The song beat when the mod begins to apply. |
-| `len: float` | The amount of beats before the ease is complete. |
+| `beat: number` | The song beat when the mod begins to apply. |
+| `len: number` | The amount of beats before the ease is complete. |
 | [`ease_fn: function`](eases.md) | The way to approach the target value. |
-| `percent: float` | The amount to add to the mod. |
+| `percent: number` | The amount to add to the mod. |
 | `mod: string` | The mod to apply. |
 
 Example:

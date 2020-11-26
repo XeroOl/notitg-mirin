@@ -8,8 +8,8 @@ Use the `set` function to set a mod to a specific value at a specific beat in th
 Arguments:
 
 | -------------- | ---------- |
-| `beat: float` | The song beat when the mod applies. |
-| `percent: float` | The target amount to set the mod to. |
+| `beat: number` | The song beat when the mod applies. |
+| `percent: number` | The target amount to set the mod to. |
 | `mod: string` | The mod to apply. |
 
 Examples:
