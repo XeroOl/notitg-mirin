@@ -35,6 +35,11 @@
 	sh = SCREEN_HEIGHT
 	e = 'end'
 	plr = {1, 2}
+	all_players = {}
+	
+	for pn = 1, max_pn do
+		all_players[pn] = pn
+	end
 	
 	function sprite(self)
 		self:basezoomx(sw / dw)
@@ -477,6 +482,21 @@
 		node_start = start
 	end
 	
+	-- used to create your own mods.
+	-- calls aux and node on the provided arguments
+	function definemod(self, depth, name)
+		local depth = 1 + (type(depth) == 'number' and depth or 0)
+		local name = name or 'definemod'
+		for i = 1, #self do
+			if type(self[i]) ~= 'string' then
+				break
+			end
+			aux(self[i], depth, name)
+		end
+		node(self, depth, name)
+		return definemod
+	end
+	
 	-- scans through all the tables
 	-- replaces aliases with their respective mods
 	local function resolve_aliases()
@@ -608,7 +628,7 @@
 		'zoomx', 'zoomy',
 		defer = true,
 	}
-	set {-9e9, 100, 'zoom', 100, 'zoomx', 100, 'zoomy'}
+	set {-9e9, 100, 'zoom', 100, 'zoomx', 100, 'zoomy', plr = all_players}
 	
 	-- movex
 	for _, a in ipairs {'x', 'y', 'z'} do
@@ -637,7 +657,7 @@
 		end,
 		defer = true,
 	}
-	set {-9e9+1, 1, 'xmod'}
+	set {-9e9+1, 1, 'xmod', plr = all_players}
 	
 	local targets_mt = {__index = function() return 0 end}
 	
