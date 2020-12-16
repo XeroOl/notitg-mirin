@@ -35,8 +35,8 @@
 	sh = SCREEN_HEIGHT
 	e = 'end'
 	plr = {1, 2}
+
 	all_players = {}
-	
 	for pn = 1, max_pn do
 		all_players[pn] = pn
 	end
@@ -132,6 +132,17 @@
 		return rawget(xero, 'plr') or default_plr
 	end
 	
+	-- the last set value of each mod
+	local current_mods = {}
+	local current_mods_mt = {
+		__index = function(self, i)
+			self[i] = 0
+			return 0
+		end
+	}
+	for pn = 1, max_pn do
+		current_mods[pn] = setmetatable({}, current_mods_mt)
+	end
 	-- the table of eases/add/set
 	local eases = {n = 0}
 	
@@ -191,6 +202,18 @@
 			end
 		else
 			screen_error('invalid plr', depth, name)
+		end
+		-- update current mods
+		if not self.transient then
+			for _, pn in ipairs(type(plr) == 'table' and plr or {plr}) do
+				for n = 5, self.n, 2 do
+					if self.relative then
+						current_mods[pn][self[n]] = current_mods[pn][self[n]] + self[n - 1]
+					else
+						current_mods[pn][self[n]] = self[n - 1]
+					end
+				end
+			end
 		end
 		return ease
 	end
@@ -495,6 +518,10 @@
 		end
 		node(self, depth, name)
 		return definemod
+	end
+	
+	function current(modname, pn)
+		return current_mods[pn or 1][modname]
 	end
 	
 	-- scans through all the tables
