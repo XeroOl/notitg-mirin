@@ -14,6 +14,20 @@
 		return dest
 	end
 	
+	function clear(t)
+		for k, v in pairs(t) do
+			t[k] = nil
+		end
+		return t
+	end
+
+	function iclear(t)
+		for i, v in ipairs(t) do
+			t[i] = nil
+		end
+		return t
+	end
+
 	xero = xero
 	type = type
 	print = print
@@ -35,11 +49,6 @@
 	sh = SCREEN_HEIGHT
 	e = 'end'
 	plr = {1, 2}
-
-	all_players = {}
-	for pn = 1, max_pn do
-		all_players[pn] = pn
-	end
 	
 	function sprite(self)
 		self:basezoomx(sw / dw)
@@ -78,6 +87,12 @@
 	local function push(self, obj)
 		self.n = self.n + 1
 		self[self.n] = obj
+	end
+	
+	local default_plr = {1, 2}
+	
+	function get_plr()
+		return rawget(xero, 'plr') or default_plr
 	end
 	
 	-- mod aliases, or ease vars
@@ -126,23 +141,52 @@
 		return aliases[name] or name
 	end
 	
-	local default_plr = {1, 2}
-	
-	function get_plr()
-		return rawget(xero, 'plr') or default_plr
+	-- eases are loaded after the template, so this needs to be declared early
+	local function instant()
+		return 1
 	end
 	
-	-- the last set value of each mod
-	local current_mods = {}
-	local current_mods_mt = {
+	-- the table of default mod values
+	local default_mods = setmetatable({}, {
 		__index = function(self, i)
 			self[i] = 0
 			return 0
 		end
-	}
-	for pn = 1, max_pn do
-		current_mods[pn] = setmetatable({}, current_mods_mt)
+	})
+	local modtable_mt = {__index = default_mods}
+	
+	function setdefault(self, depth, name)
+		local depth = 1 + (type(depth) == 'number' and depth or 0)
+		local name = name or 'setdefault'
+		if type(self) ~= 'table' then
+			screen_error('curly braces expected', depth, name)
+			return setdefault
+		end
+		for i = 1, #self, 2 do
+			if type(self[i]) ~= 'number' then
+				screen_error('invalid mod percent', depth, name)
+				return setdefault
+			end
+			if type(self[i + 1]) ~= 'string' then
+				screen_error('invalid mod name', depth, name)
+				return setdefault
+			end
+			default_mods[self[i + 1]] = self[i]
+			add ({0, 0, instant, 0, self[i + 1]}, depth, name)
+		end
 	end
+	
+	-- the previously set value of a mod
+	local prev_mods = {}
+	for pn = 1, max_pn do
+		prev_mods[pn] = setmetatable({}, modtable_mt)
+	end
+	
+	-- get the previously set value of a mod
+	function get(modname, pn)
+		return prev_mods[pn or 1][modname]
+	end
+	
 	-- the table of eases/add/set
 	local eases = {n = 0}
 	
@@ -203,14 +247,14 @@
 		else
 			screen_error('invalid plr', depth, name)
 		end
-		-- update current mods
+		-- update prev_mods table
 		if not self.transient then
 			for _, pn in ipairs(type(plr) == 'table' and plr or {plr}) do
 				for n = 5, self.n, 2 do
 					if self.relative then
-						current_mods[pn][self[n]] = current_mods[pn][self[n]] + self[n - 1]
+						prev_mods[pn][self[n]] = prev_mods[pn][self[n]] + self[n - 1]
 					else
-						current_mods[pn][self[n]] = self[n - 1]
+						prev_mods[pn][self[n]] = self[n - 1]
 					end
 				end
 			end
@@ -226,11 +270,9 @@
 		return add
 	end
 	
-	-- eases are loaded after the template, so this needs to be declared early
-	local function instant() return 1 end
-	
 	function set(self, depth, name)
 		local depth = 1 + (type(depth) == 'number' and depth or 0)
+		local name = name or 'set'
 		local a, b, i = 0, instant, 2
 		while a do
 			a, self[i] = self[i], a
@@ -239,6 +281,22 @@
 		end
 		ease(self, depth, name)
 		return set
+	end
+
+	function reset(self, depth, name)
+		local depth = 1 + (type(depth) == 'number' and depth or 0)
+		local name = name or 'reset'
+		if type(self) ~= 'table' then
+			screen_error('curly braces expected', depth, name)
+		end
+		self[2] = self[2] or 0
+		self[3] = self[3] or instant
+		self.reset = true
+		self.exclude = self.exclude or {}
+		for _, v in ipairs(self.exclude) do
+			self.exclude[v] = true
+		end
+		ease(self, depth, name)
 	end
 	
 	-- the table of scheduled functions and perframes
@@ -360,7 +418,7 @@
 		local reverse_in = {}
 		while type(self[i]) == 'string' do
 			table.insert(inputs, self[i])
-			set({-9e9, 0, self[i]}, depth, name)
+			add({0, 0, instant, 0, self[i]}, depth, name)
 			i = i + 1
 		end
 		if i == 1 then
@@ -380,6 +438,21 @@
 		result.priority = self.defer and -nodes.n or nodes.n
 		push(nodes, result)
 		return node
+	end
+	
+	-- used to create your own mods.
+	-- calls aux and node on the provided arguments
+	function definemod(self, depth, name)
+		local depth = 1 + (type(depth) == 'number' and depth or 0)
+		local name = name or 'definemod'
+		for i = 1, #self do
+			if type(self[i]) ~= 'string' then
+				break
+			end
+			aux(self[i], depth, name)
+		end
+		node(self, depth, name)
+		return definemod
 	end
 	
 	local mods = {}
@@ -505,26 +578,6 @@
 		node_start = start
 	end
 	
-	-- used to create your own mods.
-	-- calls aux and node on the provided arguments
-	function definemod(self, depth, name)
-		local depth = 1 + (type(depth) == 'number' and depth or 0)
-		local name = name or 'definemod'
-		for i = 1, #self do
-			if type(self[i]) ~= 'string' then
-				break
-			end
-			aux(self[i], depth, name)
-		end
-		node(self, depth, name)
-		return definemod
-	end
-	
-	function current(modname, pn)
-		return current_mods[pn or 1][modname]
-	end
-	
-	-- scans through all the tables
 	-- replaces aliases with their respective mods
 	local function resolve_aliases()
 		-- ease
@@ -532,17 +585,23 @@
 			for i = 5, e.n, 2 do e[i] = normalize_mod(e[i]) end
 		end
 		-- aux
-		local new_auxes = {}
-		for mod, _ in pairs(auxes) do
-			new_auxes[normalize_mod(mod)] = true
+		local old_auxes = copy(auxes)
+		clear(auxes)
+		for mod, _ in pairs(old_auxes) do
+			auxes[normalize_mod(mod)] = true
 		end
-		auxes = new_auxes
 		-- node
 		for _, node_entry in ipairs(nodes) do
 			local input = node_entry[1]
 			local output = node_entry[2]
 			for i = 1, #input do input[i] = normalize_mod(input[i]) end
 			for i = 1, #output do output[i] = normalize_mod(output[i]) end
+		end
+		-- default_mods
+		local old_default_mods = copy(default_mods)
+		clear(default_mods)
+		for mod, percent in pairs(old_default_mods) do
+			default_mods[normalize_mod(mod)] = percent
 		end
 	end
 	
@@ -641,7 +700,6 @@
 		compile_nodes()
 		
 		self:luaeffect('Update')
-		
 	end
 	
 	-- zoom
@@ -655,7 +713,7 @@
 		'zoomx', 'zoomy',
 		defer = true,
 	}
-	set {-9e9, 100, 'zoom', 100, 'zoomx', 100, 'zoomy', plr = all_players}
+	setdefault {100, 'zoom', 100, 'zoomx', 100, 'zoomy'}
 	
 	-- movex
 	for _, a in ipairs {'x', 'y', 'z'} do
@@ -684,13 +742,11 @@
 		end,
 		defer = true,
 	}
-	set {-9e9+1, 1, 'xmod', plr = all_players}
-	
-	local targets_mt = {__index = function() return 0 end}
+	setdefault {1, 'xmod'}
 	
 	local targets = {}
 	for pn = 1, max_pn do
-		targets[pn] = setmetatable({}, targets_mt)
+		targets[pn] = setmetatable({}, modtable_mt)
 	end
 	
 	local mods_mt = {}
@@ -744,11 +800,11 @@
 	if debug_print_applymodifier_input then
 		local old_apply_modifiers = apply_modifiers
 		apply_modifiers = function(str, pn)
-			if debug_print_mod_targets == true or debug_print_mod_targets < beat then
+			if debug_print_applymodifier_input == true or debug_print_applymodifier_input < beat then
 				print('PLAYER ' .. pn .. ': ' .. str)
 				if debug_print_mod_targets ~= true then
 					apply_modifiers = old_apply_modifiers
-				end 
+				end
 			end
 			old_apply_modifiers(str, pn)
 		end
@@ -787,6 +843,14 @@
 		while eases_index <= eases.n and eases[eases_index][1] < beat do
 			local e = eases[eases_index]
 			local plr = e.plr
+			if e.reset then
+				for mod, pecent in pairs(targets[plr]) do
+					if not e.exclude[mod] and targets[plr][mod] ~= default_mods[mod] then
+						push(e, default_mods[mod])
+						push(e, mod)
+					end
+				end
+			end
 			e.offset = e.transient and 0 or 1
 			if not e.relative then
 				for i = 4, e.n, 2 do
