@@ -790,8 +790,7 @@
 		return x * x * y < x * y * y
 	end)
 	
-	GAMESTATE:ApplyModifiers('clearall,*0 0x,*-1 overhead')
-	-- default eases
+	GAMESTATE:ApplyModifiers('clearall,*-1 overhead')
 	
 	local function apply_modifiers(str, pn)
 		GAMESTATE:ApplyModifiers(str, pn)
