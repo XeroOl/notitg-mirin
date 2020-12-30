@@ -10,6 +10,8 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 
 ## Documentation:
 [Index](docs/index.md)
+[Choosing a template](docs/comparison.md)
+Comparison with exschwasion template
 <div style="display:flex">
 <div style="flex:50%" markdown="1">
 * How to set up the template
@@ -18,6 +20,9 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * [add](docs/ease.md#add)
 * for loop
 * [actors](docs/actors.md)
+* [definemod](docs/definemod.md)
+* [reset](docs/reset.md)
+* [setdefault](docs/setdefault.md)
 * [aux](docs/aux.md)
 * [node](docs/aux.md#node)
 * [alias](docs/alias.md)
@@ -25,6 +30,8 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 <div style="flex:50%" markdown="1">
 * [extra players](docs/players.md)
 * mode='end'
+* [flip](docs/flip.md)
+* [get](docs/get.md)
 * [func](docs/func.md)
 * [function eases](docs/func.md#func_for_function_eases)
 * [poptions](docs/func.md#poptions)
@@ -34,13 +41,15 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * [list of ease functions](docs/eases.md)
 </div>
 </div>
-
+Bonus:
+* [gradients](docs/gradients.md)
+* [splines](docs/splines.md)
 ```lua
 -- turn on invert
 ease {0, 1, outExpo, 100, 'invert'}
 -- turn off invert
 ease {7, 1, outExpo, 0, 'invert'}
 ```
-Bonus: [gradients](docs/gradients.md) [splines](docs/splines.md)
+
 
 Documentation by XeroOl, Chegg, Kirby5464

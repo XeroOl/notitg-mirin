@@ -1,6 +1,52 @@
 [Back to main page](..)
 # Ease list
-Here is a plot of each ease.
+
+* bell
+* bounce
+* tap
+* tapElastic
+* impulse
+* inBack
+* inBounce
+* inCirc
+* inCubic
+* inElastic
+* inExpo
+* inOutBack
+* inOutBounce
+* inOutCirc
+* inOutCubic
+* inOutElastic
+* inOutExpo
+* inOutQuad
+* inOutQuart
+* inOutQuint
+* inOutSine
+* inQuad
+* inQuart
+* inQuint
+* inSine
+* instant
+* inverse
+* linear
+* outBack
+* outBounce
+* outCirc
+* outCubic
+* outElastic
+* outExpo
+* outQuad
+* outQuart
+* outQuint
+* outSine
+* pop
+* popElastic
+* pulse
+* pulseElastic
+* spike
+* tri
+
+Here is a plot of each ease
 
 instant
 
@@ -167,4 +213,3 @@ popElastic[damping_factor][oscillation_speed]
 tapElastic[damping_factor][oscillation_speed]
 pulseElastic[damping_factor][oscillation_speed]
 impulse[damp]
-
