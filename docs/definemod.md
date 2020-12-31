@@ -6,6 +6,7 @@ definemod {modname, function(percent)
 end}
 ```
 The function `definemod` can be used to define custom auxiliary mods. Whenever `modname` is eased, the callback function will be called with the updated `percent`. `definemod` is useful because it lets the ease engine be used to control arbitrary non-mod behavior.
+
 Arguments:
 
 | ----- | ----- |

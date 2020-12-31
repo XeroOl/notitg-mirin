@@ -10,8 +10,9 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 
 ## Documentation:
 [Index](docs/index.md)
+<br>
 [Choosing a template](docs/comparison.md)
-Comparison with exschwasion template
+<br>
 <div style="display:flex">
 <div style="flex:50%" markdown="1">
 * How to set up the template
@@ -44,6 +45,8 @@ Comparison with exschwasion template
 Bonus:
 * [gradients](docs/gradients.md)
 * [splines](docs/splines.md)
+
+Example code:
 ```lua
 -- turn on invert
 ease {0, 1, outExpo, 100, 'invert'}
