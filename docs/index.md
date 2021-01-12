@@ -77,7 +77,7 @@ Yeah.
 
 # Constants
 ### dh
-The display height, in actual pixels.
+The display height, in actual pixels. This is only useful for AFT stuff, because NotITG uses screen pixels for measurement.
 ### dw
 The display width, in actual pixels.
 ### e
@@ -102,7 +102,8 @@ This function can be used in a for loop to iterate over numerical keys:
 ```lua
 for i, v in ipairs(t) do
 	-- body
-end```
+end
+```
 will iterate over the pairs `(1,t[1])`, `(2,t[2])`, ···, up to the first integer key absent from the table.
 
 ### pairs
@@ -110,7 +111,8 @@ This function can be used in a for loop to iterate over key, value pairs:
 ```lua
 for k, v in pairs(t) do
 	-- body
-end```
+end
+```
 will iterate over all key–value pairs of table t.
 
 ### math

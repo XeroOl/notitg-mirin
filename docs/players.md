@@ -1,6 +1,6 @@
 [Back to main page](..)
 # Player Specific Mods
-* This section is not done. Ask for @XeroOl in the (NotITG Discord)[https://uksrt.heysora.net/discord].
+* This section is not done. Ask for @XeroOl in the [NotITG Discord](https://uksrt.heysora.net/discord).
 `set`, `ease`, and `add` all can take in an optional argument called `plr`.
 It can be passed in by setting a global, or by adding a key to the table. If `plr` is a number, then the mods will only apply to the specified player. If `plr` is a table, then the mods will only apply to the specified players. If not provided, `plr` will default to `{1, 2}`, which means that mods affect both players by default.
 

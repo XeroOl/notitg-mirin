@@ -9,13 +9,15 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 
 
 ## Documentation:
-[Index](docs/index.md)
+[Index](docs/index.md) - in progress
 <br>
 [Choosing a template](comparison.md)
+[Getting Started](Getting Started.md)
 <br>
 <div style="display:flex">
 <div style="flex:50%" markdown="1">
-* How to set up the template
+* [How to set up the template](Getting Started.md)
+* [setdefault](docs/setdefault.md)
 * [set](docs/set.md)
 * [ease](docs/ease.md)
 * [add](docs/ease.md#add)
@@ -23,7 +25,6 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * [actors](docs/actors.md)
 * [definemod](docs/definemod.md)
 * [reset](docs/reset.md)
-* [setdefault](docs/setdefault.md)
 * [aux](docs/aux.md)
 * [node](docs/aux.md#node)
 * [alias](docs/alias.md)
@@ -43,6 +44,7 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 </div>
 </div>
 Bonus:
+* [learn Lua](https://www.lua.org/manual/5.1/)
 * [gradients](docs/gradients.md)
 * [splines](docs/splines.md)
 
