@@ -3,22 +3,26 @@
 This document will walk you through how to begin modding using the Mirin Template.
 
 Table of Contents
-1. [Install NotITG](#Install NotITG)
-2. [Download the Template](#Download the Template)
-3. [Setting up the Song and .sm](#Setting up the Song and .sm)
-4. [Check your work](#Check your work)
-5. [Default Mods](#Default Mods)
-6. [Setting Mods](#Setting Mods)
-7. [Smooth Transitions](#Smooth Transitions)
-8. [Conclusion](#Conclusion)
+1. [Install NotITG](#install-notitg)
+2. [Download the Template](#download-the-template)
+3. [Setting up the Song and .sm](#song-setup)
+4. [Check your work](#check-your-work)
+5. [Default Mods](#default-mods)
+6. [Setting Mods](#setting-mods)
+7. [Smooth Transitions](smooth-transitions)
+8. [Conclusion](#conclusion)
 
+<a name="install-notitg">
 ## Install NotITG
+</a>
 If you already have the game, you can skip this step.
 If you don't have NotITG already, you can install NotITG from [notitg.heysora.net](https://notitg.heysora.net).
 Download the full setup, unzip it, and then make a shortcut to the `NotITG` executable.
 If everything went right, you should be able to start up the game by running the `NotITG.exe` file in the `Program/` folder.
 
+<a name="download-the-template">
 ## Download the Template
+</a>
 To start, you need to find the folder that NotITG is installed in.
 Download the [Mirin Template Code from GitHub](http://github.com/xerool/notitg-mirin/archive/master.zip) and unzip it into a song pack in your `Songs` folder.
 When you're done, the structure should be something like this (except `My Song Pack` would be filled in with whatever information you want):
@@ -36,7 +40,9 @@ NotITG
 
 Now, if everything went right, you can launch the game and find the "Mirin Template" song in the song wheel.
 
+<a name="song-setup">
 ## Setting up the Song and .sm
+</a>
 You probably don't want to make mods for the provided `Song.sm` and `Song.ogg`, so you can use your own.
 
 ### Using an existing simfile
@@ -62,7 +68,9 @@ Inside, there are a couple of things to change:
 NOTE: Only edit the `.sm` while the game is closed. To make the game reload changes to the `.sm` file, you need to delete the `Cache` folder before re-opening the game.
 After you've put all of the metadata into the `.sm`, you'll need to replace the default provided chart by writing your own chart. I'm not going to cover how to do this here.
 
+<a name="check-your-work">
 ## Check your work
+</a>
 Before you go any further, you'll want to check that things are prepared correctly.
 Here's what to do:
 1. Open up NotITG, and then find your song in the song wheel.
@@ -70,7 +78,9 @@ Here's what to do:
 
 If that works, you're finally ready to start modding!
 
+<a name="default-mods">
 ## Default Mods
+</a>
 In NotITG:
 1. Go to Edit Mode
 2. Select Group
@@ -90,7 +100,9 @@ This sets the rate to `2x`, sets the perpective to overhead, and does a couple o
 The `setdefault` function takes in pairs of numbers and mods, and sets the mod to that amount.
 More information about `setdefault` can be found on [its documentation page](docs/setdefault.md).
 
+<a name="setting-mods">
 ## Setting Mods
+/a>
 Now that you've set some base mods, you can now schedule mods to change at different beats of the song. To do that, you can use the [set function](docs/set.md).
 The `set` function works just like `setdefault`, except for an extra beat number at the beginning.
 Try choosing a mod from [the list](docs/mods.md), and applying it with set.
@@ -104,7 +116,9 @@ set {8, 0, 'invert'}
 ```
 This example used invert, but `set` works with any mod. You can try changing out `invert` for another mod from [the list](docs/mods.md), or find more information can be found on [set's documentation page](docs/set.md).
 
+<a name="smooth-transitions">
 ## Smooth Transitions
+</a>
 If you tried the previous example, you'll notice that there's no animations; the mods instantly turn on and off. Sometimes that's okay, but lots of the time, you'll want to choose an animation to use.
 That's where the [ease function](docs/ease.md) comes in.
 The ease function works like set, except it needs two more arguments: a length, and an ease function.
@@ -122,5 +136,7 @@ ease {12, 2, outExpo, 0, 'invert'}
 This example used a length of `2`, and the `outExpo` ease, but you can try changing the ease to another one from [the ease list](docs/eases.md), and you can change the length.
 You can find more information about `ease` on [its documentation page](docs/ease.md).
 
+<a name="conclusion">
 ## Conclusion
+/a>
 Now you have everything you need to begin modding. The [main page](index.md) has links to other functions you can read about.

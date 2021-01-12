@@ -13,7 +13,7 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 <br>
 [Choosing a template](comparison.md)
 <br>
-[*Getting Started*](Getting Started.md)
+[Getting Started](Getting Started.md)
 <br>
 <div style="display:flex">
 <div style="flex:50%" markdown="1">
