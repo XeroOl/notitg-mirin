@@ -293,6 +293,9 @@
 		self[3] = self[3] or instant
 		self.reset = true
 		self.exclude = self.exclude or {}
+		if type(self.exclude) == 'string' then
+			self.exclude == {self.exclude}
+		end
 		for _, v in ipairs(self.exclude) do
 			self.exclude[v] = true
 		end
@@ -311,7 +314,7 @@
 		end
 		
 		if self.mode or self.m then
-			if type(self[2]) == number then
+			if type(self[2]) == 'number' then
 				self[2] = self[2] - self[1]
 			end
 			if type(self.persist) == 'number' then
@@ -801,7 +804,7 @@
 		apply_modifiers = function(str, pn)
 			if debug_print_applymodifier_input == true or debug_print_applymodifier_input < beat then
 				print('PLAYER ' .. pn .. ': ' .. str)
-				if debug_print_mod_targets ~= true then
+				if debug_print_applymodifier_input ~= true then
 					apply_modifiers = old_apply_modifiers
 				end
 			end
@@ -952,7 +955,7 @@
 						local outputs = {}
 						local i = 0
 						for k, v in pairs(targets[pn]) do
-							if v ~= 0 then
+							if v ~= default_mods[k] then
 								i = i + 1
 								outputs[i] = tostring(k) .. ': ' .. tostring(v)
 							end
