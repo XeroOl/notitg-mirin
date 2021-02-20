@@ -117,13 +117,13 @@
 		end
 	end
 	function inExpo(t) return 1000 ^ (t - 1) - 0.001 end
-	function outExpo(t) return 0.999 - 1000 ^ -t end
+	function outExpo(t) return 1.001 - 1000 ^ -t end
 	function inOutExpo(t)
 		t = t * 2
 		if t < 1 then
 			return 0.5 * 1000 ^ (t - 1) - 0.0005
 		else
-			return 0.9995 - 0.5 * 1000 ^ (1 - t)
+			return 1.0005 - 0.5 * 1000 ^ (1 - t)
 		end
 	end
 	function inCirc(t) return 1 - sqrt(1 - t * t) end
