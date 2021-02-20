@@ -97,7 +97,6 @@
 	
 	-- mod aliases, or ease vars
 	local aliases = {}
-	local reverse_aliases = {}
 	
 	-- alias a mod
 	function alias(self, depth, name)
@@ -109,30 +108,15 @@
 		end
 		local a, b = self[1], self[2]
 		if type(a) ~= 'string' then
-			screen_error('unexpected argument 1', depth, name)
+			screen_error('argument 1 should be a string', depth, name)
 			return alias
 		end
 		if type(b) ~= 'string' then
-			screen_error('unexpected argument 2', depth, name)
+			screen_error('argument 2 should be a string', depth, name)
 			return alias
 		end
 		a, b = string.lower(a), string.lower(b)
-		-- TODO make alias logic clearer
-		local collection = {a}
-		while aliases[b] do
-			if reverse_aliases[b] then
-				for _, item in ipairs(reverse_aliases[b]) do
-					table.insert(collection, item)
-				end
-				reverse_aliases[b] = nil
-			end
-			b = aliases[b]
-		end
-		reverse_aliases[b] = reverse_aliases[b] or {}
-		for _, name in ipairs(collection) do
-			aliases[name] = b
-			table.insert(reverse_aliases[b], name)
-		end
+		aliases[a] = b
 		return alias
 	end
 	
@@ -144,6 +128,11 @@
 	-- eases are loaded after the template, so this needs to be declared early
 	local function instant()
 		return 1
+	end
+	
+	local touched_mods = {}
+	for pn = 1, max_pn do
+		touched_mods[pn] = {}
 	end
 	
 	-- the table of default mod values
@@ -172,8 +161,11 @@
 				return setdefault
 			end
 			default_mods[self[i + 1]] = self[i]
-			add ({0, 0, instant, 0, self[i + 1]}, depth, name)
+			for pn = 1, max_pn do
+				touched_mods[pn][self[i + 1]] = true
+			end
 		end
+		return setdefault
 	end
 	
 	-- the previously set value of a mod
@@ -250,6 +242,13 @@
 		-- update prev_mods table
 		if not self.transient then
 			for _, pn in ipairs(type(plr) == 'table' and plr or {plr}) do
+				if self.reset then
+					for mod, percent in pairs(prev_mods[pn]) do
+						if not self.exclude[mod] then
+							prev_mods[pn][mod] = default_mods[mod]
+						end
+					end
+				end
 				for n = 5, self.n, 2 do
 					if self.relative then
 						prev_mods[pn][self[n]] = prev_mods[pn][self[n]] + self[n - 1]
@@ -294,12 +293,13 @@
 		self.reset = true
 		self.exclude = self.exclude or {}
 		if type(self.exclude) == 'string' then
-			self.exclude == {self.exclude}
+			self.exclude = {self.exclude}
 		end
 		for _, v in ipairs(self.exclude) do
 			self.exclude[v] = true
 		end
 		ease(self, depth, name)
+		return reset
 	end
 	
 	-- the table of scheduled functions and perframes
@@ -418,10 +418,8 @@
 		end
 		local i = 1
 		local inputs = {}
-		local reverse_in = {}
 		while type(self[i]) == 'string' do
 			table.insert(inputs, self[i])
-			add({0, 0, instant, 0, self[i]}, depth, name)
 			i = i + 1
 		end
 		if i == 1 then
@@ -716,7 +714,7 @@
 		'zoomx', 'zoomy',
 		defer = true,
 	}
-	setdefault {100, 'zoom', 100, 'zoomx', 100, 'zoomy'}
+	setdefault {100, 'zoom', 100, 'zoomx', 100, 'zoomy', 100, 'zoomz'}
 	
 	-- movex
 	for _, a in ipairs {'x', 'y', 'z'} do
@@ -761,7 +759,9 @@
 	for pn = 1, max_pn do
 		mods[pn] = setmetatable({}, mods_mt[pn])
 	end
-
+	
+	local last_seen_awake = {}
+	
 	local poptions = {}
 	local poptions_mt = {}
 	local poptions_logging_target
@@ -922,6 +922,13 @@
 		
 		for pn = 1, max_pn do
 			if P[pn] and P[pn]:IsAwake() then
+				if not last_seen_awake[pn] then
+					last_seen_awake[pn] = true
+					for mod, percent in pairs(touched_mods[pn]) do
+						mods[pn][mod] = mods[pn][mod] + 0
+						touched_mods[pn][mod] = nil
+					end
+				end
 				mod_buffer = stringbuilder()
 				seen = seen + 1
 				for k in pairs(mods[pn]) do
@@ -944,6 +951,12 @@
 				end
 				if mod_buffer[1] then
 					apply_modifiers(mod_buffer:build(','), pn)
+				end
+			else
+				last_seen_awake[pn] = false
+				for mod, percent in pairs(mods[pn]) do
+					mods[pn][mod] = nil
+					touched_mods[pn][mod] = true
 				end
 			end
 		end
