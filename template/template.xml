@@ -431,7 +431,7 @@
 			i = i + 1
 		end
 		if i == 1 then
-			screen_error('inputs to node expected', depth, name)
+			screen_error('the first argument needs to be the mod name', depth, name)
 		end
 		local fn = self[i]
 		if type(fn) ~= 'function' then
@@ -439,7 +439,10 @@
 		end
 		i = i + 1
 		local out = {}
-		while type(self[i]) == 'string' do
+		while self[i] do
+			if type(self[i]) ~= 'string' then
+				screen_error('unexpected argument '..tostring(self[i])..', expected a string', depth, name)
+			end
 			table.insert(out, self[i])
 			i = i + 1
 		end
