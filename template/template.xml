@@ -322,6 +322,14 @@
 			end
 		end
 
+		-- new string syntax, like `func {0, 1, outExpo, scx*0.5, scx, 'P1:x'}`
+		for i = 1, #self do
+			if type(self[i]) == string then
+				self[i] = loadstring('return function(p) ' .. self[i].. '(p) end')()
+				break
+			end
+		end
+
 		local can_use_poptions = false
 		local a, b, c, d, e, f = self[1], self[2], self[3], self[4], self[5], self[6]
 		-- function ease, type 3
