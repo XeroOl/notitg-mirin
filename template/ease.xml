@@ -12,11 +12,17 @@
 	end
 	
 	-- make a function cache its results from previous calls
-	local function fncache(func)
+	local function fncache(func, default)
 		local cache = {}
 		return function(arg)
+			if arg == nil then arg = default end
 			cache[arg] = cache[arg] or func(arg)
 			return cache[arg]
+		end
+	end
+	local function uncurry2(func)
+		return function(a, b)
+			func(a)(b)
 		end
 	end
 	
@@ -138,36 +144,49 @@
 		end
 	end
 	
-	function inElastic(t)
-		t = t - 1
-		return -(pow(2, 10 * t) * sin((t - 0.075) * (2 * pi) / 0.3))
-	end
-	function outElastic(t)
-		return pow(2, -10 * t) * sin((t - 0.075) * (2 * pi) / 0.3) + 1
-	end
-	function inOutElastic(t)
-		t = t * 2 - 1
-		if t < 0 then
-			return -0.5 * pow(2, 10 * t) * sin((t - 0.1125) * 2 * pi / 0.45)
-		else
-			return pow(2, -10 * t) * sin((t - 0.1125) * 2 * pi / 0.45) * 0.5 + 1
+	inElastic = function(a)
+		local inner = function(p)
+			return function(t)
+				t = t - 1
+				return -(a * pow(2, 10 * t) * sin(t - p / (2 * pi) * asin(1/a)) * (2 * pi) / p)
+			end
 		end
+		return fncache(inner, 0.3)
 	end
+	inElastic = uncurry2(fncache(inElastic, 1))
+
+	function outElastic(a)
+		local inner = function(p)
+			return function(t)
+				return a * pow(2, 10 * t) * sin(t - p / (2 * pi) * asin(1/a)) * (2 * pi) / p + 1
+			end
+		end
+		return fncache(inner, 0.3)
+	end
+	outElastic = uncurry2(fncache(outElastic, 1))
+
+	function inOutElastic(a)
+		local inner = function(p)
+			local in1 = inElastic(a, p)
+			local out1 = outElastic(a, p)
+			return function(t) return t < 0.5 and in1(t * 2) * 0.5 or out1(t * 2 - 1) * 0.5 + 0.5 end
+		end
+		return fncache(inner, 0.3)
+	end
+	inOutElastic = uncurry2(fncache(inOutElastic, 1))
 	
-	function inBack(t) return t * t * (2.70158 * t - 1.70158) end
-	function outBack(t)
-		t = t - 1
-		return (t * t * (2.70158 * t + 1.70158)) + 1
+	function inBack(a) return function(t) return t * t * (a * t + t - a) end end
+	inBack = fncache(inBack, 1.70158)
+
+	function outBack(a) return function(t) t = t - 1 return t * t * (a * t + a) + 1 end end
+	outBack = fncache(outBack, 1.70158)
+
+	function inOutBack(s)
+		local in1 = inBack(s)
+		local out1 = outBack(s)
+		return function(t) return t < 0.5 and in1(t * 2) * 0.5 or out1(t * 2 - 1) * 0.5 + 0.5 end
 	end
-	function inOutBack(t)
-		t = t * 2
-		if t < 1 then
-			return 0.5 * (t * t * (3.5864016 * t - 2.5864016))
-		else
-			t = t - 2
-			return 0.5 * (t * t * (3.5864016 * t + 2.5864016) + 2)
-		end
-	end
+	inOutBack = fncache(inOutBack, 1.70158)
 	
 	function outBounce(t)
 		if t < 1 / 2.75 then
