@@ -324,8 +324,8 @@
 
 		-- new string syntax, like `func {0, 1, outExpo, scx*0.5, scx, 'P1:x'}`
 		for i = 1, #self do
-			if type(self[i]) == string then
-				self[i] = loadstring('return function(p) ' .. self[i].. '(p) end')()
+			if type(self[i]) == 'string' then
+				self[i] = xero(loadstring('return function(p) ' .. self[i].. '(p) end'))()
 				break
 			end
 		end
@@ -471,7 +471,6 @@
 	local targets = {}
 	mod_buffer = stringbuilder()
 
-
 	function touch_mod(mod, pn)
 		-- run metatables
 		if pn then
@@ -483,20 +482,21 @@
 		end
 	end
 
-	function touch_all_mods()
+	function touch_all_mods(pn)
 		for mod in pairs(default_mods) do
 			touch_mod(mod)
 		end
-		for pn = 1, max_pn do
+		if pn then
 			for mod in pairs(targets[pn]) do
 				touch_mod(mod, pn)
 			end
+		else
+			for pn = 1, 8 do
+				for mod in pairs(targets[pn]) do
+					touch_mod(mod, pn)
+				end
+			end
 		end
-	end
-
-	function launchattack(start_time, len, mods, pn)
-		GAMESTATE:LaunchAttack(start_time, len, mods, pn)
-		func{start_time, touch_all_mods}
 	end
 
 	local function compile_nodes()
@@ -951,7 +951,7 @@
 				e[3](beat, poptions)
 			else
 				if e.mods then
-					for mod, _ in e.mods[pn] do
+					for mod, _ in pairs(e.mods[pn]) do
 						touch_mod(mod)
 					end
 				end
