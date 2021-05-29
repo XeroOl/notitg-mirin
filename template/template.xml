@@ -197,7 +197,7 @@
 			screen_error('len / end missing', depth, name)
 			return ease
 		end
-		if type(self[3]) ~= 'function' then
+		if type(self[3]) ~= 'function' and (not getmetatable(self[3]) or not getmetatable(self[3]).__call) then
 			screen_error('invalid ease function', depth, name)
 			return ease
 		end
