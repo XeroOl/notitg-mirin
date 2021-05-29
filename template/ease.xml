@@ -25,7 +25,8 @@
 		end
 		local default = params(defaultparam1)
 		return setmetatable({
-			params = params
+			params = params,
+			param = params,
 		}, {
 			__call = function(self, x)
 				return default(x)
@@ -41,7 +42,8 @@
 		end
 		local default = params(defaultparam1, defaultparam2)
 		return setmetatable({
-			params = params
+			params = params,
+			param = params,
 		}, {
 			__call = function(self, x)
 				return default(x)
