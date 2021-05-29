@@ -754,7 +754,15 @@
 		'zoomx', 'zoomy',
 		defer = true,
 	}
-	setdefault {100, 'zoom', 100, 'zoomx', 100, 'zoomy', 100, 'zoomz'}
+
+	setdefault {
+		100, 'zoom',
+		100, 'zoomx',
+		100, 'zoomy',
+		100, 'zoomz',
+	}
+
+	setdefault {400, 'grain'}
 
 	-- movex
 	for _, a in ipairs {'x', 'y', 'z'} do
