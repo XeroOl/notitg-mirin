@@ -740,6 +740,19 @@
 		resolve_aliases()
 		compile_nodes()
 
+		-- disable all the table inserters during runtime
+		ease = function() screen_error('cannot be run after beat 0', 1, 'ease') end
+		add = function() screen_error('cannot be run after beat 0', 1, 'add') end
+		func = function() screen_error('cannot be run after beat 0', 1, 'func') end
+		set = function() screen_error('cannot be run after beat 0', 1, 'set') end
+		get = function() screen_error('cannot be run after beat 0', 1, 'get') end
+		setdefault = function() screen_error('cannot be run after beat 0', 1, 'setdefault') end
+		reset = function() screen_error('cannot be run after beat 0', 1, 'reset') end
+		node = function() screen_error('cannot be run after beat 0', 1, 'node') end
+		definemod = function() screen_error('cannot be run after beat 0', 1, 'definemod') end
+		aux = function() screen_error('cannot be run after beat 0', 1, 'aux') end
+		alias = function() screen_error('cannot be run after beat 0', 1, 'alias') end
+
 		self:luaeffect('Update')
 	end
 
