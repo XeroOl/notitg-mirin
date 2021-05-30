@@ -1,6 +1,0 @@
-<Layer Type="ActorFrame" Name="Kaden.frame"><children>
-	<Layer  Name="Kaden.idle"      File="../Kaken/idle.png"      />
-	<Layer  Name="Kaden.animated"  File="../Kaden/animated.png"  />
-	<Layer  Name="Kaden.angry"     File="../Kaden/angry.png"     />
-	<Layer  Name="Kaden.particle"  File="../Kaden/particle.png"  />
-</children></Layer>
