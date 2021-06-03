@@ -972,8 +972,10 @@
 				e[3](beat, poptions)
 			else
 				if e.mods then
-					for mod, _ in pairs(e.mods[pn]) do
-						touch_mod(mod)
+					for pn = 1, max_pn do
+						for mod, _ in pairs(e.mods[pn]) do
+							touch_mod(mod, pn)
+						end
 					end
 				end
 				active_funcs:remove()
