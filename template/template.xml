@@ -1,177 +1,74 @@
-<Template Condition = "(function() --template.xml
+<Template InitCommand = "%xero(function(self) --template.xml
 
-	xero()
+	-- All of the code is here, thank you for coming
 
 	max_pn = 8 -- default: `8`
 	local debug_print_applymodifier_input = false -- default: `false`
 	local debug_print_mod_targets = false -- default: `false`
 
-	function copy(src)
-		local dest = {}
-		for k, v in pairs(src) do
-			dest[k] = v
-		end
-		return dest
-	end
-
-	function clear(t)
-		for k, v in pairs(t) do
-			t[k] = nil
-		end
-		return t
-	end
-
-	function iclear(t)
-		for i, v in ipairs(t) do
-			t[i] = nil
-		end
-		return t
-	end
-
-	xero = xero
-	type = type
-	print = print
-	pairs = pairs
-	ipairs = ipairs
-	unpack = unpack
-	tonumber = tonumber
-	tostring = tostring
-	math = copy(math)
-	table = copy(table)
-	string = copy(string)
-
-	dw = DISPLAY:GetDisplayWidth()
-	dh = DISPLAY:GetDisplayHeight()
-
-	scx = SCREEN_CENTER_X
-	scy = SCREEN_CENTER_Y
-	sw = SCREEN_WIDTH
-	sh = SCREEN_HEIGHT
-	e = 'end'
-	plr = {1, 2}
-
-	function sprite(self)
-		self:basezoomx(sw / dw)
-		self:basezoomy(-sh / dh)
-		self:x(scx)
-		self:y(scy)
-	end
-
-	function aft(self)
-		self:SetWidth(dw)
-		self:SetHeight(dh)
-		self:EnableDepthBuffer(false)
-		self:EnableAlphaBuffer(false)
-		self:EnableFloat(false)
-		self:EnablePreserveTexture(true)
-		self:Create()
-	end
-
-	function aftsprite(aft, sprite)
-		sprite:SetTexture(aft:GetTexture())
-	end
-
-	function setupJudgeProxy(proxy, target, pn)
-		proxy:SetTarget(target)
-		proxy:xy(scx * (pn-.5), scy)
-		target:hidden(1)
-		target:sleep(9e9)
-	end
-
-	function screen_error(output, depth, name)
-		local depth = 3 + (type(depth) == 'number' and depth or 0)
-		local _, err = pcall(error, type(name) == 'string' and (name .. ':' .. output) or output, depth)
+	-- screen_error reports an error to the screen
+	-- needs to be called through
+	function screen_error(output, name)
+		local _, err = pcall(error, type(name) == 'string' and (name .. ':' .. output) or output, 5)
 		SCREENMAN:SystemMessage(err)
+		return err
 	end
 
-	local function push(self, obj)
-		self.n = self.n + 1
-		self[self.n] = obj
-	end
+	---------------------
+	-- DATA STRUCTURES --
+	---------------------
 
-	local default_plr = {1, 2}
+	-- the table of eases/add/set
+	local eases = {}
 
-	function get_plr()
-		return rawget(xero, 'plr') or default_plr
-	end
+	-- the table of scheduled functions and perframes
+	local funcs = {}
 
-	-- mod aliases, or ease vars
+	-- auxilliary variables
+	local auxes = {}
+
+	-- the table of nodes
+	local nodes = {}
+
+	-- mod aliases
 	local aliases = {}
 
-	-- alias a mod
-	function alias(self, depth, name)
-		local depth = 1 + (type(depth) == 'number' and depth or 0)
-		local name = name or 'alias'
-		if type(self) ~= 'table' then
-			screen_error('curly braces expected', depth, name)
-			return alias
-		end
-		local a, b = self[1], self[2]
-		if type(a) ~= 'string' then
-			screen_error('argument 1 should be a string', depth, name)
-			return alias
-		end
-		if type(b) ~= 'string' then
-			screen_error('argument 2 should be a string', depth, name)
-			return alias
-		end
-		a, b = string.lower(a), string.lower(b)
-		aliases[a] = b
-		return alias
-	end
-
-	function normalize_mod(name)
-		name = string.lower(name)
-		return aliases[name] or name
-	end
-
-	-- eases are loaded after the template, so this needs to be declared early
-	local function instant()
-		return 1
-	end
-
+	-- mods whose values have changed that need to be applied
 	local touched_mods = {}
 	for pn = 1, max_pn do
 		touched_mods[pn] = {}
 	end
 
-	-- the table of default mod values
-	local default_mods = setmetatable({}, {
+	-- store the default values for every mod
+	local default_mods = {}
+
+	-- the default_mods table defaults to 0
+	setmetatable(default_mods, {
 		__index = function(self, i)
 			self[i] = 0
 			return 0
 		end
 	})
-	local modtable_mt = {__index = default_mods}
-
-	function setdefault(self, depth, name)
-		local depth = 1 + (type(depth) == 'number' and depth or 0)
-		local name = name or 'setdefault'
-		if type(self) ~= 'table' then
-			screen_error('curly braces expected', depth, name)
-			return setdefault
-		end
-		for i = 1, #self, 2 do
-			if type(self[i]) ~= 'number' then
-				screen_error('invalid mod percent', depth, name)
-				return setdefault
-			end
-			if type(self[i + 1]) ~= 'string' then
-				screen_error('invalid mod name', depth, name)
-				return setdefault
-			end
-			default_mods[self[i + 1]] = self[i]
-			for pn = 1, max_pn do
-				touched_mods[pn][self[i + 1]] = true
-			end
-		end
-		return setdefault
-	end
 
 	-- the previously set value of a mod
+	-- this is used only for the `get` function
 	local prev_mods = {}
+	local modtable_mt = {__index = default_mods}
 	for pn = 1, max_pn do
 		prev_mods[pn] = setmetatable({}, modtable_mt)
+	end
+
+	---------------
+	-- FUNCTIONS --
+	---------------
+
+	-- the `plr=` system
+	local default_plr = {1, 2}
+
+	-- for reading the `plr` variable from the xero environment
+	-- without falling back to the global table
+	function get_plr()
+		return rawget(xero, 'plr') or default_plr
 	end
 
 	-- get the previously set value of a mod
@@ -179,68 +76,37 @@
 		return prev_mods[pn or 1][modname]
 	end
 
-	-- the table of eases/add/set
-	local eases = {n = 0}
+	-- convert a mod to its lowercase dealiased name
+	function normalize_mod(name)
+		name = string.lower(name)
+		return aliases[name] or name
+	end
 
-	function ease(self, depth, name)
-		local depth = 1 + (type(depth) == 'number' and depth or 0)
-		local name = name or 'ease'
-		if type(self) ~= 'table' then
-			screen_error('curly braces expected', depth, name)
-			return ease
-		end
-		if type(self[1]) ~= 'number' then
-			screen_error('beat missing', depth, name)
-			return ease
-		end
-		if type(self[2]) ~= 'number' then
-			screen_error('len / end missing', depth, name)
-			return ease
-		end
-		if type(self[3]) ~= 'function' and (not getmetatable(self[3]) or not getmetatable(self[3]).__call) then
-			screen_error('invalid ease function', depth, name)
-			return ease
-		end
-		local i = 4
-		while self[i] do
-			if type(self[i]) ~= 'number' then
-				screen_error('invalid mod percent', depth, name)
-				return ease
-			end
-			if type(self[i + 1]) ~= 'string' then
-				screen_error('invalid mod', depth, name)
-				return ease
-			end
-			i = i + 2
-		end
-		self.n = i - 1
-		local result = self[3](1)
-		if type(result) ~= 'number' then
-			screen_error('invalid ease function', depth, name)
-			return ease
-		end
-		if result < 0.5 then
+	-- ease {start, len, eas, percent, 'mod'}
+	-- adds an ease to the ease table
+	local function ease(self)
+		self.n = #self
+		if self[3](1) < 0.5 then
 			self.transient = 1
 		end
 		if self.mode or self.m then
 			self[2] = self[2] - self[1]
 		end
+
 		local plr = self.plr or get_plr()
-		if type(plr) == 'number' then
-			self.plr = plr
-			push(eases, self)
-		elseif type(plr) == 'table' then
-			self.plr = nil
+		if type(plr) == 'table' then
 			for _, plr in ipairs(plr) do
 				local copy = copy(self)
 				copy.plr = plr
-				push(eases, copy)
+				table.insert(eases, copy)
 			end
 		else
-			screen_error('invalid plr', depth, name)
+			self.plr = plr
+			table.insert(eases, self)
 		end
-		-- update prev_mods table
+
 		if not self.transient then
+			-- update prev_mods table
 			for _, pn in ipairs(type(plr) == 'table' and plr or {plr}) do
 				if self.reset then
 					for mod, percent in pairs(prev_mods[pn]) do
@@ -260,34 +126,29 @@
 		end
 		return ease
 	end
-
-	function add(self, depth, name)
-		local depth = 1 + (type(depth) == 'number' and depth or 0)
-		local name = name or 'add'
+	-- add {start, len, eas, percent, mod}
+	-- adds an ease to the ease table
+	local function add(self)
 		self.relative = true
-		ease(self, depth, name)
-		return add
+		ease(self)
 	end
 
-	function set(self, depth, name)
-		local depth = 1 + (type(depth) == 'number' and depth or 0)
-		local name = name or 'set'
-		local a, b, i = 0, instant, 2
-		while a do
-			a, self[i] = self[i], a
-			b, self[i + 1] = self[i + 1], b
-			i = i + 2
-		end
-		ease(self, depth, name)
-		return set
+	-- eases are loaded after the template, so this needs to be declared early
+	local function instant()
+		return 1
 	end
 
-	function reset(self, depth, name)
-		local depth = 1 + (type(depth) == 'number' and depth or 0)
-		local name = name or 'reset'
-		if type(self) ~= 'table' then
-			screen_error('curly braces expected', depth, name)
-		end
+	-- set {start, percent, mod}
+	-- adds a set to the ease table
+	local function set(self)
+		table.insert(self, 2, 0)
+		table.insert(self, 3, instant)
+		ease(self)
+	end
+
+	-- reset {start, [len, eas], [exclude = {mod list}]}
+	-- adds a reset to the ease table
+	local function reset(self)
 		self[2] = self[2] or 0
 		self[3] = self[3] or instant
 		self.reset = true
@@ -298,184 +159,221 @@
 		for _, v in ipairs(self.exclude) do
 			self.exclude[v] = true
 		end
-		ease(self, depth, name)
+		ease(self)
 		return reset
 	end
 
-	-- the table of scheduled functions and perframes
-	local funcs = {n = 0}
-
-	function func(self, depth, name)
-		local name = name or 'func'
-		local depth = 1 + (type(depth) == 'number' and depth or 0)
-		if type(self) ~= 'table' then
-			screen_error('curly braces expected', depth, name)
-			return func
+	-- func helper for scheduling a function
+	local function func_function(self)
+		self[2], self[3] = nil, self[2]
+		local persist = self.persist
+		if type(persist) == 'number' and self.mode then
+			persist = persist - self[1]
 		end
-
-		if self.mode or self.m then
-			if type(self[2]) == 'number' then
-				self[2] = self[2] - self[1]
-			end
-			if type(self.persist) == 'number' then
-				self.persist = self.persist - self[1]
-			end
+		if persist == false then
+			persist = 0.5
 		end
-
-		-- new string syntax, like `func {0, 1, outExpo, scx*0.5, scx, 'P1:x'}`
-		for i = 1, #self do
-			if type(self[i]) == 'string' then
-				self[i] = xero(loadstring('return function(p) ' .. self[i].. '(p) end'))()
-				break
-			end
-		end
-
-		local can_use_poptions = false
-		local a, b, c, d, e, f = self[1], self[2], self[3], self[4], self[5], self[6]
-		-- function ease, type 3
-		if type(a) == 'number' and type(b) == 'number' and type(c) == 'function' and type(d) == 'number' and type(e) == 'number' and type(f) == 'function' then
-			local eas = c
-			a, b, c = a, b, function(beat)
-				f(d + (e - d) * eas((beat - a) / b))
-			end
-		-- function ease, type 2
-		elseif type(a) == 'number' and type(b) == 'number' and type(c) == 'function' and type(d) == 'number' and type(e) == 'function' then
-			local eas = c
-			a, b, c = a, b, function(beat)
-				e(d * eas((beat - a) / b))
-			end
-		-- function ease, type 1
-		elseif type(a) == 'number' and type(b) == 'number' and type(c) == 'function' and type(d) == 'function' then
-			local eas = c
-			a, b, c = a, b, function(beat)
-				d(eas((beat - a) / b))
-			end
-		-- perframe
-		elseif type(a) == 'number' and type(b) == 'number' and type(c) == 'function' then
-			a, b, c = a, b, c
-			can_use_poptions = true
-		-- scheduling a message
-		elseif type(a) == 'number' and type(b) == 'function' then
-			a, b, c = a, nil, b
-			local fn = c
-			if self.persist ~= nil and self.persist ~= true then
-				if self.persist == false then
-					self.persist = 0.5
-				end
-				local len = self.persist
-				c = function(beat)
-					if beat < a + len then
-						fn(beat)
-					end
+		if type(persist) == 'number' then
+			local fn = self[3]
+			local final_time = self[1] + persist
+			self[3] = function(beat)
+				if beat < final_time then
+					fn(beat)
 				end
 			end
-		else
-			screen_error('overload resolution failed: check argument types', depth, name)
-			return func
 		end
-		self[1], self[2], self[3], self[4], self[5], self[6] = a, b, c, nil, nil, nil
+		self.priority = (self.defer and -1 or 1) * table.getn(funcs)
+		table.insert(funcs, self)
+	end
+
+	-- func helper for scheduling a perframe
+	local function func_perframe(self, can_use_poptions)
 		if can_use_poptions then
 			self.mods = {}
 			for pn = 1, max_pn do
 				self.mods[pn] = {}
 			end
 		end
-		push(funcs, self)
-		if self.defer then
-			self.priority = -funcs.n
-		else
-			self.priority = funcs.n
-		end
-		-- if it's a function-ease variant then make it persist
-		if d then
-			local end_beat = a + b
-			func {end_beat, function() c(end_beat) end, persist = self.persist, defer = self.defer}
-		end
-		return func
+		self.priority = (self.defer and -1 or 1) * table.getn(funcs)
+		table.insert(funcs, self)
 	end
 
-	-- auxilliary variables
-	local auxes = {}
+	-- func helper for function eases
+	local function func_ease(self)
+		-- use the mode to adjust len
+		if self.mode or self.m then
+			self[2] = self[2] - self[1]
+		end
+		local fn = table.remove(self)
+		local eas = self[3]
+		local start_percent = #self >= 5 and table.remove(self, 4) or 0
+		local end_percent = #self >= 4 and table.remove(self, 4) or 1
+		local end_beat = self[1] + self[2]
 
-	function aux(self, depth, name)
-		local depth = 1 + (type(depth) == 'number' and depth or 0)
-		local name = name or 'aux'
+		-- string syntax, like `func {0, 1, outExpo, scx*0.5, scx, 'P1:x'}`
+		if type(fn) == 'string' then
+			fn = xero(loadstring('return function(p) '..fn..'(p) end'))()
+		end
+
+		self[3] = function(beat)
+			local progress = (beat - self[1]) / self[2]
+			fn(start_percent + (end_percent - start_percent) * eas(progress))
+		end
+
+		func_perframe(self)
+		-- it's a function-ease variant, so make it persist
+		if self.persist ~= false then
+			func_function {
+				end_beat,
+				function()
+					fn(end_percent)
+				end,
+				persist = self.persist,
+				defer = self.defer,
+				mode = self.mode
+			}
+		end
+	end
+
+	-- func dispatcher
+	local function func(self)
+		-- scheduled function variant
+		if #self == 2 then
+			func_function(self)
+
+		-- basic perframe variant
+		elseif #self == 3 then
+			func_perframe(self, true)
+
+		-- function ease variant
+		else
+			func_ease(self)
+		end
+	end
+
+	-- alias {'old', 'new'}
+	-- aliases a mod
+	local function alias(self)
+		local a, b = self[1], self[2]
+		a, b = string.lower(a), string.lower(b)
+		aliases[a] = b
+	end
+
+	-- setdefault {percent, 'mod'}
+	-- set the default value of a mod
+	local function setdefault(self)
+		for i = 1, #self, 2 do
+			default_mods[self[i + 1]] = self[i]
+			touch_mod(self[i + 1])
+		end
+		return setdefault
+	end
+
+	-- aux {'mod'}
+	-- mark a mod as an aux, which won't get sent to `ApplyModifiers`
+	local function aux(self)
 		if type(self) == 'string' then
 			local v = self
 			auxes[v] = true
 		elseif type(self) == 'table' then
 			for i = 1, #self do
-				aux(self[i], depth, name)
+				aux(self[i])
 			end
-		else
-			screen_error('aux var name must be a string', depth, name)
 		end
 		return aux
 	end
 
-	-- the table of nodes
-	local nodes = {n = 0}
-	local node_start
-
-	function node(self, depth, name)
-		local depth = 1 + (type(depth) == 'number' and depth or 0)
-		local name = name or 'node'
-		if type(self) ~= 'table' then
-			screen_error('curly braces expected', depth, name)
-			return node
-		end
+	-- node {'inputs', function(inputs) return outputs end, 'outputs'}
+	-- create a listener that gets run whenever a mod value gets changed
+	local function node(self)
 		local i = 1
 		local inputs = {}
 		while type(self[i]) == 'string' do
 			table.insert(inputs, self[i])
 			i = i + 1
 		end
-		if i == 1 then
-			screen_error('the first argument needs to be the mod name', depth, name)
-		end
 		local fn = self[i]
-		if type(fn) ~= 'function' then
-			screen_error('node function expected', depth, name)
-		end
 		i = i + 1
 		local out = {}
 		while self[i] do
-			if type(self[i]) ~= 'string' then
-				screen_error('unexpected argument '..tostring(self[i])..', expected a string', depth, name)
-			end
 			table.insert(out, self[i])
 			i = i + 1
 		end
 		local result = {inputs, out, fn}
-		result.priority = self.defer and -nodes.n or nodes.n
-		push(nodes, result)
+		result.priority = (self.defer and -1 or 1) * table.getn(nodes)
+		table.insert(nodes, result)
 		return node
 	end
 
-	-- used to create your own mods.
+	-- definemod{'mod', function(mod, pn) end}
 	-- calls aux and node on the provided arguments
-	function definemod(self, depth, name)
+	local function definemod(self)
 		local depth = 1 + (type(depth) == 'number' and depth or 0)
 		local name = name or 'definemod'
 		for i = 1, #self do
 			if type(self[i]) ~= 'string' then
 				break
 			end
-			aux(self[i], depth, name)
+			aux(self[i])
 		end
-		node(self, depth, name)
+		node(self)
 		return definemod
 	end
 
-	local mods = {}
+	-------------
+	-- RUNTIME --
+	-------------
+
+	-- mod targets are the values that the mod would be at if the current eases finished
 	local targets = {}
+	for pn = 1, max_pn do
+		targets[pn] = setmetatable({}, modtable_mt)
+	end
+
+	-- the live value of the current mods. Gets recomputed each frame
+	local mods = {}
+	local mods_mt = {}
+	for pn = 1, max_pn do
+		mods_mt[pn] = {__index = targets[pn]}
+		mods[pn] = setmetatable({}, mods_mt[pn])
+	end
+
+	-- a stringbuilder of the modstring that is being applied
 	mod_buffer = stringbuilder()
 
+	-- data structure for nodes
+	local node_start = {}
+
+	-- keep track of which players are awake
+	local last_seen_awake = {}
+
+	-- poptions table
+	local poptions = {}
+	local poptions_logging_target
+	for pn = 1, max_pn do
+		local pn = pn
+		local mods_pn = mods[pn]
+		local mt = {
+			__index = function(self, k)
+				return mods_pn[normalize_mod(k)]
+			end,
+			__newindex = function(self, k, v)
+				k = normalize_mod(k)
+				mods_pn[k] = v
+				if v then
+					poptions_logging_target[pn][k] = true
+				end
+			end,
+		}
+		poptions[pn] = setmetatable({}, mt)
+	end
+
 	function touch_mod(mod, pn)
-		-- run metatables
+		-- run metatables to ensure that the mod gets applied this frame
 		if pn then
 			mods[pn][mod] = mods[pn][mod]
 		else
+			-- if no player is provided, run for every player
 			for pn = 1, max_pn do
 				touch_mod(mod, pn)
 			end
@@ -499,6 +397,140 @@
 		end
 	end
 
+	-- runs once during OnCommand
+	-- takes Name= actors and places them in the xero table
+	local function scan_named_actors()
+		local mt = {}
+		function mt.__index(self, k)
+			self[k] = setmetatable({}, mt)
+			return self[k]
+		end
+		local actors = setmetatable({}, mt)
+		local list = {}
+		local code = stringbuilder()
+		local function sweep(actor, skip)
+			if actor.GetNumChildren then
+				for i = 0, actor:GetNumChildren() - 1 do
+					sweep(actor:GetChildAt(i))
+				end
+			end
+			if skip then
+				return
+			end
+			local name = actor:GetName()
+			if name and name ~= '' then
+				if loadstring('t.'..name..'=t') then
+					table.insert(list, actor)
+					code'actors.'(name)' = list['(#list)']\n'
+				else
+					SCREENMAN:SystemMessage('invalid actor name: \''..name..'\'')
+				end
+			end
+		end
+
+		code'return function(list, actors)\n'
+		sweep(foreground, true)
+		code'end'
+
+		local load_actors = xero(assert(loadstring(code:build())))()
+		load_actors(list, actors)
+
+		local function clear_metatables(tab)
+			setmetatable(tab, nil)
+			for _, obj in pairs(tab) do
+				if type(obj) == 'table' and getmetatable(obj) == mt then
+					clear_metatables(obj)
+				end
+			end
+		end
+		clear_metatables(actors)
+
+		for name, actor in pairs(actors) do
+			xero[name] = actor
+		end
+
+	end
+
+	local function on_command(self)
+		scan_named_actors()
+	end
+
+	-- runs once during ScreenReadyCommand, before the user code is loaded
+	-- hides various actors that are placed by the theme
+	local function hide_theme_actors()
+		for _, element in ipairs {
+			'Overlay', 'Underlay',
+			'ScoreP1', 'ScoreP2',
+			'LifeP1', 'LifeP2',
+		} do
+			local child = SCREENMAN(element)
+			if child then child:hidden(1) end
+		end
+	end
+
+	-- runs once during ScreenReadyCommand, before the user code is loaded
+	-- sets up the player tables
+	local function prepare_variables()
+		P = {}
+		for pn = 1, max_pn do
+			local player = SCREENMAN('PlayerP' .. pn)
+			xero['P' .. pn] = player
+			P[pn] = player
+		end
+	end
+
+	-- runs once during ScreenReadyCommand, after the user code is loaded
+	-- sorts the mod tables so that things can be processed in order
+	local function sort_tables()
+		-- sort eases by their beat
+		stable_sort(eases, function(a, b) return a[1] < b[1] end)
+
+		-- sort the funcs by their beat and priority
+		stable_sort(funcs, function(a, b)
+			if a[1] == b[1] then
+				local x, y = a.priority, b.priority
+				return x * x * y < x * y * y
+			else
+				return a[1] < b[1]
+			end
+		end)
+
+		-- sort the nodes by their priority
+		stable_sort(nodes, function(a, b)
+			local x, y = a.priority, b.priority
+			return x * x * y < x * y * y
+		end)
+	end
+
+	-- runs once during ScreenReadyCommand, after the user code is loaded
+	-- replaces aliases with their respective mods
+	local function resolve_aliases()
+		-- ease
+		for _, e in ipairs(eases) do
+			for i = 5, e.n, 2 do e[i] = normalize_mod(e[i]) end
+		end
+		-- aux
+		local old_auxes = copy(auxes)
+		clear(auxes)
+		for mod, _ in pairs(old_auxes) do
+			auxes[normalize_mod(mod)] = true
+		end
+		-- node
+		for _, node_entry in ipairs(nodes) do
+			local input = node_entry[1]
+			local output = node_entry[2]
+			for i = 1, #input do input[i] = normalize_mod(input[i]) end
+			for i = 1, #output do output[i] = normalize_mod(output[i]) end
+		end
+		-- default_mods
+		local old_default_mods = copy(default_mods)
+		clear(default_mods)
+		for mod, percent in pairs(old_default_mods) do
+			default_mods[normalize_mod(mod)] = percent
+		end
+	end
+
+	-- runs once during ScreenReadyCommand
 	local function compile_nodes()
 		local terminators = {}
 		for _, nd in ipairs(nodes) do
@@ -507,9 +539,9 @@
 			end
 		end
 		for k, _ in pairs(terminators) do
-			push(nodes, {{k}, {}, nil, nil, nil, nil, nil, true})
+			table.insert(nodes, {{k}, {}, nil, nil, nil, nil, nil, true})
 		end
-		local start = {}
+		local start = node_start
 		local locked = {}
 		local last = {}
 		for _, nd in ipairs(nodes) do
@@ -616,246 +648,35 @@
 		for mod, v in pairs(start) do
 			v[locked] = nil
 		end
-		node_start = start
 	end
 
-	-- replaces aliases with their respective mods
-	local function resolve_aliases()
-		-- ease
-		for _, e in ipairs(eases) do
-			for i = 5, e.n, 2 do e[i] = normalize_mod(e[i]) end
-		end
-		-- aux
-		local old_auxes = copy(auxes)
-		clear(auxes)
-		for mod, _ in pairs(old_auxes) do
-			auxes[normalize_mod(mod)] = true
-		end
-		-- node
-		for _, node_entry in ipairs(nodes) do
-			local input = node_entry[1]
-			local output = node_entry[2]
-			for i = 1, #input do input[i] = normalize_mod(input[i]) end
-			for i = 1, #output do output[i] = normalize_mod(output[i]) end
-		end
-		-- default_mods
-		local old_default_mods = copy(default_mods)
-		clear(default_mods)
-		for mod, percent in pairs(old_default_mods) do
-			default_mods[normalize_mod(mod)] = percent
-		end
+	local function disable_functions()
+		ease = function() screen_error('cannot be run after beat 0', 'ease') end
+		add = function() screen_error('cannot be run after beat 0', 'add') end
+		func = function() screen_error('cannot be run after beat 0', 'func') end
+		set = function() screen_error('cannot be run after beat 0', 'set') end
+		setdefault = function() screen_error('cannot be run after beat 0', 'setdefault') end
+		reset = function() screen_error('cannot be run after beat 0', 'reset') end
+		node = function() screen_error('cannot be run after beat 0', 'node') end
+		definemod = function() screen_error('cannot be run after beat 0', 'definemod') end
+		aux = function() screen_error('cannot be run after beat 0', 'aux') end
+		alias = function() screen_error('cannot be run after beat 0', 'alias') end
+		get = function(mod, pn) return mods[pn or 1][normalize_mod(mod)] end
 	end
 
-	-- takes every actor with a Name= and places it in the xero table
-	local function scan_named_actors()
-		local mt = {}
-		function mt.__index(self, k)
-			self[k] = setmetatable({}, mt)
-			return self[k]
-		end
-		local actors = setmetatable({}, mt)
-		local list = {n = 0}
-		local code = stringbuilder()
-		local function sweep(actor, skip)
-			if actor.GetNumChildren then
-				for i = 0, actor:GetNumChildren() - 1 do
-					sweep(actor:GetChildAt(i))
-				end
-			end
-			if skip then
-				return
-			end
-			local name = actor:GetName()
-			if name and name ~= '' then
-				if loadstring('t.'..name..'=t') then
-					push(list, actor)
-					code'actors.'(name)' = list['(list.n)']\n'
-				else
-					SCREENMAN:SystemMessage('invalid actor name: \''..name..'\'')
-				end
-			end
-		end
-
-		code'return function(list, actors)\n'
-			sweep(foreground, true)
-		code'end'
-
-		local load_actors = xero(assert(loadstring(code:build())))()
-		load_actors(list, actors)
-
-		local function clear_metatables(tab)
-			setmetatable(tab, nil)
-			for _, obj in pairs(tab) do
-				if type(obj) == 'table' and getmetatable(obj) == mt then
-					clear_metatables(obj)
-				end
-			end
-		end
-		clear_metatables(actors)
-
-		for name, actor in pairs(actors) do
-			xero[name] = actor
-		end
-
-	end
-
-	function on_command(self)
-		scan_named_actors()
-		self:queuecommand('BeginUpdate')
-	end
-
-	function begin_update_command(self)
-
-		for _, element in ipairs {
-			'Overlay', 'Underlay',
-			'ScoreP1', 'ScoreP2',
-			'LifeP1', 'LifeP2',
-		} do
-			local child = SCREENMAN(element)
-			if child then child:hidden(1) end
-		end
-
-		P = {}
-		for pn = 1, max_pn do
-			local player = SCREENMAN('PlayerP' .. pn)
-			xero['P' .. pn] = player
-			P[pn] = player
-		end
-
+	function screen_ready_command(self)
+		hide_theme_actors()
+		prepare_variables()
+		foreground:hidden(0)
+		-- loads both the plugins and the mod.xml due to propagation
 		foreground:playcommand('Load')
-
-		stable_sort(eases, function(a, b) return a[1] < b[1] end)
-		stable_sort(funcs, function(a, b)
-			if a[1] == b[1] then
-				local x, y = a.priority, b.priority
-				return x * x * y < x * y * y
-			else
-				return a[1] < b[1]
-			end
-		end)
-		stable_sort(nodes, function(a, b)
-			local x, y = a.priority, b.priority
-			return x * x * y < x * y * y
-		end)
+		sort_tables()
 		resolve_aliases()
 		compile_nodes()
-
 		-- disable all the table inserters during runtime
-		ease = function() screen_error('cannot be run after beat 0', 1, 'ease') end
-		add = function() screen_error('cannot be run after beat 0', 1, 'add') end
-		func = function() screen_error('cannot be run after beat 0', 1, 'func') end
-		set = function() screen_error('cannot be run after beat 0', 1, 'set') end
-		get = function() screen_error('cannot be run after beat 0', 1, 'get') end
-		setdefault = function() screen_error('cannot be run after beat 0', 1, 'setdefault') end
-		reset = function() screen_error('cannot be run after beat 0', 1, 'reset') end
-		node = function() screen_error('cannot be run after beat 0', 1, 'node') end
-		definemod = function() screen_error('cannot be run after beat 0', 1, 'definemod') end
-		aux = function() screen_error('cannot be run after beat 0', 1, 'aux') end
-		alias = function() screen_error('cannot be run after beat 0', 1, 'alias') end
-
+		disable_functions()
 		self:luaeffect('Update')
 	end
-
-	-- zoom
-	aux 'zoom'
-	node {
-		'zoom', 'zoomx', 'zoomy',
-		function(zoom, x, y)
-			local m = zoom * 0.01
-			return m * x, m * y
-		end,
-		'zoomx', 'zoomy',
-		defer = true,
-	}
-
-	setdefault {
-		100, 'zoom',
-		100, 'zoomx',
-		100, 'zoomy',
-		100, 'zoomz',
-	}
-
-	setdefault {400, 'grain'}
-
-	-- movex
-	for _, a in ipairs {'x', 'y', 'z'} do
-		aux {'move' .. a}
-		node {
-			'move' .. a,
-			function(a)
-				return a, a, a, a, a, a, a, a
-			end,
-			'move'..a..'0', 'move'..a..'1', 'move'..a..'2', 'move'..a..'3',
-			'move'..a..'4', 'move'..a..'5', 'move'..a..'6', 'move'..a..'7',
-			defer = true,
-		}
-	end
-
-	-- xmod
-	aux 'xmod' 'cmod'
-	node {
-		'xmod', 'cmod',
-		function(xmod, cmod)
-			if cmod == 0 then
-				mod_buffer(string.format('*-1 %fx', xmod))
-			else
-				mod_buffer(string.format('*-1 %fx,*-1 c%f', xmod, cmod))
-			end
-		end,
-		defer = true,
-	}
-	setdefault {1, 'xmod'}
-
-	-- defined earlier
-	local targets = targets
-	for pn = 1, max_pn do
-		targets[pn] = setmetatable({}, modtable_mt)
-	end
-
-	local mods_mt = {}
-	for pn = 1, max_pn do
-		mods_mt[pn] = {__index = targets[pn]}
-	end
-	-- defined earlier
-	local mods = mods
-	for pn = 1, max_pn do
-		mods[pn] = setmetatable({}, mods_mt[pn])
-	end
-
-	local last_seen_awake = {}
-
-	local poptions = {}
-	local poptions_mt = {}
-	local poptions_logging_target
-	for pn = 1, max_pn do
-		local pn = pn
-		local mods_pn = mods[pn]
-		local mt = {
-			__index = function(self, k)
-				return mods_pn[normalize_mod(k)]
-			end,
-			__newindex = function(self, k, v)
-				k = normalize_mod(k)
-				mods_pn[k] = v
-				if v then
-					poptions_logging_target[pn][k] = true
-				end
-			end,
-		}
-		poptions_mt[pn] = mt
-		poptions[pn] = setmetatable({}, mt)
-	end
-
-	local eases_index = 1
-	local funcs_index = 1
-
-	local active_eases = {n = 0}
-	local active_funcs = perframe_data_structure(function(a, b)
-		local x, y = a.priority, b.priority
-		return x * x * y < x * y * y
-	end)
-
-	GAMESTATE:ApplyModifiers('clearall,*-1 overhead')
 
 	local function apply_modifiers(str, pn)
 		GAMESTATE:ApplyModifiers(str, pn)
@@ -870,48 +691,21 @@
 					apply_modifiers = old_apply_modifiers
 				end
 			end
-			old_apply_modifiers(str, pn)
+			GAMESTATE:ApplyModifiers(str, pn)
 		end
 	end
 
-	local seen = 1
-	local active_nodes = {}
-	local active_terminators = {}
-	local propagateAll, propagate
-	function propagateAll(nodes)
-		if nodes then
-			for _, nd in ipairs(nodes) do
-				propagate(nd)
-			end
-		end
-	end
-	function propagate(nd)
-		if nd[9] ~= seen then
-			nd[9] = seen
-			if nd[8] then
-				table.insert(active_terminators, nd)
-			else
-				propagateAll(nd[4])
-				table.insert(active_nodes, nd)
-			end
-		end
-	end
-
-	local oldbeat = 0
-	function update_command(self)
-
-		local beat = GAMESTATE:GetSongBeat()
-		if beat == oldbeat then return end
-		oldbeat = beat
-
-		while eases_index <= eases.n and eases[eases_index][1] < beat do
+	local eases_index = 1
+	local active_eases = {}
+	local function run_eases(beat)
+		while eases_index <= #eases and eases[eases_index][1] < beat do
 			local e = eases[eases_index]
 			local plr = e.plr
 			if e.reset then
 				for mod, pecent in pairs(targets[plr]) do
 					if not e.exclude[mod] and targets[plr][mod] ~= default_mods[mod] then
-						push(e, default_mods[mod])
-						push(e, mod)
+						table.insert(e, default_mods[mod])
+						table.insert(e, mod)
 					end
 				end
 			end
@@ -928,12 +722,12 @@
 					targets[plr][mod] = targets[plr][mod] + e[i]
 				end
 			end
-			push(active_eases, e)
+			table.insert(active_eases, e)
 			eases_index = eases_index + 1
 		end
 
 		local active_eases_index = 1
-		while active_eases_index <= active_eases.n do
+		while active_eases_index <= table.getn(active_eases) do
 			local e = active_eases[active_eases_index]
 			local plr = e.plr
 			if beat < e[1] + e[2] then
@@ -948,13 +742,18 @@
 					local mod = e[i + 1]
 					touch_mod(mod, plr)
 				end
-				active_eases[active_eases_index] = active_eases[active_eases.n]
-				active_eases[active_eases.n] = nil
-				active_eases.n = active_eases.n - 1
+				active_eases[active_eases_index] = table.remove(active_eases)
 			end
 		end
+	end
 
-		while funcs_index <= funcs.n and funcs[funcs_index][1] < beat do
+	local funcs_index = 1
+	local active_funcs = perframe_data_structure(function(a, b)
+		local x, y = a.priority, b.priority
+		return x * x * y < x * y * y
+	end)
+	local function run_funcs(beat)
+		while funcs_index <= #funcs and funcs[funcs_index][1] < beat do
 			local e = funcs[funcs_index]
 			if not e[2] then
 				e[3](beat)
@@ -981,7 +780,32 @@
 				active_funcs:remove()
 			end
 		end
+	end
 
+	local seen = 1
+	local active_nodes = {}
+	local active_terminators = {}
+	local propagateAll, propagate
+	function propagateAll(nodes)
+		if nodes then
+			for _, nd in ipairs(nodes) do
+				propagate(nd)
+			end
+		end
+	end
+	function propagate(nd)
+		if nd[9] ~= seen then
+			nd[9] = seen
+			if nd[8] then
+				table.insert(active_terminators, nd)
+			else
+				propagateAll(nd[4])
+				table.insert(active_nodes, nd)
+			end
+		end
+	end
+
+	local function run_nodes_and_mods()
 		for pn = 1, max_pn do
 			if P[pn] and P[pn]:IsAwake() then
 				if not last_seen_awake[pn] then
@@ -991,7 +815,7 @@
 						touched_mods[pn][mod] = nil
 					end
 				end
-				mod_buffer = stringbuilder()
+				mod_buffer:clear()
 				seen = seen + 1
 				for k in pairs(mods[pn]) do
 					-- identify all nodes to execute this frame
@@ -1022,7 +846,9 @@
 				end
 			end
 		end
+	end
 
+	local function run_debug_print_mod_targets(beat)
 		if debug_print_mod_targets then
 			if debug_print_mod_targets == true or debug_print_mod_targets < beat then
 				for pn = 1, max_pn do
@@ -1032,20 +858,324 @@
 						for k, v in pairs(targets[pn]) do
 							if v ~= default_mods[k] then
 								i = i + 1
-								outputs[i] = tostring(k) .. ': ' .. tostring(v)
+								outputs[i] = tostring(k)..': '..tostring(v)
 							end
 						end
-						print('Player ' .. pn .. ' at beat ' .. beat .. ' --> ' .. table.concat(outputs, ', '))
+						print('Player '..pn..' at beat '..beat..' --> '..table.concat(outputs, ', '))
 					end
 				end
 				debug_print_mod_targets = (debug_print_mod_targets == true)
 			end
 		end
 	end
-	return true
-end)()"
+
+	local oldtime = 0
+	function update_command(self)
+		local beat = GAMESTATE:GetSongBeat()
+		local time = GAMESTATE:GetSongTime()
+
+		-- don't run multiple times if the game hasn't 'ticked' yet
+		if time == oldtime then return end
+		oldtime = time
+
+		run_eases(beat)
+		run_funcs(beat)
+		run_nodes_and_mods()
+		run_debug_print_mod_targets(beat)
+	end
+
+    ---------------------------------------------------------------------------------------
+	GAMESTATE:ApplyModifiers('clearall,*-1 overhead')
+
+	-- Shorthand for commonly used variables
+	scx = SCREEN_CENTER_X
+	scy = SCREEN_CENTER_Y
+	sw = SCREEN_WIDTH
+	sh = SCREEN_HEIGHT
+
+	dw = DISPLAY:GetDisplayWidth()
+	dh = DISPLAY:GetDisplayHeight()
+
+	e = 'end'
+
+	function sprite(self)
+		self:basezoomx(sw / dw)
+		self:basezoomy(-sh / dh)
+		self:x(scx)
+		self:y(scy)
+	end
+
+	function aft(self)
+		self:SetWidth(dw)
+		self:SetHeight(dh)
+		self:EnableDepthBuffer(false)
+		self:EnableAlphaBuffer(false)
+		self:EnableFloat(false)
+		self:EnablePreserveTexture(true)
+		self:Create()
+	end
+
+	function aftsprite(aft, sprite)
+		sprite:SetTexture(aft:GetTexture())
+	end
+
+	function setupJudgeProxy(proxy, target, pn)
+		proxy:SetTarget(target)
+		proxy:xy(scx * (pn-.5), scy)
+		target:hidden(1)
+		target:sleep(9e9)
+	end
+
+	-- zoom
+	aux 'zoom'
+	node {
+		'zoom', 'zoomx', 'zoomy',
+		function(zoom, x, y)
+			local m = zoom * 0.01
+			return m * x, m * y
+		end,
+		'zoomx', 'zoomy',
+		defer = true,
+	}
+
+	setdefault {
+		100, 'zoom',
+		100, 'zoomx',
+		100, 'zoomy',
+		100, 'zoomz',
+	}
+
+	setdefault {400, 'grain'}
+
+	-- movex
+	local function repeat8(a)
+		return a, a, a, a, a, a, a, a
+	end
+
+	for _, a in ipairs {'x', 'y', 'z'} do
+		definemod {
+			'move' .. a,
+			repeat8,
+			'move'..a..'0', 'move'..a..'1', 'move'..a..'2', 'move'..a..'3',
+			'move'..a..'4', 'move'..a..'5', 'move'..a..'6', 'move'..a..'7',
+			defer = true,
+		}
+	end
+
+	-- xmod
+	setdefault {1, 'xmod'}
+	definemod {
+		'xmod', 'cmod',
+		function(xmod, cmod)
+			if cmod == 0 then
+				mod_buffer(string.format('*-1 %fx', xmod))
+			else
+				mod_buffer(string.format('*-1 %fx,*-1 c%f', xmod, cmod))
+			end
+		end,
+		defer = true,
+	}
+
+	--------------------
+	-- ERROR CHECKING --
+	--------------------
+
+	local function is_valid_ease(eas)
+		local err = type(eas) ~= 'function' and (not getmetatable(eas) or not getmetatable(eas).__call)
+		if not err then
+			local result = eas(1)
+			err = type(result) ~= 'number'
+		end
+		return not err
+	end
+
+	local function check_ease_errors(self, name)
+		if type(self) ~= 'table' then
+			return screen_error('curly braces expected', name)
+		end
+		if type(self[1]) ~= 'number' then
+			return screen_error('beat missing', name)
+		end
+		if name ~= 'set' then
+			if type(self[2]) ~= 'number' then
+				return screen_error('len / end missing', name)
+			end
+			if not is_valid_ease(self[3]) then
+				return screen_error('invalid ease function', name)
+			end
+		end
+		local i = is_set and 2 or 4
+		while self[i] do
+			if type(self[i]) ~= 'number' then
+				return screen_error('invalid mod percent', name)
+			end
+			if type(self[i + 1]) ~= 'string' then
+				return screen_error('invalid mod', name)
+			end
+			i = i + 2
+		end
+		local plr = self.plr or get_plr()
+		if type(plr) ~= 'number' and type(plr) ~= 'table' then
+			return screen_error('invalid plr', name)
+		end
+	end
+
+	local function check_reset_errors(self, name)
+		if type(self) ~= 'table' then
+			return screen_error('curly braces expected', name)
+		end
+		if type(self[1]) ~= 'number' then
+			return screen_error('invalid beat number', name)
+		end
+		if self[2] and self[3] then
+			if type(self[2]) ~= 'number' then
+				return screen_error('invalid length', name)
+			end
+			if not is_valid_ease(self[3]) then
+				return screen_error('invalid ease', name)
+			end
+		elseif self[2] or self[3] then
+			return screen_error('needs both length and ease', name)
+		end
+		if type(self.exclude) ~= 'nil' and type(self.exclude) ~= 'string' and type(self.exclude) ~= 'table' then
+			return screen_error('invalid `exclude=`', name)
+		end
+	end
+
+	local valid_func_signatures = {
+		['number, function'] = true,
+		['number, number, function'] = true,
+		['number, number, ease, function'] = true,
+		['number, number, ease, string'] = true,
+		['number, number, ease, number, function'] = true,
+		['number, number, ease, number, string'] = true,
+		['number, number, ease, number, number, function'] = true,
+		['number, number, ease, number, number, string'] = true,
+	}
+
+	function check_func_errors(self, name)
+		if type(self) ~= 'table' then
+			return screen_error('curly braces expected', name)
+		end
+		local types = stringbuilder()
+		for i, v in ipairs(self) do
+			types(type(v))
+		end
+		if #self >= 3 then
+			if is_valid_ease(self[3]) then
+				types[3] = 'ease'
+			end
+		end
+		local signature = types:build(', ')
+		if signature == 'number, number, function' and self.persist ~= nil then
+			return screen_error('persist is not supported for perframes', name)
+		end
+		if not valid_func_signatures[signature] then
+			return screen_error('something is wrong with your func', name)
+		end
+	end
+
+	local function check_alias_errors(self, name)
+		if type(self) ~= 'table' then
+			return screen_error('curly braces expected', name)
+		end
+		local a, b = self[1], self[2]
+		if type(a) ~= 'string' then
+			return screen_error('argument 1 should be a string', name)
+		end
+		if type(b) ~= 'string' then
+			return screen_error('argument 2 should be a string', name)
+		end
+	end
+
+	local function check_setdefault_errors(self, name)
+		if type(self) ~= 'table' then
+			return screen_error('curly braces expected', name)
+		end
+		for i = 1, #self, 2 do
+			if type(self[i]) ~= 'number' then
+				return screen_error('invalid mod percent', name)
+			end
+			if type(self[i + 1]) ~= 'string' then
+				return screen_error('invalid mod name', name)
+			end
+		end
+	end
+
+	local function check_aux_errrors(self, name)
+		if type(self) ~= 'string' and type(self) ~= 'table' then
+			return screen_error('expecting curly braces', name)
+		end
+		if type(self) == 'table' then
+			for i, v in ipairs(self) do
+				if type(v) ~= 'string' then
+					return screen_error('invalid mod to aux: '.. v, name)
+				end
+			end
+		end
+	end
+
+	local function check_node_errors(self, name)
+		if type(self) ~= 'table' then
+			return screen_error('curly braces expected', name)
+		end
+		local i = 1
+		while type(self[i]) == 'string' do
+			i = i + 1
+		end
+		if i == 1 then
+			return screen_error('the first argument needs to be the mod name', name)
+		end
+		if type(self[i]) ~= 'function' then
+			return screen_error('mod definition expected', name)
+		end
+		i = i + 1
+		while self[i] do
+			if type(self[i]) ~= 'string' then
+				return screen_error('unexpected argument '..tostring(self[i])..', expected a string', name)
+			end
+		end
+	end
+
+	-------------
+	-- EXPORTS --
+	-------------
+
+	local function export(fn, check_errors, name)
+		local function inner(self)
+			if not check_errors(self, name) then
+				fn(self)
+			end
+			return inner
+		end
+		xero[name] = inner
+	end
+
+	export(ease, check_ease_errors, 'ease')
+	export(add, check_ease_errors, 'add')
+	export(set, check_ease_errors, 'set')
+	export(reset, check_reset_errors, 'reset')
+	export(func, check_func_errors, 'func')
+	export(alias, check_alias_errors, 'alias')
+	export(setdefault, check_setdefault_errors, 'setdefault')
+	export(aux, check_aux_errrors, 'aux')
+	export(node, check_node_errors, 'node')
+	export(definemod, check_node_errors, 'definemod')
+
+	-- Register the commands to the actor
+	self:addcommand('On', on_command)
+	self:addcommand('ScreenReady', screen_ready_command)
+
+	function skip_first_update()
+		self:removecommand('Update')
+		self:addcommand('Update', update_command)
+	end
+	self:addcommand('Update', skip_first_update)
+
+	-- NotITG and OpenITG have a long standing bug where the InitCommand on an actor can run twice in certain cases.
+	-- By removing the command after it's done, it can only ever run once
+	self:removecommand('Init')
+
+end)"
 Type = "ActorFrame"
-OnCommand = "%xero.on_command"
-BeginUpdateCommand = "%xero.begin_update_command"
-UpdateCommand = "%xero.update_command"
 />

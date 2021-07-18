@@ -1,113 +1,88 @@
-<Layer Condition = "(function() --std.xml
-	
-	local xero = setmetatable(xero, xero)
-	xero.__index = _G
-	
-	local function noop() end
-	
-	function xero:__call(f, name)
-		
-		if type(f) == 'string' then
-			-- if xero is called with a string, we need to load the string as code
-			local err
-			-- try compiling the code
-			f, err = loadstring( 'return function(self)' .. f .. '\nend', name)
-			if err then SCREENMAN:SystemMessage(err) return noop end
-			-- grab the function
-			f, err = pcall(f)
-			if err then SCREENMAN:SystemMessage(err) return noop end
+<Layer InitCommand = "%function() --std.xml
+	-- std.xml contains definitions for functions that don't interact with the NotITG backend.
+
+	-- Prepare the xero table
+	setmetatable(xero, {
+
+		-- if something isn't found in the xero table, fall back to a global lookup
+		__index = _G,
+
+		-- handle xero() calls to set the environment
+		__call = function(self, f)
+			setfenv(f or 2, self)
+			return f
 		end
-		
-		setfenv(f or 2, self)
-		return f
-	end
-	
+	})
+
 	xero()
-	
-	local function insertion_sort(t, l, h, c)
-		for i = l + 1, h do
-			local k = l
-			local v = t[i]
-			for j = i, l + 1, -1 do
-				if c(v, t[j - 1]) then
-					t[j] = t[j - 1]
-				else
-					k = j
-					break
-				end
-			end
-			t[k] = v
+
+	function copy(src)
+		local dest = {}
+		for k, v in pairs(src) do
+			dest[k] = v
 		end
+		return dest
 	end
-	
-	local function merge(t, b, l, m, h, c)
-		if c(t[m], t[m + 1]) then
-			return
+
+	function deepcopy(src)
+		local dest = {}
+		for k, v in pairs(src) do
+			if type(k) == 'table' then k = deepcopy(k) end
+			if type(v) == 'table' then v = deepcopy(v) end
+			dest[k] = v
 		end
-		local i, j, k
-		i = 1
-		for j = l, m do
-			b[i] = t[j]
-			i = i + 1
-		end
-		i, j, k = 1, m + 1, l
-		while k < j and j <= h do
-			if c(t[j], b[i]) then
-				t[k] = t[j]
-				j = j + 1
-			else
-				t[k] = b[i]
-				i = i + 1
-			end
-			k = k + 1
-		end
-		for k = k, j - 1 do
-			t[k] = b[i]
-			i = i + 1
-		end
+		return dest
 	end
-	
-	local magic_number = 12
-	
-	local function merge_sort(t, b, l, h, c)
-		if h - l < magic_number then
-			insertion_sort(t, l, h, c)
-		else
-			local m = math.floor((l + h) / 2)
-			merge_sort(t, b, l, m, c)
-			merge_sort(t, b, m + 1, h, c)
-			merge(t, b, l, m, h, c)
+
+	function clear(t)
+		for k, v in pairs(t) do
+			t[k] = nil
 		end
-	end
-	
-	local function default_comparator(a, b) return a < b end
-	local function flip_comparator(c) return function(a, b) return c(b, a) end end
-	
-	function stable_sort(t, c)
-		if not t[2] then return t end
-		c = c or default_comparator
-		local n = t.n
-		local b = {}
-		b[math.floor((n + 1) / 2)] = t[1]
-		merge_sort(t, b, 1, n, c)
 		return t
 	end
-	
-	local function add(self, obj)
+
+	function iclear(t)
+		for i = 1, #t do
+			table.remove(t)
+		end
+		return t
+	end
+
+	-- move things from _G to xero
+	xero.xero = _G.xero
+	xero.type = _G.type
+	xero.print = _G.print
+	xero.pairs = _G.pairs
+	xero.ipairs = _G.ipairs
+	xero.unpack = _G.unpack
+	xero.tonumber = _G.tonumber
+	xero.tostring = _G.tostring
+	xero.math = copy(_G.math)
+	xero.table = copy(_G.table)
+	xero.string = copy(_G.string)
+
+	-------------------
+	-- Perframes have some special requirements to be handled.
+	-- To meet those requirements, a special data structure is required.
+	-- This is the data structure
+
+	local methods = {}
+
+	function methods:add(obj)
 		local stage = self.stage
 		self.n = self.n + 1
 		stage.n = stage.n + 1
 		stage[stage.n] = obj
 	end
 	
-	local function remove(self)
+	function methods:remove()
 		local swap = self.swap
 		swap[swap.n] = nil
 		swap.n = swap.n - 1
 		self.n = self.n - 1
 	end
 	
-	local function next(self)
+	function methods:next()
 		if self.n == 0 then return end
 		
 		local swap = self.swap
@@ -153,32 +128,60 @@
 		end
 		return swap[swap.n]
 	end
+
+	local mt = {__index = methods}
 	
 	function perframe_data_structure(comparator)
-		return {
-			add = add,
-			remove = remove,
-			next = next,
-			comparator = comparator or default_comparator,
-			reverse_comparator = flip_comparator(comparator or default_comparator),
+		return setmetatable({
+			reverse_comparator = function(a, b) return comparator(b, a) end,
 			stage = {n = 0},
 			list = {n = 0},
 			swap = {n = 0},
 			n = 0,
-		}
+		}, mt)
 	end
-	
+
+	-- the behavior of a stringbuilder
 	local stringbuilder_mt =  {
-		__index = {build = table.concat},
-		__tostring = table.concat,
+		__index = {
+			-- :build() method converts a stringbuilder into a string, with optional delimiter
+			build = table.concat,
+			-- :clear() method empties the stringbuilder
+			clear = iclear,
+		},
+
+		-- calling a stringbuilder appends to it
 		__call = function(self, a)
 			table.insert(self, tostring(a))
 			return self
 		end,
+
+		-- stringbuilder can convert to a string
+		__tostring = table.concat,
 	}
-	
+
+	-- creates and returns a new string builder
 	function stringbuilder()
 		return setmetatable({}, stringbuilder_mt)
 	end
-	
-end)()" />
+
+
+	-- function that does nothing
+	local function noop() end
+
+	-- load a string as code with the `xero` environment
+	function xero_load(code)
+		local f, err = loadstring( 'return function(self)' .. code .. '\nend', name)
+		if err then
+			SCREENMAN:SystemMessage(err)
+			return noop
+		end
+		f, err = pcall(f)
+		if err then
+			SCREENMAN:SystemMessage(err)
+			return noop
+		end
+		return xero(f)
+	end
+
+end" />

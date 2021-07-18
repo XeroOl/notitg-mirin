@@ -1,11 +1,9 @@
 <ActorFrame
-	Condition = "(function()
-		_G.xero = {}
-		return true
-	end)()"
 	InitCommand = "%function(self)
+		_G.xero = {}
 		xero.foreground = self
 		self:sleep(9e9)
+		--self:hidden(0)
 	end"
 >
 	<children>
@@ -13,6 +11,9 @@
 		<!-- Std library -->
 		<Code File = "std.xml" />
 		
+		<!-- Sorting algorithm -->
+		<Code File = "sort.xml" />
+
 		<!-- Load the actual template -->
 		<Code File = "template.xml" />
 		
