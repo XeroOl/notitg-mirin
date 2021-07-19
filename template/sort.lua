@@ -1,4 +1,3 @@
-<Layer InitCommand = "%xero(function() 
 -- this is based on code from Dirk Laurie and Steve Fisher,
 -- used under license as follows:
 
@@ -25,6 +24,7 @@
 -- (modifications by XeroOl 2021)
 
 -- Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
+xero()
 
 local sort = {}
 
@@ -141,5 +141,3 @@ end
 
 unstable_sort = table.sort
 stable_sort = sort.stable_sort
-
-end)" />

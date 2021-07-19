@@ -3,28 +3,28 @@
 		_G.xero = {}
 		xero.foreground = self
 		self:sleep(9e9)
-		--self:hidden(0)
+
+		-- Std library
+		dofile'template/std.lua'
+
+		-- Sorting algorithm
+		dofile'template/sort.lua'
+
+		-- Load the Eases
+		dofile'template/ease.lua'
 	end"
 >
 	<children>
-		
-		<!-- Std library -->
-		<Code File = "std.xml" />
-		
-		<!-- Sorting algorithm -->
-		<Code File = "sort.xml" />
+
 
 		<!-- Load the actual template -->
-		<Code File = "template.xml" />
-		
-		<!-- Load the Eases -->
-		<Code File = "ease.xml" />
-		
+		<Layer Type = "ActorFrame" InitCommand = "%dofile'template/template.lua'" />
+
 		<!-- Load the Plugins -->
 		<Code File = "plugins.xml" />
-		
+
 		<!-- Load the User's code -->
 		<Code File = "../lua/mods.xml" />
-		
+
 	</children>
 </ActorFrame>
