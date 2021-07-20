@@ -1052,7 +1052,7 @@ function check_func_errors(self, name)
 	for i, v in ipairs(self) do
 		types(type(v))
 	end
-	if #self >= 3 then
+	if #self > 3 then
 		if is_valid_ease(self[3]) then
 			types[3] = 'ease'
 		end
