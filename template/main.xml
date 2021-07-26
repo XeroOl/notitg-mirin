@@ -18,7 +18,8 @@
 
 
 		<!-- Load the actual template -->
-		<Layer Type = "ActorFrame" InitCommand = "%dofile'template/template.lua'" />
+		<Layer File = "template.xml"  />
+		<!-- InitCommand = "%dofile'template/template.lua'" -->
 
 		<!-- Load the Plugins -->
 		<Code File = "plugins.xml" />
