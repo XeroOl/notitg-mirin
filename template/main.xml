@@ -3,23 +3,21 @@
 		_G.xero = {}
 		xero.foreground = self
 		self:sleep(9e9)
-
-		-- Std library
-		dofile'template/std.lua'
-
-		-- Sorting algorithm
-		dofile'template/sort.lua'
-
-		-- Load the Eases
-		dofile'template/ease.lua'
 	end"
 >
 	<children>
 
+		<!-- Std Library -->
+		<Layer File = "std.xml" />
+
+		<!-- Sorting algorithm -->
+		<Layer File = "sort.xml" />
+
+		<!-- All of the eases -->
+		<Layer File = "ease.xml" />
 
 		<!-- Load the actual template -->
 		<Layer File = "template.xml"  />
-		<!-- InitCommand = "%dofile'template/template.lua'" -->
 
 		<!-- Load the Plugins -->
 		<Code File = "plugins.xml" />

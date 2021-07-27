@@ -139,6 +139,16 @@
 		ease(self)
 	end
 
+
+	-- acc {start, percent, mod}
+	-- adds a relative set to the ease table
+	local function acc(self)
+		self.relative = true
+		table.insert(self, 2, 0)
+		table.insert(self, 3, instant)
+		ease(self)
+	end
+
 	-- reset {start, [len, eas], [exclude = {mod list}]}
 	-- adds a reset to the ease table
 	local function reset(self)
@@ -999,7 +1009,8 @@
 		if type(self[1]) ~= 'number' then
 			return screen_error('beat missing', name)
 		end
-		if name ~= 'set' then
+		local is_set = name == 'set' or name == 'acc'
+		if not is_set then
 			if type(self[2]) ~= 'number' then
 				return screen_error('len / end missing', name)
 			end
@@ -1164,6 +1175,7 @@
 	export(ease, check_ease_errors, 'ease')
 	export(add, check_ease_errors, 'add')
 	export(set, check_ease_errors, 'set')
+	export(acc, check_ease_errors, 'acc')
 	export(reset, check_reset_errors, 'reset')
 	export(func, check_func_errors, 'func')
 	export(alias, check_alias_errors, 'alias')

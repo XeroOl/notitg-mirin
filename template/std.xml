@@ -1,0 +1,187 @@
+<Layer InitCommand = "%function(self)
+
+	-- std.lua contains definitions for functions that don't interact with the NotITG backend.
+
+	-- Prepare the xero table
+	setmetatable(xero, {
+
+		-- if something isn't found in the xero table, fall back to a global lookup
+		__index = _G,
+
+		-- handle xero() calls to set the environment
+		__call = function(self, f)
+			setfenv(f or 2, self)
+			return f
+		end
+	})
+
+	xero()
+
+	function copy(src)
+		local dest = {}
+		for k, v in pairs(src) do
+			dest[k] = v
+		end
+		return dest
+	end
+
+	function deepcopy(src)
+		local dest = {}
+		for k, v in pairs(src) do
+			if type(k) == 'table' then k = deepcopy(k) end
+			if type(v) == 'table' then v = deepcopy(v) end
+			dest[k] = v
+		end
+		return dest
+	end
+
+	function clear(t)
+		for k, v in pairs(t) do
+			t[k] = nil
+		end
+		return t
+	end
+
+	function iclear(t)
+		for i = 1, #t do
+			table.remove(t)
+		end
+		return t
+	end
+
+	-- move things from _G to xero
+	xero.xero = _G.xero
+	xero.type = _G.type
+	xero.print = _G.print
+	xero.pairs = _G.pairs
+	xero.ipairs = _G.ipairs
+	xero.unpack = _G.unpack
+	xero.tonumber = _G.tonumber
+	xero.tostring = _G.tostring
+	xero.math = copy(_G.math)
+	xero.table = copy(_G.table)
+	xero.string = copy(_G.string)
+
+	-------------------
+	-- Perframes have some special requirements to be handled.
+	-- To meet those requirements, a special data structure is required.
+	-- This is the data structure
+
+	local methods = {}
+
+	function methods:add(obj)
+		local stage = self.stage
+		self.n = self.n + 1
+		stage.n = stage.n + 1
+		stage[stage.n] = obj
+	end
+
+	function methods:remove()
+		local swap = self.swap
+		swap[swap.n] = nil
+		swap.n = swap.n - 1
+		self.n = self.n - 1
+	end
+
+	function methods:next()
+		if self.n == 0 then return end
+		
+		local swap = self.swap
+		local stage = self.stage
+		local list = self.list
+		
+		if swap.n == 0 then
+			stable_sort(stage, self.reverse_comparator)
+		end
+		if stage.n == 0 then
+			if list.n == 0 then
+				while swap.n ~= 0 do
+					list.n = list.n + 1
+					list[list.n] = swap[swap.n]
+					swap[swap.n] = nil
+					swap.n = swap.n - 1
+				end
+			else
+				swap.n = swap.n + 1
+				swap[swap.n] = list[list.n]
+				list[list.n] = nil
+				list.n = list.n - 1
+			end
+		else
+			if list.n == 0 then
+				swap.n = swap.n + 1
+				swap[swap.n] = stage[stage.n]
+				stage[stage.n] = nil
+				stage.n = stage.n - 1
+			else
+				if self.comparator(list[list.n], stage[stage.n]) then
+					swap.n = swap.n + 1
+					swap[swap.n] = list[list.n]
+					list[list.n] = nil
+					list.n = list.n - 1
+				else
+					swap.n = swap.n + 1
+					swap[swap.n] = stage[stage.n]
+					stage[stage.n] = nil
+					stage.n = stage.n - 1
+				end
+			end
+		end
+		return swap[swap.n]
+	end
+
+	local mt = {__index = methods}
+
+	function perframe_data_structure(comparator)
+		return setmetatable({
+			reverse_comparator = function(a, b) return comparator(b, a) end,
+			stage = {n = 0},
+			list = {n = 0},
+			swap = {n = 0},
+			n = 0,
+		}, mt)
+	end
+
+	-- the behavior of a stringbuilder
+	local stringbuilder_mt =  {
+		__index = {
+			-- :build() method converts a stringbuilder into a string, with optional delimiter
+			build = table.concat,
+			-- :clear() method empties the stringbuilder
+			clear = iclear,
+		},
+
+		-- calling a stringbuilder appends to it
+		__call = function(self, a)
+			table.insert(self, tostring(a))
+			return self
+		end,
+
+		-- stringbuilder can convert to a string
+		__tostring = table.concat,
+	}
+
+	-- creates and returns a new string builder
+	function stringbuilder()
+		return setmetatable({}, stringbuilder_mt)
+	end
+
+	-- function that does nothing
+	local function noop() end
+
+	-- load a string as code with the `xero` environment
+	function xero_load(code)
+		local f, err = loadstring( 'return function(self)' .. code .. '\nend', name)
+		if err then
+			SCREENMAN:SystemMessage(err)
+			return noop
+		end
+		f, err = pcall(f)
+		if err then
+			SCREENMAN:SystemMessage(err)
+			return noop
+		end
+		return xero(f)
+	end
+
+end" />
