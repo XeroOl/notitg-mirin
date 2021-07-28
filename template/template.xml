@@ -885,7 +885,7 @@
 	local oldtime = 0
 	function update_command(self)
 		local beat = GAMESTATE:GetSongBeat()
-		local time = GAMESTATE:GetSongTime()
+		local time = self:GetSecsIntoEffect()
 
 		-- don't run multiple times if the game hasn't 'ticked' yet
 		if time == oldtime then return end
@@ -1185,6 +1185,7 @@
 	export(definemod, check_node_errors, 'definemod')
 
 
+	self:effectclock('music')
 	-- Register the commands to the actor
 	self:addcommand('On', on_command)
 	self:addcommand('ScreenReady', screen_ready_command)
