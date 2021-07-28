@@ -20,10 +20,10 @@
 		<Layer File = "template.xml"  />
 
 		<!-- Load the Plugins -->
-		<Code File = "plugins.xml" />
+		<Layer File = "plugins.xml" />
 
 		<!-- Load the User's code -->
-		<Code File = "../lua/mods.xml" />
+		<Layer File = "../lua/mods.xml" />
 
 	</children>
 </ActorFrame>
