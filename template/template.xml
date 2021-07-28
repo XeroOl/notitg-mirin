@@ -284,7 +284,6 @@
 	local function setdefault(self)
 		for i = 1, #self, 2 do
 			default_mods[self[i + 1]] = self[i]
-			touch_mod(self[i + 1])
 		end
 		return setdefault
 	end
@@ -546,7 +545,11 @@
 		local old_default_mods = copy(default_mods)
 		clear(default_mods)
 		for mod, percent in pairs(old_default_mods) do
-			default_mods[normalize_mod(mod)] = percent
+			local normalized = normalize_mod(mod)
+			default_mods[normalized] = percent
+			for pn = 1, max_pn do
+				touched_mods[pn][normalized] = true
+			end
 		end
 	end
 
