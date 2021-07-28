@@ -678,6 +678,7 @@
 		add = function() screen_error('cannot be run after beat 0', 'add') end
 		func = function() screen_error('cannot be run after beat 0', 'func') end
 		set = function() screen_error('cannot be run after beat 0', 'set') end
+		acc = function() screen_error('cannot be run after beat 0', 'acc') end
 		setdefault = function() screen_error('cannot be run after beat 0', 'setdefault') end
 		reset = function() screen_error('cannot be run after beat 0', 'reset') end
 		node = function() screen_error('cannot be run after beat 0', 'node') end
@@ -828,7 +829,7 @@
 		end
 	end
 
-	local function run_nodes_and_mods()
+	local function run_nodes()
 		for pn = 1, max_pn do
 			if P[pn] and P[pn]:IsAwake() then
 				if not last_seen_awake[pn] then
@@ -852,6 +853,19 @@
 					-- run all the nodes marked as 'terminator'
 					table.remove(active_terminators)[6](pn)
 				end
+			else
+				last_seen_awake[pn] = false
+				for mod, percent in pairs(mods[pn]) do
+					mods[pn][mod] = nil
+					touched_mods[pn][mod] = true
+				end
+			end
+		end
+	end
+
+	local function run_mods()
+		for pn = 1, max_pn do
+			if P[pn] and P[pn]:IsAwake() then
 				for mod, percent in pairs(mods[pn]) do
 					if not auxes[mod] then
 						mod_buffer('*-1 '..percent..' '..mod)
@@ -860,12 +874,6 @@
 				end
 				if mod_buffer[1] then
 					apply_modifiers(mod_buffer:build(','), pn)
-				end
-			else
-				last_seen_awake[pn] = false
-				for mod, percent in pairs(mods[pn]) do
-					mods[pn][mod] = nil
-					touched_mods[pn][mod] = true
 				end
 			end
 		end
@@ -901,9 +909,10 @@
 		if time == oldtime then return end
 		oldtime = time
 
-		run_eases(beat)
-		run_funcs(beat)
-		run_nodes_and_mods()
+		run_eases(beat, time)
+		run_funcs(beat, time)
+		run_nodes()
+		run_mods()
 		run_debug_print_mod_targets(beat)
 	end
 
