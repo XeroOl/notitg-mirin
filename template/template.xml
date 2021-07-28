@@ -72,11 +72,6 @@
 		return rawget(xero, 'plr') or default_plr
 	end
 
-	-- get the previously set value of a mod
-	function get(modname, pn)
-		return prev_mods[pn or 1][modname]
-	end
-
 	-- convert a mod to its lowercase dealiased name
 	function normalize_mod(name)
 		if string.sub(name, 1, 1) == ' ' or string.sub(name, #name, #name) == ' ' then
@@ -708,7 +703,6 @@
 		definemod = function() screen_error('cannot be run after beat 0', 'definemod') end
 		aux = function() screen_error('cannot be run after beat 0', 'aux') end
 		alias = function() screen_error('cannot be run after beat 0', 'alias') end
-		get = function(mod, pn) return mods[pn or 1][normalize_mod(mod)] end
 	end
 
 	function screen_ready_command(self)
