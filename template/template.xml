@@ -178,7 +178,11 @@
 				args[i] = self[i + 2]
 			end
 			local syms = table.concat(syms, ', ')
-			self[2] = xero(assert(loadstring('return function('..syms..') return function() '..self[2]..'('..syms..') end end', 'func_generated')))(unpack(args))
+			local code = 'return function('..syms..') return function() '..self[2]..'('..syms..') end end'
+			self[2] = xero(assert(loadstring(code, 'func_generated')))()(unpack(args))
+			while self[3] do
+				table.remove(self)
+			end
 		end
 		self[2], self[3] = nil, self[2]
 		local persist = self.persist
