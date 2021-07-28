@@ -775,7 +775,7 @@
 		end
 
 		local active_eases_index = 1
-		while active_eases_index <= table.getn(active_eases) do
+		while active_eases_index <= #active_eases do
 			local e = active_eases[active_eases_index]
 			local plr = e.plr
 			local measure = e.time and time or beat
@@ -940,6 +940,7 @@
 		run_funcs(beat, time)
 		run_nodes()
 		run_mods()
+
 		run_debug_print_mod_targets(beat)
 	end
 
