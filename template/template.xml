@@ -305,6 +305,22 @@
 	-- node {'inputs', function(inputs) return outputs end, 'outputs'}
 	-- create a listener that gets run whenever a mod value gets changed
 	local function node(self)
+
+		if type(self[2]) == 'number' then
+			-- transform the shorthand into the full version
+			local multipliers = {}
+			local i = 2
+			while self[i] do
+				local amt = string.format('p * %f', table.remove(self, i) * 0.01)
+				table.insert(multipliers, amt)
+				i = i + 1
+			end
+			local ret = table.concat(multipliers, ', ')
+			local code = 'return function(p) return '..ret..' end'
+			local fn = loadstring(code, 'node_generated')()
+			table.insert(self, 2, fn)
+		end
+
 		local i = 1
 		local inputs = {}
 		while type(self[i]) == 'string' do
@@ -1159,20 +1175,34 @@
 		if type(self) ~= 'table' then
 			return screen_error('curly braces expected', name)
 		end
-		local i = 1
-		while type(self[i]) == 'string' do
+		if type(self[2]) == 'number' then
+			-- the shorthand version
+			for i = 2, #self, 2 do
+				if type(self[i]) ~= 'number' then
+					return screen_error('invalid mod percent', name)
+				end
+				if type(self[i + 1]) ~= 'string' then
+					return screen_error('invalid mod name', name)
+				end
+			end
+		else
+			-- the function form
+			local i = 1
+			while type(self[i]) == 'string' do
+				i = i + 1
+			end
+			if i == 1 then
+				return screen_error('the first argument needs to be the mod name', name)
+			end
+			if type(self[i]) ~= 'function' then
+				return screen_error('mod definition expected', name)
+			end
 			i = i + 1
-		end
-		if i == 1 then
-			return screen_error('the first argument needs to be the mod name', name)
-		end
-		if type(self[i]) ~= 'function' then
-			return screen_error('mod definition expected', name)
-		end
-		i = i + 1
-		while self[i] do
-			if type(self[i]) ~= 'string' then
-				return screen_error('unexpected argument '..tostring(self[i])..', expected a string', name)
+			while self[i] do
+				if type(self[i]) ~= 'string' then
+					return screen_error('unexpected argument '..tostring(self[i])..', expected a string', name)
+				end
+				i = i + 1
 			end
 		end
 	end
