@@ -77,6 +77,9 @@
 
 	-- convert a mod to its lowercase dealiased name
 	function normalize_mod(name)
+		if string.sub(name, 1, 1) == ' ' or string.sub(name, #name, #name) == ' ' then
+			error('No spaces allowed in any mod names. You wrote \''..name..'\', but you probably meant \''..string.gsub(name, ' ', '')..'\'')
+		end
 		name = string.lower(name)
 		return aliases[name] or name
 	end
