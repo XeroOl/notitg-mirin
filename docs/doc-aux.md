@@ -53,6 +53,7 @@ Node is a very general function that can be used in different ways. These exampl
 <br><br>
 ### Blacksphere
 This example shows how to create a `'blacksphere'` mod with `node`.
+
 ```lua
 aux {'blacksphere'}
 node {
