@@ -27,7 +27,7 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * [definemod](docs/definemod.md)
 * [reset](docs/reset.md)
 * [aux](docs/doc-aux.md)
-* [node](docs/aux.md#node)
+* [node](docs/doc-aux.md#node)
 * [alias](docs/alias.md)
 </div>
 <div style="flex:50%" markdown="1">
