@@ -160,6 +160,7 @@ node {
         ox, oz = oz, ox
         return ox, oy, oz
     end,
+    'confusionxoffset', 'confusionyoffset', 'confusionoffset',
 }
 ```
 <br><br>
