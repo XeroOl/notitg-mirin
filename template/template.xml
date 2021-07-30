@@ -49,13 +49,6 @@
 		end
 	})
 
-	-- the previously set value of a mod
-	-- this is used only for the `get` function
-	local prev_mods = {}
-	local modtable_mt = {__index = default_mods}
-	for pn = 1, max_pn do
-		prev_mods[pn] = setmetatable({}, modtable_mt)
-	end
 
 	local song = GAMESTATE:GetCurrentSong()
 
@@ -106,25 +99,6 @@
 			table.insert(eases, self)
 		end
 
-		if not self.transient then
-			-- update prev_mods table
-			for _, pn in ipairs(type(plr) == 'table' and plr or {plr}) do
-				if self.reset then
-					for mod, percent in pairs(prev_mods[pn]) do
-						if not self.exclude[mod] then
-							prev_mods[pn][mod] = default_mods[mod]
-						end
-					end
-				end
-				for n = 5, self.n, 2 do
-					if self.relative then
-						prev_mods[pn][self[n]] = prev_mods[pn][self[n]] + self[n - 1]
-					else
-						prev_mods[pn][self[n]] = self[n - 1]
-					end
-				end
-			end
-		end
 	end
 
 	-- add {start, len, eas, percent, mod}
@@ -363,8 +337,9 @@
 
 	-- mod targets are the values that the mod would be at if the current eases finished
 	local targets = {}
+	local targets_mt = {__index = default_mods}
 	for pn = 1, max_pn do
-		targets[pn] = setmetatable({}, modtable_mt)
+		targets[pn] = setmetatable({}, targets_mt)
 	end
 
 	-- the live value of the current mods. Gets recomputed each frame
