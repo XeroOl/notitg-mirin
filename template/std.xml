@@ -14,8 +14,9 @@
 			return f
 		end
 	})
-
 	xero()
+
+	strict = setmetatable({}, {__index = _G, __newindex = function(s, t) error(t) end})
 
 	function copy(src)
 		local dest = {}

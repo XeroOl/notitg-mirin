@@ -1,7 +1,7 @@
 <Layer Type="ActorFrame" InitCommand="%function(self)
-	xero()
-
-	max_pn = 8 -- default: `8`
+	-- strict mode
+	setfenv(1, xero.strict)
+	local max_pn = 8 -- default: `8`
 	local debug_print_applymodifier_input = false -- default: `false`
 	local debug_print_mod_targets = false -- default: `false`
 
@@ -12,6 +12,14 @@
 		SCREENMAN:SystemMessage(err)
 		return err
 	end
+	
+	local foreground = xero.foreground
+	local copy = xero.copy
+	local clear = xero.clear
+	local stringbuilder = xero.stringbuilder
+	local stable_sort = xero.stable_sort
+	local perframe_data_structure = xero.perframe_data_structure
+	local instant = xero.instant
 
 	---------------------
 	-- DATA STRUCTURES --
@@ -61,14 +69,20 @@
 
 	-- for reading the `plr` variable from the xero environment
 	-- without falling back to the global table
-	function get_plr()
+	local function get_plr()
 		return rawget(xero, 'plr') or default_plr
 	end
 
+	local banned_chars = {}
+	string.gsub('\'\\{}(),;* ', '.', function(t) banned_chars[t] = true end)
 	-- convert a mod to its lowercase dealiased name
-	function normalize_mod(name)
-		if string.sub(name, 1, 1) == ' ' or string.sub(name, #name, #name) == ' ' then
-			error('No spaces allowed in any mod names. You wrote \''..name..'\', but you probably meant \''..string.gsub(name, ' ', '')..'\'')
+	local function normalize_mod(name)
+		if banned_chars[string.sub(name, 1, 1)] or banned_chars[string.sub(name, #name, #name)] then
+			error(
+				'You have  allowed in any mod names. '..
+				'You wrote \''..name..'\', but you probably meant '..
+				'\''..string.gsub(name, '[\'\\{}(),;* ]', '')..'\''
+			)
 		end
 		name = string.lower(name)
 		return aliases[name] or name
@@ -205,7 +219,6 @@
 		local end_percent = #self >= 4 and table.remove(self, 4) or 1
 		local end_beat = self[1] + self[2]
 
-		-- string syntax, like `func {0, 1, outExpo, scx*0.5, scx, 'P1:x'}`
 		if type(fn) == 'string' then
 			fn = xero(assert(loadstring('return function(p) '..fn..'(p) end', 'func_generated')))()
 		end
@@ -351,7 +364,7 @@
 	end
 
 	-- a stringbuilder of the modstring that is being applied
-	mod_buffer = stringbuilder()
+	local mod_buffer = stringbuilder()
 
 	-- data structure for nodes
 	local node_start = {}
@@ -380,7 +393,7 @@
 		poptions[pn] = setmetatable({}, mt)
 	end
 
-	function touch_mod(mod, pn)
+	local function touch_mod(mod, pn)
 		-- run metatables to ensure that the mod gets applied this frame
 		if pn then
 			mods[pn][mod] = mods[pn][mod]
@@ -392,7 +405,7 @@
 		end
 	end
 
-	function touch_all_mods(pn)
+	local function touch_all_mods(pn)
 		for mod in pairs(default_mods) do
 			touch_mod(mod)
 		end
@@ -482,13 +495,14 @@
 
 	-- runs once during ScreenReadyCommand, before the user code is loaded
 	-- sets up the player tables
+	local P = {}
 	local function prepare_variables()
-		P = {}
 		for pn = 1, max_pn do
 			local player = SCREENMAN('PlayerP' .. pn)
 			xero['P' .. pn] = player
 			P[pn] = player
 		end
+		xero.P = P
 	end
 
 	-- runs once during ScreenReadyCommand, after the user code is loaded
@@ -680,7 +694,7 @@
 		alias = function() screen_error('cannot be run after beat 0', 'alias') end
 	end
 
-	function screen_ready_command(self)
+	local function screen_ready_command(self)
 		hide_theme_actors()
 		prepare_variables()
 		foreground:hidden(0)
@@ -897,14 +911,13 @@
 	end
 
 	local oldtime = 0
-	function update_command(self)
+	local function update_command(self)
 		local beat = GAMESTATE:GetSongBeat()
 		local time = self:GetSecsIntoEffect()
 
 		-- don't run multiple times if the game hasn't 'ticked' yet
 		if time == oldtime then return end
 		oldtime = time
-
 		run_eases(beat, time)
 		run_funcs(beat, time)
 		run_nodes()
@@ -916,44 +929,6 @@
 	---------------------------------------------------------------------------------------
 	GAMESTATE:ApplyModifiers('clearall,*-1 overhead')
 
-	-- Shorthand for commonly used variables
-	scx = SCREEN_CENTER_X
-	scy = SCREEN_CENTER_Y
-	sw = SCREEN_WIDTH
-	sh = SCREEN_HEIGHT
-
-	dw = DISPLAY:GetDisplayWidth()
-	dh = DISPLAY:GetDisplayHeight()
-
-	e = 'end'
-
-	function sprite(self)
-		self:basezoomx(sw / dw)
-		self:basezoomy(-sh / dh)
-		self:x(scx)
-		self:y(scy)
-	end
-
-	function aft(self)
-		self:SetWidth(dw)
-		self:SetHeight(dh)
-		self:EnableDepthBuffer(false)
-		self:EnableAlphaBuffer(false)
-		self:EnableFloat(false)
-		self:EnablePreserveTexture(true)
-		self:Create()
-	end
-
-	function aftsprite(aft, sprite)
-		sprite:SetTexture(aft:GetTexture())
-	end
-
-	function setupJudgeProxy(proxy, target, pn)
-		proxy:SetTarget(target)
-		proxy:xy(scx * (pn-.5), scy)
-		target:hidden(1)
-		target:sleep(9e9)
-	end
 
 	-- zoom
 	aux 'zoom'
@@ -1084,7 +1059,7 @@
 		['number, string, ?'] = true,
 	}
 
-	function check_func_errors(self, name)
+	local function check_func_errors(self, name)
 		if type(self) ~= 'table' then
 			return screen_error('curly braces expected', name)
 		end
@@ -1202,6 +1177,8 @@
 		xero[name] = inner
 	end
 
+	xero()
+
 	export(ease, check_ease_errors, 'ease')
 	export(add, check_ease_errors, 'add')
 	export(set, check_ease_errors, 'set')
@@ -1213,7 +1190,52 @@
 	export(aux, check_aux_errrors, 'aux')
 	export(node, check_node_errors, 'node')
 	export(definemod, check_node_errors, 'definemod')
+	xero.get_plr = get_plr
+	xero.touch_mod = touch_mod
+	xero.touch_all_mods = touch_all_mods
 
+	xero.max_pn = max_pn
+
+	xero.scx = SCREEN_CENTER_X
+	xero.scy = SCREEN_CENTER_Y
+	xero.sw = SCREEN_WIDTH
+	xero.sh = SCREEN_HEIGHT
+
+	xero.dw = DISPLAY:GetDisplayWidth()
+	xero.dh = DISPLAY:GetDisplayHeight()
+
+	xero.e = 'end'
+
+	function xero.sprite(self)
+		self:basezoomx(sw / dw)
+		self:basezoomy(-sh / dh)
+		self:x(scx)
+		self:y(scy)
+	end
+
+	function xero.aft(self)
+		self:SetWidth(dw)
+		self:SetHeight(dh)
+		self:EnableDepthBuffer(false)
+		self:EnableAlphaBuffer(false)
+		self:EnableFloat(false)
+		self:EnablePreserveTexture(true)
+		self:Create()
+	end
+
+	function xero.aftsprite(aft, sprite)
+		sprite:SetTexture(aft:GetTexture())
+	end
+
+	function xero.setupJudgeProxy(proxy, target, pn)
+		proxy:SetTarget(target)
+		proxy:xy(scx * (pn-.5), scy)
+		target:hidden(1)
+		target:sleep(9e9)
+	end
+
+	-- UNDOCUMENTED
+	xero.mod_buffer = mod_buffer
 
 	self:effectclock('music')
 	-- Register the commands to the actor
