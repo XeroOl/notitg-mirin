@@ -22,13 +22,12 @@
 				return fn(x, param1)
 			end
 		end
-		local default = params(defaultparam1)
 		return setmetatable({
 			params = params,
 			param = params,
 		}, {
-			__call = function(self, x)
-				return default(x)
+			__call = function(self, x, param1)
+				return fn(x, param1 or defaultparam1)
 			end
 		})
 	end
@@ -39,13 +38,12 @@
 				return fn(x, param1, param2)
 			end
 		end
-		local default = params(defaultparam1, defaultparam2)
 		return setmetatable({
 			params = params,
 			param = params,
 		}, {
-			__call = function(self, x)
-				return default(x)
+			__call = function(self, x, param1, param2)
+				return fn(x, param1 or defaultparam1, param2 or defaultparam2)
 			end
 		})
 	end

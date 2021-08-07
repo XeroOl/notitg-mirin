@@ -5,14 +5,6 @@
 	local debug_print_applymodifier_input = false -- default: `false`
 	local debug_print_mod_targets = false -- default: `false`
 
-	-- screen_error reports an error to the screen
-	-- needs to be called through
-	local function screen_error(output, name)
-		local _, err = pcall(error, type(name) == 'string' and (name .. ':' .. output) or output, 5)
-		SCREENMAN:SystemMessage(err)
-		return err
-	end
-	
 	local foreground = xero.foreground
 	local copy = xero.copy
 	local clear = xero.clear
@@ -146,12 +138,20 @@
 		self[2] = self[2] or 0
 		self[3] = self[3] or instant
 		self.reset = true
-		self.exclude = self.exclude or {}
-		if type(self.exclude) == 'string' then
-			self.exclude = {self.exclude}
-		end
-		for _, v in ipairs(self.exclude) do
-			self.exclude[v] = true
+		if self.only then
+			if type(self.only) == 'string' then
+				self.only = {self.only}
+			end
+		else
+			self.exclude = self.exclude or {}
+			if type(self.exclude) == 'string' then
+				self.exclude = {self.exclude}
+			end
+			local exclude = {}
+			for _, v in ipairs(self.exclude) do
+				exclude[v] = true
+			end
+			self.exclude = exclude
 		end
 		ease(self)
 	end
@@ -533,7 +533,21 @@
 	local function resolve_aliases()
 		-- ease
 		for _, e in ipairs(eases) do
-			for i = 5, e.n, 2 do e[i] = normalize_mod(e[i]) end
+			for i = 5, e.n, 2 do
+				e[i] = normalize_mod(e[i])
+			end
+			if e.exclude then
+				local exclude = {}
+				for k, v in pairs(e.exclude) do
+					exclude[normalize_mod(k)] = v
+				end
+				e.exclude = exclude
+			end
+			if e.only then
+				for i = 1, #e.only do
+					e.only[i] = normalize_mod(e.only[i])
+				end
+			end
 		end
 		-- aux
 		local old_auxes = copy(auxes)
@@ -681,17 +695,17 @@
 	end
 
 	local function disable_functions()
-		ease = function() screen_error('cannot be run after beat 0', 'ease') end
-		add = function() screen_error('cannot be run after beat 0', 'add') end
-		func = function() screen_error('cannot be run after beat 0', 'func') end
-		set = function() screen_error('cannot be run after beat 0', 'set') end
-		acc = function() screen_error('cannot be run after beat 0', 'acc') end
-		setdefault = function() screen_error('cannot be run after beat 0', 'setdefault') end
-		reset = function() screen_error('cannot be run after beat 0', 'reset') end
-		node = function() screen_error('cannot be run after beat 0', 'node') end
-		definemod = function() screen_error('cannot be run after beat 0', 'definemod') end
-		aux = function() screen_error('cannot be run after beat 0', 'aux') end
-		alias = function() screen_error('cannot be run after beat 0', 'alias') end
+		ease = function() error('ease cannot be run after beat 0') end
+		add = function() error('add cannot be run after beat 0') end
+		func = function() error('func cannot be run after beat 0') end
+		set = function() error('set cannot be run after beat 0') end
+		acc = function() error('acc cannot be run after beat 0') end
+		setdefault = function() error('setdefault cannot be run after beat 0') end
+		reset = function() error('reset cannot be run after beat 0') end
+		node = function() error('node cannot be run after beat 0') end
+		definemod = function() error('definemod cannot be run after beat 0') end
+		aux = function() error('aux cannot be run after beat 0') end
+		alias = function() error('alias cannot be run after beat 0') end
 	end
 
 	local function screen_ready_command(self)
@@ -727,16 +741,25 @@
 
 	local eases_index = 1
 	local active_eases = {}
+
+
 	local function run_eases(beat, time)
 		-- {start_beat, len, ease, p0, m0, p1, m1, p2, m2, p3, m3}
 		while eases_index <= #eases and eases[eases_index].start_time < time do
 			local e = eases[eases_index]
 			local plr = e.plr
 			if e.reset then
-				for mod, pecent in pairs(targets[plr]) do
-					if not e.exclude[mod] and targets[plr][mod] ~= default_mods[mod] then
+				if e.only then
+					for _, mod in ipairs(e.only) do
 						table.insert(e, default_mods[mod])
 						table.insert(e, mod)
+					end
+				else
+					for mod, percent in pairs(targets[plr]) do
+						if not e.exclude[mod] and targets[plr][mod] ~= default_mods[mod] then
+							table.insert(e, default_mods[mod])
+							table.insert(e, mod)
+						end
 					end
 				end
 			end
@@ -995,55 +1018,61 @@
 
 	local function check_ease_errors(self, name)
 		if type(self) ~= 'table' then
-			return screen_error('curly braces expected', name)
+			return 'curly braces expected'
 		end
 		if type(self[1]) ~= 'number' then
-			return screen_error('beat missing', name)
+			return 'beat missing'
 		end
 		local is_set = name == 'set' or name == 'acc'
 		if not is_set then
 			if type(self[2]) ~= 'number' then
-				return screen_error('len / end missing', name)
+				return 'len / end missing'
 			end
 			if not is_valid_ease(self[3]) then
-				return screen_error('invalid ease function', name)
+				return 'invalid ease function'
 			end
 		end
 		local i = is_set and 2 or 4
 		while self[i] do
 			if type(self[i]) ~= 'number' then
-				return screen_error('invalid mod percent', name)
+				return 'invalid mod percent'
 			end
 			if type(self[i + 1]) ~= 'string' then
-				return screen_error('invalid mod', name)
+				return 'invalid mod'
 			end
 			i = i + 2
 		end
 		local plr = self.plr or get_plr()
 		if type(plr) ~= 'number' and type(plr) ~= 'table' then
-			return screen_error('invalid plr', name)
+			return 'invalid plr'
 		end
 	end
 
-	local function check_reset_errors(self, name)
+	local function check_reset_errors(self)
 		if type(self) ~= 'table' then
-			return screen_error('curly braces expected', name)
+			return 'curly braces expected'
 		end
 		if type(self[1]) ~= 'number' then
-			return screen_error('invalid beat number', name)
+			return 'invalid beat number'
 		end
 		if self[2] and self[3] then
 			if type(self[2]) ~= 'number' then
-				return screen_error('invalid length', name)
+				return 'invalid length'
 			end
 			if not is_valid_ease(self[3]) then
-				return screen_error('invalid ease', name)
+				return 'invalid ease'
 			end
 		elseif self[2] or self[3] then
-			return screen_error('needs both length and ease', name)
+			return 'needs both length and ease'
 		end
 		if type(self.exclude) ~= 'nil' and type(self.exclude) ~= 'string' and type(self.exclude) ~= 'table' then
-			return screen_error('invalid `exclude=`', name)
+			return 'invalid `exclude=` value: ' .. tostring(self.exclude)
+		end
+		if type(self.only) ~= 'nil' and type(self.only) ~= 'string' and type(self.only) ~= 'table' then
+			return 'invalid `only=` value: `' .. tostring(self.only)
+		end
+		if self.exclude and self.only then
+			return 'exclude= and only= are mutually exclusive'
 		end
 	end
 
@@ -1059,9 +1088,9 @@
 		['number, string, ?'] = true,
 	}
 
-	local function check_func_errors(self, name)
+	local function check_func_errors(self)
 		if type(self) ~= 'table' then
-			return screen_error('curly braces expected', name)
+			return 'curly braces expected'
 		end
 		local types = stringbuilder()
 		for i, v in ipairs(self) do
@@ -1080,65 +1109,65 @@
 		end
 		local signature = types:build(', ')
 		if signature == 'number, number, function' and self.persist ~= nil then
-			return screen_error('persist is not supported for perframes', name)
+			return 'persist is not supported for perframes'
 		end
 		if not valid_func_signatures[signature] then
-			return screen_error('something is wrong with your func', name)
+			return 'something is wrong with your func'
 		end
 	end
 
-	local function check_alias_errors(self, name)
+	local function check_alias_errors(self)
 		if type(self) ~= 'table' then
-			return screen_error('curly braces expected', name)
+			return 'curly braces expected'
 		end
 		local a, b = self[1], self[2]
 		if type(a) ~= 'string' then
-			return screen_error('argument 1 should be a string', name)
+			return 'argument 1 should be a string'
 		end
 		if type(b) ~= 'string' then
-			return screen_error('argument 2 should be a string', name)
+			return 'argument 2 should be a string'
 		end
 	end
 
-	local function check_setdefault_errors(self, name)
+	local function check_setdefault_errors(self)
 		if type(self) ~= 'table' then
-			return screen_error('curly braces expected', name)
+			return 'curly braces expected'
 		end
 		for i = 1, #self, 2 do
 			if type(self[i]) ~= 'number' then
-				return screen_error('invalid mod percent', name)
+				return 'invalid mod percent'
 			end
 			if type(self[i + 1]) ~= 'string' then
-				return screen_error('invalid mod name', name)
+				return 'invalid mod name'
 			end
 		end
 	end
 
 	local function check_aux_errrors(self, name)
 		if type(self) ~= 'string' and type(self) ~= 'table' then
-			return screen_error('expecting curly braces', name)
+			return 'expecting curly braces'
 		end
 		if type(self) == 'table' then
 			for i, v in ipairs(self) do
 				if type(v) ~= 'string' then
-					return screen_error('invalid mod to aux: '.. v, name)
+					return 'invalid mod to aux: '.. tostring(v)
 				end
 			end
 		end
 	end
 
-	local function check_node_errors(self, name)
+	local function check_node_errors(self)
 		if type(self) ~= 'table' then
-			return screen_error('curly braces expected', name)
+			return 'curly braces expected'
 		end
 		if type(self[2]) == 'number' then
 			-- the shorthand version
 			for i = 2, #self, 2 do
 				if type(self[i]) ~= 'number' then
-					return screen_error('invalid mod percent', name)
+					return 'invalid mod percent'
 				end
 				if type(self[i + 1]) ~= 'string' then
-					return screen_error('invalid mod name', name)
+					return 'invalid mod name'
 				end
 			end
 		else
@@ -1148,15 +1177,15 @@
 				i = i + 1
 			end
 			if i == 1 then
-				return screen_error('the first argument needs to be the mod name', name)
+				return 'the first argument needs to be the mod name'
 			end
 			if type(self[i]) ~= 'function' then
-				return screen_error('mod definition expected', name)
+				return 'mod definition expected'
 			end
 			i = i + 1
 			while self[i] do
 				if type(self[i]) ~= 'string' then
-					return screen_error('unexpected argument '..tostring(self[i])..', expected a string', name)
+					return 'unexpected argument '..tostring(self[i])..', expected a string'
 				end
 				i = i + 1
 			end
@@ -1169,7 +1198,10 @@
 
 	local function export(fn, check_errors, name)
 		local function inner(self)
-			if not check_errors(self, name) then
+			local err = check_errors(self, name)
+			if err then
+				error(name..': '..err, 2)
+			else
 				fn(self)
 			end
 			return inner
@@ -1206,6 +1238,7 @@
 
 	xero.e = 'end'
 
+
 	function xero.sprite(self)
 		self:basezoomx(sw / dw)
 		self:basezoomy(-sh / dh)
@@ -1223,9 +1256,6 @@
 		self:Create()
 	end
 
-	function xero.aftsprite(aft, sprite)
-		sprite:SetTexture(aft:GetTexture())
-	end
 
 	function xero.setupJudgeProxy(proxy, target, pn)
 		proxy:SetTarget(target)
@@ -1234,8 +1264,22 @@
 		target:sleep(9e9)
 	end
 
+	function xero.backToSongWheel(message)
+		if message then
+			SCREENMAN:SystemMessage(message)
+		end
+		GAMESTATE:FinishSong()
+	end
+
 	-- UNDOCUMENTED
 	xero.mod_buffer = mod_buffer
+
+	function xero.aftsprite(aft, sprite)
+		sprite:SetTexture(aft:GetTexture())
+	end
+
+	-- end UNDOCUMENTED
+
 
 	self:effectclock('music')
 	-- Register the commands to the actor
