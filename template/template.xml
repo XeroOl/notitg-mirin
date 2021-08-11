@@ -710,19 +710,6 @@
 		alias = function() error('alias cannot be run after beat 0') end
 	end
 
-	local function screen_ready_command(self)
-		hide_theme_actors()
-		prepare_variables()
-		foreground:hidden(0)
-		-- loads both the plugins and the mod.xml due to propagation
-		foreground:playcommand('Load')
-		sort_tables()
-		resolve_aliases()
-		compile_nodes()
-		-- disable all the table inserters during runtime
-		disable_functions()
-		self:luaeffect('Update')
-	end
 
 	local function apply_modifiers(str, pn)
 		GAMESTATE:ApplyModifiers(str, pn)
@@ -935,6 +922,26 @@
 		end
 	end
 
+	local function screen_ready_command(self)
+		hide_theme_actors()
+		prepare_variables()
+		foreground:hidden(0)
+		-- loads both the plugins and the mod.xml due to propagation
+		foreground:playcommand('Load')
+		sort_tables()
+		resolve_aliases()
+		compile_nodes()
+
+		-- disable all the table inserters during runtime
+		disable_functions()
+
+		-- make sure nodes are up to date
+		run_nodes()
+		run_mods()
+
+		self:luaeffect('Update')
+	end
+
 	local oldtime = 0
 	local function update_command(self)
 		local beat = GAMESTATE:GetSongBeat()
@@ -943,16 +950,23 @@
 		-- don't run multiple times if the game hasn't 'ticked' yet
 		if time == oldtime then return end
 		oldtime = time
+
+		self:hidden(1)
+
 		run_eases(beat, time)
 		run_funcs(beat, time)
 		run_nodes()
 		run_mods()
 
+		-- if no errors have occurred, unhide self
+		-- to make the update_command run again next frame
+		self:hidden(0)
+
 		run_debug_print_mod_targets(beat)
 	end
 
 	---------------------------------------------------------------------------------------
-	GAMESTATE:ApplyModifiers('clearall,*-1 overhead')
+	GAMESTATE:ApplyModifiers('clearall')
 
 
 	-- zoom
