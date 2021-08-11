@@ -1,6 +1,6 @@
 <ActorFrame
 	InitCommand = "%function(self)
-		_G.xero = {}
+		_G.xero = { MIRIN_VERSION = '4.0.0' }
 		xero.foreground = self
 		self:sleep(9e9)
 	end"

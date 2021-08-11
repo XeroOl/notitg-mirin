@@ -4,7 +4,6 @@
 
 	-- Prepare the xero table
 	setmetatable(xero, {
-
 		-- if something isn't found in the xero table, fall back to a global lookup
 		__index = _G,
 
@@ -16,6 +15,7 @@
 	})
 	xero()
 
+	-- strict environment that doesn't permit creating new globals
 	strict = setmetatable({}, {__index = _G, __newindex = function(s, t) error(t) end})
 
 	function copy(src)
@@ -29,6 +29,7 @@
 	function deepcopy(src)
 		local dest = {}
 		for k, v in pairs(src) do
+			local k, v = k, v
 			if type(k) == 'table' then k = deepcopy(k) end
 			if type(v) == 'table' then v = deepcopy(v) end
 			dest[k] = v
