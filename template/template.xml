@@ -1,6 +1,8 @@
 <Layer Type="ActorFrame" InitCommand="%function(self)
+
 	-- strict mode
 	setfenv(1, xero.strict)
+
 	local max_pn = 8 -- default: `8`
 	local debug_print_applymodifier_input = false -- default: `false`
 	local debug_print_mod_targets = false -- default: `false`
@@ -71,7 +73,7 @@
 	local function normalize_mod(name)
 		if banned_chars[string.sub(name, 1, 1)] or banned_chars[string.sub(name, #name, #name)] then
 			error(
-				'You have  allowed in any mod names. '..
+				'You have a typo in your mod name. '..
 				'You wrote \''..name..'\', but you probably meant '..
 				'\''..string.gsub(name, '[\'\\{}(),;* ]', '')..'\''
 			)
@@ -1267,8 +1269,11 @@
 	function xero.backToSongWheel(message)
 		if message then
 			SCREENMAN:SystemMessage(message)
+			print(message)
 		end
 		GAMESTATE:FinishSong()
+		-- disable update_command
+		self:hidden(1)
 	end
 
 	-- UNDOCUMENTED
