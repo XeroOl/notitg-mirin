@@ -366,7 +366,10 @@
 	end
 
 	-- a stringbuilder of the modstring that is being applied
-	local mod_buffer = stringbuilder()
+	local mod_buffer = {}
+	for pn = 1, max_pn do
+		mod_buffer[pn] = stringbuilder()
+	end
 
 	-- data structure for nodes
 	local node_start = {}
@@ -861,7 +864,6 @@
 						touched_mods[pn][mod] = nil
 					end
 				end
-				mod_buffer:clear()
 				seen = seen + 1
 				for k in pairs(mods[pn]) do
 					-- identify all nodes to execute this frame
@@ -888,14 +890,16 @@
 	local function run_mods()
 		for pn = 1, max_pn do
 			if P[pn] and P[pn]:IsAwake() then
+				local buffer = mod_buffer[pn]
 				for mod, percent in pairs(mods[pn]) do
 					if not auxes[mod] then
-						mod_buffer('*-1 '..percent..' '..mod)
+						buffer('*-1 '..percent..' '..mod)
 					end
 					mods[pn][mod] = nil
 				end
-				if mod_buffer[1] then
-					apply_modifiers(mod_buffer:build(','), pn)
+				if buffer[1] then
+					apply_modifiers(buffer:build(','), pn)
+					buffer:clear()
 				end
 			end
 		end
@@ -1009,11 +1013,11 @@
 	setdefault {1, 'xmod'}
 	definemod {
 		'xmod', 'cmod',
-		function(xmod, cmod)
+		function(xmod, cmod, pn)
 			if cmod == 0 then
-				mod_buffer(string.format('*-1 %fx', xmod))
+				mod_buffer[pn](string.format('*-1 %fx', xmod))
 			else
-				mod_buffer(string.format('*-1 %fx,*-1 c%f', xmod, cmod))
+				mod_buffer[pn](string.format('*-1 %fx,*-1 c%f', xmod, cmod))
 			end
 		end,
 		defer = true,
