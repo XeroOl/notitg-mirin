@@ -3,7 +3,7 @@
 
 * **Simple to learn**: Designed with a goal of avoiding unintuitive edge cases in NotITG.
 * **Excellent performance**: Optimized code runs quickly compareed to other templates.
-* **Theme Independent**: Mirin Template creates a separate environment for mod code that is kept separate from themes.
+* **Theme independent**: Mirin Template creates a separate environment for mod code that is kept separate from themes.
 * **Powerful abstractions**: Includes a powerful system that allows users to create custom modifiers.
 
 ```lua
