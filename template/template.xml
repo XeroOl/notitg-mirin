@@ -724,7 +724,7 @@
 					apply_modifiers = old_apply_modifiers
 				end
 			end
-			GAMESTATE:ApplyModifiers(str, pn)
+			old_apply_modifiers(str, pn)
 		end
 	end
 
@@ -901,8 +901,8 @@
 		end
 	end
 
-	local function run_debug_print_mod_targets(beat)
-		if debug_print_mod_targets then
+	if debug_print_mod_targets then
+		func {0, 9e9, function(beat)
 			if debug_print_mod_targets == true or debug_print_mod_targets < beat then
 				for pn = 1, max_pn do
 					if P[pn] and P[pn]:IsAwake() then
@@ -915,11 +915,13 @@
 							end
 						end
 						print('Player '..pn..' at beat '..beat..' --> '..table.concat(outputs, ', '))
+					else
+						print('Player '..pn..' is asleep or missing')
 					end
 				end
 				debug_print_mod_targets = (debug_print_mod_targets == true)
 			end
-		end
+		end}
 	end
 
 	local function screen_ready_command(self)
@@ -961,8 +963,6 @@
 		-- if no errors have occurred, unhide self
 		-- to make the update_command run again next frame
 		self:hidden(0)
-
-		run_debug_print_mod_targets(beat)
 	end
 
 	---------------------------------------------------------------------------------------
