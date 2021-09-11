@@ -136,6 +136,7 @@
 
 	function perframe_data_structure(comparator)
 		return setmetatable({
+			comparator = comparator,
 			reverse_comparator = function(a, b) return comparator(b, a) end,
 			stage = {n = 0},
 			list = {n = 0},
