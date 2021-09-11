@@ -512,11 +512,21 @@
 
 	-- runs once during ScreenReadyCommand, after the user code is loaded
 	-- sorts the mod tables so that things can be processed in order
+	-- after the mod tables are sorted, no more calls to table-inserting functions are allowed
 	local function sort_tables()
-		-- sort eases by their beat
-		stable_sort(eases, function(a, b) return a.start_time < b.start_time end)
+		-- sort eases by their start time, with resets running first if there's a tie break
+		-- it's a stable sort, so other ties are broken based on insertion order
+		stable_sort(eases, function(a, b)
+			if a.start_time == b.start_time then
+				return a.reset and not b.reset
+			else
+				return a.start_time < b.start_time
+			end
+		end)
 
-		-- sort the funcs by their beat and priority
+		-- sort the funcs by their start time and priority
+		-- the priority matches the insertion order unless the user added `defer = true`,
+		-- in which case the priority will be negative
 		stable_sort(funcs, function(a, b)
 			if a.start_time == b.start_time then
 				local x, y = a.priority, b.priority
@@ -527,6 +537,8 @@
 		end)
 
 		-- sort the nodes by their priority
+		-- the priority matches the insertion order unless the user added `defer = true`,
+		-- in which case the priority will be negative
 		stable_sort(nodes, function(a, b)
 			local x, y = a.priority, b.priority
 			return x * x * y < x * y * y
@@ -699,6 +711,8 @@
 		end
 	end
 
+	-- runs once during ScreenReadyCommand, after the user code is loaded
+	-- disables table-inserting functions so that they won't ruin the sorted order of the tables
 	local function disable_functions()
 		ease = function() error('ease cannot be run after beat 0') end
 		add = function() error('add cannot be run after beat 0') end
@@ -712,7 +726,6 @@
 		aux = function() error('aux cannot be run after beat 0') end
 		alias = function() error('alias cannot be run after beat 0') end
 	end
-
 
 	local function apply_modifiers(str, pn)
 		GAMESTATE:ApplyModifiers(str, pn)
@@ -733,7 +746,6 @@
 
 	local eases_index = 1
 	local active_eases = {}
-
 
 	local function run_eases(beat, time)
 		-- {start_beat, len, ease, p0, m0, p1, m1, p2, m2, p3, m3}
@@ -948,16 +960,11 @@
 		self:luaeffect('Update')
 	end
 
-	local oldtime = 0
 	local function update_command(self)
+		self:hidden(1)
+
 		local beat = GAMESTATE:GetSongBeat()
 		local time = self:GetSecsIntoEffect()
-
-		-- don't run multiple times if the game hasn't 'ticked' yet
-		if time == oldtime then return end
-		oldtime = time
-
-		self:hidden(1)
 
 		run_eases(beat, time)
 		run_funcs(beat, time)
