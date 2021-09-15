@@ -737,8 +737,10 @@
 
 	local function run_eases(beat, time)
 		-- {start_beat, len, ease, p0, m0, p1, m1, p2, m2, p3, m3}
-		while eases_index <= #eases and eases[eases_index].start_time < time do
+		while eases_index <= #eases do
 			local e = eases[eases_index]
+			local measure = e.time and time or beat
+			if measure < e[1] then break end
 			local plr = e.plr
 			if e.reset then
 				if e.only then
@@ -800,9 +802,10 @@
 		return x * x * y < x * y * y
 	end)
 	local function run_funcs(beat, time)
-		while funcs_index <= #funcs and funcs[funcs_index].start_time < time do
+		while funcs_index <= #funcs do
 			local e = funcs[funcs_index]
 			local measure = e.time and time or beat
+			if measure < e[1] then break end
 			if not e[2] then
 				e[3](measure)
 			elseif measure < e[1] + e[2] then
