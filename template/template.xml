@@ -218,7 +218,7 @@
 		local fn = table.remove(self)
 		local eas = self[3]
 		local start_percent = #self >= 5 and table.remove(self, 4) or 0
-		local end_percent = #self >= 4 and table.remove(self, 4) or 
+		local end_percent = #self >= 4 and table.remove(self, 4) or 1
 		local end_beat = self[1] + self[2]
 
 		if type(fn) == 'string' then
