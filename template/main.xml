@@ -1,13 +1,23 @@
 <ActorFrame
-	InitCommand = "%function(self)
-		_G.xero = { MIRIN_VERSION = '4.0.2' }
-		xero.foreground = self
-		self:sleep(9e9)
-	end"
->
-	<children>
+    InitCommand = "%function(self)
+        -- `xero` is the only global variable written by this template
+        -- Everything, including the modder's variables are stored in it
+        xero = {
+            MIRIN_VERSION = '4.0.3',
+            foreground = self,
+        }
 
-		<!-- Std Library -->
+        -- Needed by StepMania, in order to not kill lua mods early
+        self:sleep(9e9)
+    end"
+>
+    <children>
+
+        <!--
+            Standard Library
+            Contains function definitions unrelated with StepMania
+            Also prepares the xero table
+        -->
 		<Layer File = "std.xml" />
 
 		<!-- Sorting algorithm -->
