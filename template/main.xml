@@ -3,7 +3,7 @@
         -- `xero` is the only global variable written by this template
         -- Everything, including the modder's variables are stored in it
         xero = {
-            MIRIN_VERSION = '4.0.3',
+            MIRIN_VERSION = '4.0.3 dev',
             foreground = self,
         }
 
