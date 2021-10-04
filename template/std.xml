@@ -2,40 +2,40 @@
 
 	-- Environments
 
-    -- Create the xero environment, in which everything is
-    setmetatable(xero, {
-        -- if something isn't found in the xero table, fall back to a _G lookup
-        __index = _G,
+	-- Create the xero environment, in which everything is
+	setmetatable(xero, {
+		-- if something isn't found in the xero table, fall back to a _G lookup
+		__index = _G,
 
-        -- Calling xero() sets the environment of the current function
-        -- Calling xero(func) returns `func` with the xero environment applied
-        __call = function(self, f)
-            setfenv(f or 2, self)
-            return f
-        end
-    })
-    -- Apply the environment. :)
-    xero()
+		-- Calling xero() sets the environment of the current function
+		-- Calling xero(func) returns `func` with the xero environment applied
+		__call = function(self, f)
+			setfenv(f or 2, self)
+			return f
+		end
+	})
+	-- Apply the environment. :)
+	xero()
 
-    -- Create the strict environment, forbidding creating any variable
-    -- This environment is not related to the xero table, and won't fetch
-    -- values from it, unless explicitely prefixed with `xero.`
-    strict = setmetatable({}, {
-        -- Allow access to _G elements, containing all game methods
-        __index = _G,
-        -- Prevent creating any variable
-        __newindex = function(s, t)
-            error(t)
-        end
-    })
-
-
-    -- ===================================================================== --
-
-    -- Utility functions
+	-- Create the strict environment, forbidding creating any variable
+	-- This environment is not related to the xero table, and won't fetch
+	-- values from it, unless explicitely prefixed with `xero.`
+	strict = setmetatable({}, {
+		-- Allow access to _G elements, containing all game methods
+		__index = _G,
+		-- Prevent creating any variable
+		__newindex = function(s, t)
+			error(t)
+		end
+	})
 
 
-    -- Returns a copy of the table `src`
+	-- ===================================================================== --
+
+	-- Utility functions
+
+
+	-- Returns a copy of the table `src`
 	function copy(src)
 		local dest = {}
 		for k, v in pairs(src) do
