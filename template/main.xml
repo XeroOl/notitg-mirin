@@ -36,7 +36,11 @@
 		<!-- Load the actual template -->
 		<Layer File = "template.xml"  />
 
-		<!-- Load the Plugins -->
+		<!--
+			Template plugins
+			Handles the loading of any XML plugin present
+			in the `plugins/` directory.
+		-->
 		<Layer File = "plugins.xml" />
 
 		<!-- Load the User's code -->

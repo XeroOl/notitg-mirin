@@ -1,34 +1,57 @@
 <Plugins Condition = "xero(function()
+
+	-- If we're currently recursively loading this file, do not execute the
+	-- data initialization code again.
 	if rawget(xero, '__PLUGINS') then return true end
+
 	local path_to_plugins = GAMESTATE:GetCurrentSong():GetSongDir() .. 'plugins/'
+
+	-- Plugins data, containing infos related to the plugin loading system,
+	-- as well as containing the list of XML files to load
 	local p = {
-		i = 0, -- the current one we're on
-		r = 0, -- the current recursion level
+		-- Current plugin index
+		i = 0,
+		-- Current recursion level
+		r = 0,
+		-- Recursion handling
 		increment = function(p) p.r = p.r + 1 end,
 		decrement = function(p) p.r = p.r - 1 if p.r == 0 then __PLUGINS = nil end end,
+		-- Whether there are any remaining plugins or not
 		condition = function(p) if p.i < p.n then p.i = p.i + 1 return true end end,
+		-- File path to load, used in the XML below
 		file = function(p) return '../plugins/' .. p[p.i] end,
+		-- Whether recursion is needed or not
 		recursion = function(p) return p.r <= p.m and p.i < p.n end,
+		-- List of plugins to load
 		GAMESTATE:GetFileStructure(path_to_plugins)
 	}
+
+	-- Filter out any file that isn't a plugin file (XML file)
 	for i = #p, 1, -1 do
 		if string.sub(p[i], -4, -1) ~= '.xml' then
 			table.remove(p, i)
 		end
 	end
+
 	p.n = table.getn(p)
-	p.m = math.log10(p.n) -- max depth
+	p.m = math.log10(p.n) -- Max recursion depth
+
+	-- Sort plugins alphabetically
 	stable_sort(p)
+
+	-- If no plugins are present, do not continue
 	if p.n == 0 then
 		return false
-	else
-		__PLUGINS = p
-		return true
 	end
+
+	-- Save the plugins data to `xero.__PLUGINS`, for keeping
+	-- the state between recursive calls.
+	__PLUGINS = p
+	return true
 end)()"
 Type = "ActorFrame">
 	<children>
-		
+
 		<Layer Condition = "xero.__PLUGINS:condition()" File = "@xero.__PLUGINS:file()" />
 		<Layer Condition = "xero.__PLUGINS:condition()" File = "@xero.__PLUGINS:file()" />
 		<Layer Condition = "xero.__PLUGINS:condition()" File = "@xero.__PLUGINS:file()" />
@@ -38,7 +61,7 @@ Type = "ActorFrame">
 		<Layer Condition = "xero.__PLUGINS:condition()" File = "@xero.__PLUGINS:file()" />
 		<Layer Condition = "xero.__PLUGINS:condition()" File = "@xero.__PLUGINS:file()" />
 		<Layer Condition = "xero.__PLUGINS:condition()" File = "@xero.__PLUGINS:file()" />
-		
+
 		<Layer Condition = "xero.__PLUGINS:increment()" />
 			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
 			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
@@ -50,6 +73,6 @@ Type = "ActorFrame">
 			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
 			<Layer Condition = "xero.__PLUGINS:recursion()" File = "plugins.xml" />
 		<Layer Condition = "xero.__PLUGINS:decrement()" />
-		
+
 	</children>
 </Plugins>
