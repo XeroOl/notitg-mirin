@@ -15,8 +15,8 @@
 
 		<!--
 			Standard Library
-			Contains function definitions unrelated with StepMania
-			Also prepares the xero table
+			Contains function definitions unrelated with StepMania.
+			Also prepares the xero table.
 		-->
 		<Layer File = "std.xml" />
 
@@ -27,7 +27,10 @@
 		-->
 		<Layer File = "sort.xml" />
 
-		<!-- All of the eases -->
+		<!--
+			Easing functions
+			Contains all easing functions, + helpers such as `flip()`.
+		-->
 		<Layer File = "ease.xml" />
 
 		<!-- Load the actual template -->
