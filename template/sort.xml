@@ -27,12 +27,17 @@ Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
 -->
 <Layer InitCommand = "%xero(function(self)
 
-	local sort = {}
-
-	--tunable size for insertion sort 'bottom out'
+	-- `sort` object, container of the following methods
+	-- Tunable threshold, deciding between the insertion sort and merge sort
 	sort.max_chunk_size = 32
 
-	--insertion sort on a section of array
+
+	-- ===================================================================== --
+
+	-- Internal implementations
+
+
+	-- Insertion sort on a section of an array
 	function sort._insertion_sort_impl(array, first, last, less)
 		for i = first + 1, last do
 			local k = first
@@ -49,7 +54,7 @@ Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
 		end
 	end
 
-	--merge sorted adjacent sections of array
+	-- Merge sort on two sorted portions of an array
 	function sort._merge(array, workspace, low, middle, high, less)
 		local i, j, k
 		i = 1
@@ -82,7 +87,7 @@ Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
 		end
 	end
 
-	--implementation for the merge sort
+	-- Recursive merge sort implementation
 	function sort._merge_sort_impl(array, workspace, low, high, less)
 		if high - low <= sort.max_chunk_size then
 			sort._insertion_sort_impl(array, low, high, less)
@@ -94,16 +99,15 @@ Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
 		end
 	end
 
-	--default comparison; hoisted for clarity
+	-- Default comparison function: sort from smallest to biggest
 	local function default_less(a, b)
 		return a < b
 	end
 
-	--inline common setup stuff
+	-- Setup a sorting algorithm, check the validity of the comparator,
+	-- and determine if a case is trivial (no sorting needed)
 	function sort._sort_setup(array, less)
-		--default less
 		less = less or default_less
-		--
 		local n = #array
 		--trivial cases; empty or 1 element
 		local trivial = (n <= 1)
@@ -117,6 +121,8 @@ Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
 		return trivial, n, less
 	end
 
+	-- Public method: merge sort on an array. If the array length is
+	-- less than `max_chunk_size`, an insertion sort will be done instead.
 	function sort.stable_sort(array, less)
 		--setup
 		local trivial, n, less = sort._sort_setup(array, less)
@@ -131,6 +137,7 @@ Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
 		return array
 	end
 
+	-- Public method (currently not exposed): insertion sort
 	function sort.insertion_sort(array, less)
 		--setup
 		local trivial, n, less = sort._sort_setup(array, less)
@@ -140,6 +147,7 @@ Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
 		return array
 	end
 
+	-- Exports
 	unstable_sort = table.sort
 	stable_sort = sort.stable_sort
 
