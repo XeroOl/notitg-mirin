@@ -1,7 +1,14 @@
 <Layer Type="ActorFrame" InitCommand="%function(self)
 
-	-- strict mode
+	-- Enable strict mode for this file
+	-- See template/std.xml for more details
 	setfenv(1, xero.strict)
+
+
+	-- ===================================================================== --
+
+	-- Convenience shortcuts
+
 
 	local max_pn = 8 -- default: `8`
 	local debug_print_applymodifier_input = false -- default: `false`
@@ -15,9 +22,11 @@
 	local perframe_data_structure = xero.perframe_data_structure
 	local instant = xero.instant
 
-	---------------------
-	-- DATA STRUCTURES --
-	---------------------
+
+	-- ===================================================================== --
+
+	-- Data structures
+
 
 	-- the table of eases/add/set
 	local eases = {}
@@ -54,9 +63,11 @@
 
 	local song = GAMESTATE:GetCurrentSong()
 
-	---------------
-	-- FUNCTIONS --
-	---------------
+
+	-- ===================================================================== --
+
+	-- Functions
+
 
 	-- the `plr=` system
 	local default_plr = {1, 2}
@@ -347,9 +358,11 @@
 		return definemod
 	end
 
-	-------------
-	-- RUNTIME --
-	-------------
+
+	-- ===================================================================== --
+
+	-- Runtime
+
 
 	-- mod targets are the values that the mod would be at if the current eases finished
 	local targets = {}
@@ -1034,9 +1047,11 @@
 		defer = true,
 	}
 
-	--------------------
-	-- ERROR CHECKING --
-	--------------------
+
+	-- ===================================================================== --
+
+	-- Error checking
+
 
 	local function is_valid_ease(eas)
 		local err = type(eas) ~= 'function' and (not getmetatable(eas) or not getmetatable(eas).__call)
@@ -1223,9 +1238,11 @@
 		end
 	end
 
-	-------------
-	-- EXPORTS --
-	-------------
+
+	-- ===================================================================== --
+
+	-- Exports
+
 
 	local function export(fn, check_errors, name)
 		local function inner(self)
