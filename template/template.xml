@@ -433,7 +433,7 @@
 				touch_mod(mod, pn)
 			end
 		else
-			for pn = 1, 8 do
+			for pn = 1, max_pn do
 				for mod in pairs(targets[pn]) do
 					touch_mod(mod, pn)
 				end
