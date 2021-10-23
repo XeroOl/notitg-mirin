@@ -110,7 +110,7 @@ Here's an example of how powerful `node` can be:
 This node makes the confusionoffset mods be independent of the rotation mods.
 ```lua
 local sin, cos = math.sin, math.cos
-local asin, atan2 = math.sin, math.atan2
+local asin, atan2 = math.asin, math.atan2
 local pi = math.pi
 node {
     'rotationx', 'rotationy', 'rotationz',
