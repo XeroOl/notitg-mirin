@@ -85,6 +85,7 @@
 
 	function instant() return 1 end
 	function linear(t) return t end
+	inOutLinear = linear
 	function inQuad(t) return t * t end
 	function outQuad(t) return -t * (t - 2) end
 	function inOutQuad(t)
