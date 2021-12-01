@@ -80,6 +80,12 @@
 
 	local banned_chars = {}
 	string.gsub('\'\\{}(),;* ', '.', function(t) banned_chars[t] = true end)
+
+	local function normalize_mod_no_checks(name)
+		name = string.lower(name)
+		return aliases[name] or name
+	end
+
 	-- convert a mod to its lowercase dealiased name
 	local function normalize_mod(name)
 		if banned_chars[string.sub(name, 1, 1)] or banned_chars[string.sub(name, #name, #name)] then
@@ -89,9 +95,9 @@
 				'\''..string.gsub(name, '[\'\\{}(),;* ]', '')..'\''
 			)
 		end
-		name = string.lower(name)
-		return aliases[name] or name
+		return normalize_mod_no_checks(name)
 	end
+
 
 	-- ease {start, len, eas, percent, 'mod'}
 	-- adds an ease to the ease table
@@ -399,10 +405,10 @@
 		local mods_pn = mods[pn]
 		local mt = {
 			__index = function(self, k)
-				return mods_pn[normalize_mod(k)]
+				return mods_pn[normalize_mod_no_checks(k)]
 			end,
 			__newindex = function(self, k, v)
-				k = normalize_mod(k)
+				k = normalize_mod_no_checks(k)
 				mods_pn[k] = v
 				if v then
 					poptions_logging_target[pn][k] = true
