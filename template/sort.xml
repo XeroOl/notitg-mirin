@@ -28,6 +28,7 @@ Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
 <Layer InitCommand = "%xero(function(self)
 
 	-- `sort` object, container of the following methods
+	local sort = {}
 	-- Tunable threshold, deciding between the insertion sort and merge sort
 	sort.max_chunk_size = 32
 

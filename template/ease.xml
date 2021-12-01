@@ -16,11 +16,38 @@
 	-- Utility functions
 
 	-- Flip any easing function, making it go from 1 to 0
-	-- Example: ease{0, 20, flip(outQuad), 50, 'modname'}
+	-- Example: ease {0, 20, flip(outQuad), 50, 'modname'}
 	flip = setmetatable({}, {
 		__call = function(self, fn)
 			self[fn] = self[fn] or function(x) return 1 - fn(x) end
 			return self[fn]
+		end
+	})
+
+	-- Mix two easing functions together into a new ease
+	-- the new ease starts by acting like the first argument, and then ends like the second argument
+	-- Example: ease {0, 20, blendease(inQuad, outQuad, 100, 'modname'}
+	blendease = setmetatable({}, {
+		__index = function(self, key)
+			self[key] = {}
+			return self[key]
+		end,
+		__call = function(self, fn1, fn2)
+			if not self[fn1][fn2] then
+				local transient1 = fn1(1) <= 0.5
+				local transient2 = fn2(1) <= 0.5
+				if transient1 and not transient2 then
+					error('blendease: the first argument is a transient ease, but the second argument doesn\'t match')
+				end
+				if transient2 and not transient1 then
+					error('blendease: the second argument is a transient ease, but the first argument doesn\'t match')
+				end
+				self[fn1][fn2] = function(x)
+					local mixFactor = 3*x^2-2*x^3
+					return (1 - mixFactor) * fn1(x) + mixFactor * fn2(x)
+				end
+			end
+			return self[fn1][fn2]
 		end
 	})
 
@@ -109,6 +136,14 @@
 			return 1 - 0.5 * (2 - t) ^ 2
 		end
 	end
+	function outInQuad(t)
+		t = t * 2
+		if t < 1 then
+			return 0.5 - 0.5 * (1 - t) ^ 2
+		else
+			return 0.5 + 0.5 * (t - 1) ^ 2
+		end
+	end
 	function inCubic(t) return t * t * t end
 	function outCubic(t) return 1 - (1 - t) ^ 3 end
 	function inOutCubic(t)
@@ -117,6 +152,14 @@
 			return 0.5 * t ^ 3
 		else
 			return 1 - 0.5 * (2 - t) ^ 3
+		end
+	end
+	function outInCubic(t)
+		t = t * 2
+		if t < 1 then
+			return 0.5 - 0.5 * (1 - t) ^ 3
+		else
+			return 0.5 + 0.5 * (t - 1) ^ 3
 		end
 	end
 	function inQuart(t) return t * t * t * t end
@@ -129,6 +172,14 @@
 			return 1 - 0.5 * (2 - t) ^ 4
 		end
 	end
+	function outInQuart(t)
+		t = t * 2
+		if t < 1 then
+			return 0.5 - 0.5 * (1 - t) ^ 4
+		else
+			return 0.5 + 0.5 * (t - 1) ^ 4
+		end
+	end
 	function inQuint(t) return t ^ 5 end
 	function outQuint(t) return 1 - (1 - t) ^ 5 end
 	function inOutQuint(t)
@@ -139,6 +190,14 @@
 			return 1 - 0.5 * (2 - t) ^ 5
 		end
 	end
+	function outInQuint(t)
+		t = t * 2
+		if t < 1 then
+			return 0.5 - 0.5 * (1 - t) ^ 5
+		else
+			return 0.5 + 0.5 * (t - 1) ^ 5
+		end
+	end
 	function inExpo(t) return 1000 ^ (t - 1) - 0.001 end
 	function outExpo(t) return 1.001 - 1000 ^ -t end
 	function inOutExpo(t)
@@ -147,6 +206,13 @@
 			return 0.5 * 1000 ^ (t - 1) - 0.0005
 		else
 			return 1.0005 - 0.5 * 1000 ^ (1 - t)
+		end
+	end
+	function outInExpo(t)
+		if t < 0.5 then
+			return outExpo(t * 2) * 0.5
+		else
+			return inExpo(t * 2 - 1) * 0.5 + 0.5
 		end
 	end
 	function inCirc(t) return 1 - sqrt(1 - t * t) end
@@ -160,7 +226,13 @@
 			return 0.5 + 0.5 * sqrt(1 - t * t)
 		end
 	end
-
+	function outInCirc(t)
+		if t < 0.5 then
+			return outCirc(t * 2) * 0.5
+		else
+			return inCirc(t * 2 - 1) * 0.5 + 0.5
+		end
+	end
 	function outBounce(t)
 		if t < 1 / 2.75 then
 			return 7.5625 * t * t
@@ -183,17 +255,24 @@
 			return outBounce(t * 2 - 1) * 0.5 + 0.5
 		end
 	end
-
-	function inSine(x)
-		return 1 - cos(x * (pi * 0.5))
+	function outInBounce(t)
+		if t < 0.5 then
+			return outBounce(t * 2) * 0.5
+		else
+			return inBounce(t * 2 - 1) * 0.5 + 0.5
+		end
 	end
-
-	function outSine(x)
-		return sin(x * (pi * 0.5))
-	end
-
+	function inSine(x) return 1 - cos(x * (pi * 0.5)) end
+	function outSine(x) return sin(x * (pi * 0.5)) end
 	function inOutSine(x)
 		return 0.5 - 0.5 * cos(x * pi)
+	end
+	function outInSine(t)
+		if t < 0.5 then
+			return outSine(t * 2) * 0.5
+		else
+			return inSine(t * 2 - 1) * 0.5 + 0.5
+		end
 	end
 
 	function outElasticInternal(t, a, p)
@@ -207,10 +286,16 @@
 			and  0.5 * inElasticInternal(t * 2, a, p)
 			or  0.5 + 0.5 * outElasticInternal(t * 2 - 1, a, p)
 	end
+	function outInElasticInternal(t, a, p)
+		return t < 0.5
+			and  0.5 * outElasticInternal(t * 2, a, p)
+			or  0.5 + 0.5 * inElasticInternal(t * 2 - 1, a, p)
+	end
 
 	inElastic = with2params(inElasticInternal, 1, 0.3)
 	outElastic = with2params(outElasticInternal, 1, 0.3)
 	inOutElastic = with2params(inOutElasticInternal, 1, 0.3)
+	outInElastic = with2params(outInElasticInternal, 1, 0.3)
 
 	function inBackInternal(t, a) return t * t * (a * t + t - a) end
 	function outBackInternal(t, a) t = t - 1 return t * t * ((a + 1) * t + a) + 1 end
@@ -219,9 +304,15 @@
 			and  0.5 * inBackInternal(t * 2, a)
 			or  0.5 + 0.5 * outBackInternal(t * 2 - 1, a)
 	end
+	function outInBackInternal(t, a)
+		return t < 0.5
+			and  0.5 * outBackInternal(t * 2, a)
+			or  0.5 + 0.5 * inBackInternal(t * 2 - 1, a)
+	end
 
 	inBack = with1param(inBackInternal, 1.70158)
 	outBack = with1param(outBackInternal, 1.70158)
 	inOutBack = with1param(inOutBackInternal, 1.70158)
+	outInBack = with1param(outInBackInternal, 1.70158)
 
 end)" />
