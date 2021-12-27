@@ -1097,7 +1097,7 @@
 			return 'curly braces expected'
 		end
 		if type(self[1]) ~= 'number' then
-			return 'invalid beat number'
+			return 'the first argument needs to be a number in beats'
 		end
 		if self[2] and self[3] then
 			if type(self[2]) ~= 'number' then
