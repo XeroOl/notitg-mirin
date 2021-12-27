@@ -1166,6 +1166,69 @@
 		end
 	end
 
+	local function check_func_function_errors(self)
+		if type(self) ~= 'table' then
+			return 'curly braces expected'
+		end
+		local beat, fn = self[1], self[2]
+		if type(beat) ~= 'number' then
+			return 'the first argument needs to be a number in beats'
+		end
+		if type(fn) ~= 'function' and type(fn) ~= 'string' then
+			return 'the second argument needs to be a function'
+		end
+		if is_beyond_load_command then
+			return 'cannot call '..name..' after LoadCommand finished'
+		end
+	end
+	
+	local function check_func_ease_errors(self)
+		if type(self) ~= 'table' then
+			return 'curly braces expected'
+		end
+		local beat, len, eas, fn = self[1], self[2], self[3], self[#self]
+		if type(beat) ~= 'number' then
+			return 'the first argument needs to be a number in beats'
+		end
+		if type(len) ~= 'number' then
+			return 'the second argument needs to be a number in beats'
+		end
+		if not is_valid_ease(eas) then
+			return 'the third argument needs to be an ease'
+		end
+		if #self > 5 and type(self[4]) ~= 'number' then
+			return 'the fourth argument needs to be a percentage'
+		end
+		if type(fn) ~= 'function' and type(fn) ~= 'string' then
+			return 'the last argument needs to be a function to be eased'
+		end
+		if #self > 4 and type(self[#self - 1]) ~= 'number' then
+			return 'the second-to-last argument needs to be a number'
+		end
+		if is_beyond_load_command then
+			return 'cannot call '..name..' after LoadCommand finished'
+		end
+	end
+
+	local function check_perframe_errors(self)
+		if type(self) ~= 'table' then
+			return 'curly braces expected'
+		end
+		local beat, len, fn = self[1], self[2], self[3]
+		if type(beat) ~= 'number' then
+			return 'the first argument needs to be a number in beats'
+		end
+		if type(len) ~= 'number' then
+			return 'the second argument needs to be a number in beats'
+		end
+		if type(fn) ~= 'function' and type(fn) ~= 'string' then
+			return 'the third argument needs to be a function'
+		end
+		if is_beyond_load_command then
+			return 'cannot call '..name..' after LoadCommand finished'
+		end
+	end
+
 	local function check_alias_errors(self)
 		if type(self) ~= 'table' then
 			return 'curly braces expected'
@@ -1281,6 +1344,9 @@
 	export(acc, check_ease_errors, 'acc')
 	export(reset, check_reset_errors, 'reset')
 	export(func, check_func_errors, 'func')
+	export(func_function, check_func_function_errors, 'func_function')
+	export(perframe, check_perframe_errors, 'perframe')
+	export(func_ease, check_func_ease_errors, 'func_ease')
 	export(alias, check_alias_errors, 'alias')
 	export(setdefault, check_setdefault_errors, 'setdefault')
 	export(aux, check_aux_errrors, 'aux')
