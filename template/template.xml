@@ -214,8 +214,8 @@
 	end
 
 	-- func helper for scheduling a perframe
-	local function func_perframe(self, can_use_poptions)
-		if can_use_poptions then
+	local function perframe(self, deny_poptions)
+		if not deny_poptions then
 			self.mods = {}
 			for pn = 1, max_pn do
 				self.mods[pn] = {}
@@ -247,7 +247,7 @@
 			fn(start_percent + (end_percent - start_percent) * eas(progress))
 		end
 
-		func_perframe(self)
+		perframe(self, true)
 		-- it's a function-ease variant, so make it persist
 		if self.persist ~= false then
 			local final_percent = eas(1) > 0.5 and end_percent or start_percent
@@ -272,7 +272,7 @@
 
 		-- basic perframe variant
 		elseif #self == 3 then
-			func_perframe(self, true)
+			perframe(self)
 
 		-- function ease variant
 		else
