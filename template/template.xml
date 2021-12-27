@@ -731,22 +731,6 @@
 		end
 	end
 
-	-- runs once during ScreenReadyCommand, after the user code is loaded
-	-- disables table-inserting functions so that they won't ruin the sorted order of the tables
-	local function disable_functions()
-		ease = function() error('ease cannot be run after beat 0') end
-		add = function() error('add cannot be run after beat 0') end
-		func = function() error('func cannot be run after beat 0') end
-		set = function() error('set cannot be run after beat 0') end
-		acc = function() error('acc cannot be run after beat 0') end
-		setdefault = function() error('setdefault cannot be run after beat 0') end
-		reset = function() error('reset cannot be run after beat 0') end
-		node = function() error('node cannot be run after beat 0') end
-		definemod = function() error('definemod cannot be run after beat 0') end
-		aux = function() error('aux cannot be run after beat 0') end
-		alias = function() error('alias cannot be run after beat 0') end
-	end
-
 	local function apply_modifiers(str, pn)
 		GAMESTATE:ApplyModifiers(str, pn)
 	end
@@ -963,18 +947,23 @@
 		end}
 	end
 
+	local is_beyond_load_command = false
+
 	local function screen_ready_command(self)
 		hide_theme_actors()
 		prepare_variables()
 		foreground:hidden(0)
+
 		-- loads both the plugins and the mod.xml due to propagation
 		foreground:playcommand('Load')
+
 		sort_tables()
 		resolve_aliases()
 		compile_nodes()
 
-		-- disable all the table inserters during runtime
-		disable_functions()
+		-- load command has happened
+		-- Set this variable so that ease{}s get denied past this point
+		is_beyond_load_command = true
 
 		-- make sure nodes are up to date
 		run_nodes()
@@ -1098,6 +1087,9 @@
 		if type(plr) ~= 'number' and type(plr) ~= 'table' then
 			return 'invalid plr'
 		end
+		if is_beyond_load_command then
+			return 'cannot call '..name..' after LoadCommand finished'
+		end
 	end
 
 	local function check_reset_errors(self)
@@ -1125,6 +1117,9 @@
 		end
 		if self.exclude and self.only then
 			return 'exclude= and only= are mutually exclusive'
+		end
+		if is_beyond_load_command then
+			return 'cannot call '..name..' after LoadCommand finished'
 		end
 	end
 
@@ -1166,6 +1161,9 @@
 		if not valid_func_signatures[signature] then
 			return 'something is wrong with your func'
 		end
+		if is_beyond_load_command then
+			return 'cannot call '..name..' after LoadCommand finished'
+		end
 	end
 
 	local function check_alias_errors(self)
@@ -1178,6 +1176,9 @@
 		end
 		if type(b) ~= 'string' then
 			return 'argument 2 should be a string'
+		end
+		if is_beyond_load_command then
+			return 'cannot call '..name..' after LoadCommand finished'
 		end
 	end
 
@@ -1193,6 +1194,9 @@
 				return 'invalid mod name'
 			end
 		end
+		if is_beyond_load_command then
+			return 'cannot call '..name..' after LoadCommand finished'
+		end
 	end
 
 	local function check_aux_errrors(self, name)
@@ -1205,6 +1209,9 @@
 					return 'invalid mod to aux: '.. tostring(v)
 				end
 			end
+		end
+		if is_beyond_load_command then
+			return 'cannot call '..name..' after LoadCommand finished'
 		end
 	end
 
@@ -1241,6 +1248,9 @@
 				end
 				i = i + 1
 			end
+		end
+		if is_beyond_load_command then
+			return 'cannot call '..name..' after LoadCommand finished'
 		end
 	end
 
