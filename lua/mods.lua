@@ -1,12 +1,12 @@
 if not P1 or not P2 then
-    backToSongWheel('Two Player Mode Required')
-    return
+	backToSongWheel('Two Player Mode Required')
+	return
 end
 
 -- judgment / combo proxies
 for pn = 1, 2 do
-    setupJudgeProxy(PJ[pn], P[pn]:GetChild('Judgment'), pn)
-    setupJudgeProxy(PC[pn], P[pn]:GetChild('Combo'), pn)
+	setupJudgeProxy(PJ[pn], P[pn]:GetChild('Judgment'), pn)
+	setupJudgeProxy(PC[pn], P[pn]:GetChild('Combo'), pn)
 end
 -- player proxies
 for pn = 1, #PP do

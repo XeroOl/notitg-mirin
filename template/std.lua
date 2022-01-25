@@ -15,9 +15,9 @@ setmetatable(xero, {
 -- Apply the environment. :)
 xero()
 
--- Create the strict environment, forbidding creating any variable
--- This environment is not related to the xero table, and won't fetch
--- values from it, unless explicitely prefixed with `xero.`
+--- Create the strict environment, forbidding creating any variable
+--- This environment is not related to the xero table, and won't fetch
+--- values from it, unless explicitely prefixed with `xero.`
 strict = setmetatable({}, {
 	-- Allow access to _G elements, containing all game methods
 	__index = _G,
@@ -33,7 +33,7 @@ strict = setmetatable({}, {
 -- Utility functions
 
 
--- Returns a copy of the table `src`
+--- Returns a copy of the table `src`
 function copy(src)
 	local dest = {}
 	for k, v in pairs(src) do
@@ -42,7 +42,7 @@ function copy(src)
 	return dest
 end
 
--- Returns a copy of the table `src`, copying also every nested table
+--- Returns a copy of the table `src`, copying also every nested table
 function deepcopy(src)
 	local dest = {}
 	for k, v in pairs(src) do

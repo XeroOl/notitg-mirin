@@ -5,8 +5,7 @@ setfenv(1, xero.strict)
 
 -- ===================================================================== --
 
--- Convenience shortcuts
-
+-- Convenience shortcuts / options
 
 local max_pn = 8 -- default: `8`
 local debug_print_applymodifier_input = false -- default: `false`
@@ -19,6 +18,7 @@ local stringbuilder = xero.stringbuilder
 local stable_sort = xero.stable_sort
 local perframe_data_structure = xero.perframe_data_structure
 local instant = xero.instant
+
 
 
 -- ===================================================================== --
@@ -77,7 +77,9 @@ local function get_plr()
 end
 
 local banned_chars = {}
-string.gsub('\'\\{}(),;* ', '.', function(t) banned_chars[t] = true end)
+local _ = string.gsub('\'\\{}(),;* ', '.', function(t)
+	banned_chars[t] = true
+end)
 
 local function normalize_mod_no_checks(name)
 	name = string.lower(name)
@@ -182,8 +184,8 @@ local function func_function(self)
 			syms[i] = 'arg' .. i
 			args[i] = self[i + 2]
 		end
-		local syms = table.concat(syms, ', ')
-		local code = 'return function('..syms..') return function() '..self[2]..'('..syms..') end end'
+		local symstring = table.concat(syms, ', ')
+		local code = 'return function('..symstring..') return function() '..self[2]..'('..symstring..') end end'
 		self[2] = xero(assert(loadstring(code, 'func_generated')))()(unpack(args))
 		while self[3] do
 			table.remove(self)
@@ -350,8 +352,6 @@ end
 -- definemod{'mod', function(mod, pn) end}
 -- calls aux and node on the provided arguments
 local function definemod(self)
-	local depth = 1 + (type(depth) == 'number' and depth or 0)
-	local name = name or 'definemod'
 	for i = 1, #self do
 		if type(self[i]) ~= 'string' then
 			break
@@ -402,10 +402,10 @@ for pn = 1, max_pn do
 	local pn = pn
 	local mods_pn = mods[pn]
 	local mt = {
-		__index = function(self, k)
+		__index = function(_, k)
 			return mods_pn[normalize_mod_no_checks(k)]
 		end,
-		__newindex = function(self, k, v)
+		__newindex = function(_, k, v)
 			k = normalize_mod_no_checks(k)
 			mods_pn[k] = v
 			if v then
@@ -501,6 +501,7 @@ end
 
 local function on_command(self)
 	scan_named_actors()
+	self:queuecommand('Ready')
 end
 
 -- runs once during ScreenReadyCommand, before the user code is loaded
@@ -665,7 +666,7 @@ local function compile_nodes()
 				table.insert(parents[i], pre[7])
 			end
 		end
-		for i, v in ipairs(out) do
+		for _, v in ipairs(out) do
 			if reverse_in[v] then
 				start[v][locked] = true
 				last[v] = {nd}
@@ -852,9 +853,9 @@ local seen = 1
 local active_nodes = {}
 local active_terminators = {}
 local propagateAll, propagate
-function propagateAll(nodes)
-	if nodes then
-		for _, nd in ipairs(nodes) do
+function propagateAll(nodes_to_propagate)
+	if nodes_to_propagate then
+		for _, nd in ipairs(nodes_to_propagate) do
 			propagate(nd)
 		end
 	end
@@ -876,7 +877,7 @@ local function run_nodes()
 		if P[pn] and P[pn]:IsAwake() then
 			if not last_seen_awake[pn] then
 				last_seen_awake[pn] = true
-				for mod, percent in pairs(touched_mods[pn]) do
+				for mod, _ in pairs(touched_mods[pn]) do
 					touch_mod(mod, pn)
 					touched_mods[pn][mod] = nil
 				end
@@ -886,17 +887,17 @@ local function run_nodes()
 				-- identify all nodes to execute this frame
 				propagateAll(node_start[k])
 			end
-			for i = 1, #active_nodes do
+			for _ = 1, #active_nodes do
 				-- run all the nodes
 				table.remove(active_nodes)[6](pn)
 			end
-			for i = 1, #active_terminators do
+			for _ = 1, #active_terminators do
 				-- run all the nodes marked as 'terminator'
 				table.remove(active_terminators)[6](pn)
 			end
 		else
 			last_seen_awake[pn] = false
-			for mod, percent in pairs(mods[pn]) do
+			for mod, _ in pairs(mods[pn]) do
 				mods[pn][mod] = nil
 				touched_mods[pn][mod] = true
 			end
@@ -947,7 +948,7 @@ end
 
 local is_beyond_load_command = false
 
-local function screen_ready_command(self)
+local function ready_command(self)
 	hide_theme_actors()
 	prepare_variables()
 	foreground:hidden(0)
@@ -1090,7 +1091,7 @@ local function check_ease_errors(self, name)
 	end
 end
 
-local function check_reset_errors(self)
+local function check_reset_errors(self, name)
 	if type(self) ~= 'table' then
 		return 'curly braces expected'
 	end
@@ -1133,12 +1134,12 @@ local valid_func_signatures = {
 	['number, string, ?'] = true,
 }
 
-local function check_func_errors(self)
+local function check_func_errors(self, name)
 	if type(self) ~= 'table' then
 		return 'curly braces expected'
 	end
 	local types = stringbuilder()
-	for i, v in ipairs(self) do
+	for _, v in ipairs(self) do
 		types(type(v))
 	end
 	if #types >= 2 and types[2] == 'string' then
@@ -1164,7 +1165,7 @@ local function check_func_errors(self)
 	end
 end
 
-local function check_func_function_errors(self)
+local function check_func_function_errors(self, name)
 	if type(self) ~= 'table' then
 		return 'curly braces expected'
 	end
@@ -1180,7 +1181,7 @@ local function check_func_function_errors(self)
 	end
 end
 
-local function check_func_ease_errors(self)
+local function check_func_ease_errors(self, name)
 	if type(self) ~= 'table' then
 		return 'curly braces expected'
 	end
@@ -1208,7 +1209,7 @@ local function check_func_ease_errors(self)
 	end
 end
 
-local function check_perframe_errors(self)
+local function check_perframe_errors(self, name)
 	if type(self) ~= 'table' then
 		return 'curly braces expected'
 	end
@@ -1227,7 +1228,7 @@ local function check_perframe_errors(self)
 	end
 end
 
-local function check_alias_errors(self)
+local function check_alias_errors(self, name)
 	if type(self) ~= 'table' then
 		return 'curly braces expected'
 	end
@@ -1243,7 +1244,7 @@ local function check_alias_errors(self)
 	end
 end
 
-local function check_setdefault_errors(self)
+local function check_setdefault_errors(self, name)
 	if type(self) ~= 'table' then
 		return 'curly braces expected'
 	end
@@ -1265,7 +1266,7 @@ local function check_aux_errrors(self, name)
 		return 'expecting curly braces'
 	end
 	if type(self) == 'table' then
-		for i, v in ipairs(self) do
+		for _, v in ipairs(self) do
 			if type(v) ~= 'string' then
 				return 'invalid mod to aux: '.. tostring(v)
 			end
@@ -1276,7 +1277,7 @@ local function check_aux_errrors(self, name)
 	end
 end
 
-local function check_node_errors(self)
+local function check_node_errors(self, name)
 	if type(self) ~= 'table' then
 		return 'curly braces expected'
 	end
@@ -1334,8 +1335,6 @@ local function export(fn, check_errors, name)
 	xero[name] = inner
 end
 
-xero()
-
 export(ease, check_ease_errors, 'ease')
 export(add, check_ease_errors, 'add')
 export(set, check_ease_errors, 'set')
@@ -1356,25 +1355,26 @@ xero.touch_all_mods = touch_all_mods
 
 xero.max_pn = max_pn
 
-xero.scx = SCREEN_CENTER_X
-xero.scy = SCREEN_CENTER_Y
-xero.sw = SCREEN_WIDTH
-xero.sh = SCREEN_HEIGHT
+xero()
 
-xero.dw = DISPLAY:GetDisplayWidth()
-xero.dh = DISPLAY:GetDisplayHeight()
+scx = SCREEN_CENTER_X
+scy = SCREEN_CENTER_Y
+sw = SCREEN_WIDTH
+sh = SCREEN_HEIGHT
 
-xero.e = 'end'
+dw = DISPLAY:GetDisplayWidth()
+dh = DISPLAY:GetDisplayHeight()
 
+e = 'end'
 
-function xero.sprite(self)
+function sprite(self)
 	self:basezoomx(sw / dw)
 	self:basezoomy(-sh / dh)
 	self:x(scx)
 	self:y(scy)
 end
 
-function xero.aft(self)
+function aft(self)
 	self:SetWidth(dw)
 	self:SetHeight(dh)
 	self:EnableDepthBuffer(false)
@@ -1385,46 +1385,58 @@ function xero.aft(self)
 end
 
 
-function xero.setupJudgeProxy(proxy, target, pn)
+function setupJudgeProxy(proxy, target, pn)
 	proxy:SetTarget(target)
 	proxy:xy(scx * (pn-.5), scy)
 	target:hidden(1)
 	target:sleep(9e9)
 end
 
-function xero.backToSongWheel(message)
+function backToSongWheel(message)
 	if message then
 		SCREENMAN:SystemMessage(message)
 		print(message)
 	end
 	GAMESTATE:FinishSong()
 	-- disable update_command
-	-- TODO test for funny
+	-- TODO test for funnies
 	foreground:hidden(1)
 end
 
 -- UNDOCUMENTED
 xero.mod_buffer = mod_buffer
 
+---@diagnostic disable-next-line: lowercase-global
 function xero.aftsprite(aft, sprite)
 	sprite:SetTexture(aft:GetTexture())
 end
 
 -- end UNDOCUMENTED
 
-function init_command(self)
-	self:effectclock('music')
-	-- Register the commands to the actor
-	self:addcommand('On', on_command)
-	self:addcommand('ScreenReady', screen_ready_command)
 
-	function skip_first_update()
-		self:removecommand('Update')
-		self:addcommand('Update', update_command)
-	end
-	self:addcommand('Update', skip_first_update)
+-- This is the entry point of the template.
+-- It sets up all of the commands used to run the template.
+function xero.init_command(self)
+	-- This sets up a trick to get the Song time during the update command
+	self:effectclock('music')
+
+	-- Register the commands to the actor
+
+	-- OnCommand is for resolving Name= on all the actors
+	self:addcommand('On', on_command)
+
+	-- ReadyCommand is called after OnCommand, and does all of the loading
+	-- at the end of ReadyCommand, the tables are sorted and prepared for UpdateCommand
+	self:addcommand('Ready', ready_command)
+
+	-- Update command is called every frame. It is what sets the mod values every frame,
+	-- and reads through everything that's been queued by the user.
+	self:addcommand('Update', update_command)
 
 	-- NotITG and OpenITG have a long standing bug where the InitCommand on an actor can run twice in certain cases.
-	-- By removing the command after it's done, it can only ever run once
+	-- By removing the command here (at the end of init_command), we prevent it from being run again.
 	self:removecommand('Init')
+
+	-- init_command is the only one that was in the xero table, so clean it up
+	xero.init_command = nil
 end

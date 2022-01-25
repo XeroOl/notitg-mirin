@@ -15,8 +15,11 @@ xero()
 
 -- Utility functions
 
--- Flip any easing function, making it go from 1 to 0
--- Example: ease {0, 20, flip(outQuad), 50, 'modname'}
+--- Flip any easing function, making it go from 1 to 0
+-- Example use:
+-- ```lua
+-- ease {0, 20, flip(outQuad), 50, 'modname'}
+-- ```
 flip = setmetatable({}, {
 	__call = function(self, fn)
 		self[fn] = self[fn] or function(x) return 1 - fn(x) end
