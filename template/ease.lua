@@ -73,20 +73,14 @@ local param1mt = {
 
 -- Declare an easing function taking one custom parameter
 function with1param(fn, defaultparam1)
-	local function params(param1)
-		return function(x)
-			return fn(x, param1)
-		end
-	end
 	return setmetatable({
-		fn = fn, dp1 = defaultparam1,
-		params = params,
-		param = params,
-		cache = {}
+		fn = fn,
+		dp1 = defaultparam1,
+		cache = {},
 	}, param1mt)
 end
 
-function param2cache(self, param1, param2)
+local function param2cache(self, param1, param2)
 	self.cache[param1] = self.cache[param1] or {}
 	self.cache[param1][param2] = self.cache[param1][param2] or function(x)
 		return self.fn(x, param1, param2)
@@ -106,17 +100,10 @@ local param2mt = {
 
 -- Declare an easing function taking two custom parameters
 function with2params(fn, defaultparam1, defaultparam2)
-	local function params(param1, param2)
-		return function(x)
-			return fn(x, param1, param2)
-		end
-	end
 	return setmetatable({
 		fn = fn,
 		defaultparam1 = defaultparam1,
 		defaultparam2 = defaultparam2,
-		params = params,
-		param = params,
 	}, param2mt)
 end
 
