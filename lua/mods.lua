@@ -10,8 +10,8 @@ for pn = 1, 2 do
 end
 -- player proxies
 for pn = 1, #PP do
-    PP[pn]:SetTarget(P[pn])
-    P[pn]:hidden(1)
+	PP[pn]:SetTarget(P[pn])
+	P[pn]:hidden(1)
 end
 -- your code goes here here:
 
