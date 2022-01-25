@@ -102,22 +102,52 @@ end
 -- ease {start, len, eas, percent, 'mod'}
 -- adds an ease to the ease table
 local function ease(self)
+
+	-- Welcome to Ease!
+	--
+	-- -- Flags set by the user
+	-- * plr: number[] or number or nil
+	-- * mode: 'end' or nil (also m could be set to 'e')
+	-- * time: true or nil
+	--
+	-- -- Flags set by the user (but only from `reset`)
+	-- * only: mod[] or nil
+	-- * exclude: mod[] or nil
+	--
+	-- -- Set by the other ease functions
+	-- * relative: true or nil
+	--     * makes this entry act like `add`
+	-- * reset: true or nil
+	--     * activates special reset code later
+	--
+	-- [1]: start beat (or time)
+	-- [2]: length
+	-- [3]: the ease
+	-- [4 + 2*n]: the target mod value
+	-- [5 + 2*n]: the mod name
+
 	self.n = #self
-	if self[3](1) < 0.5 then
-		self.transient = 1
-	end
-	if self.mode or self.m then
+
+	-- convert mode into a regular true or false
+	self.mode = self.mode == 'end' or self.m == 'e'
+
+	-- convert the ease into relative
+	if self.mode then
 		self[2] = self[2] - self[1]
 	end
 
+	-- convert the start beat into time and store it in start_time
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
 
+	-- future steps assume that plr is a number, so if it's a table,
+	-- we need to duplicate the entry once for each player number
+	-- The table is then stored into `eases` for later
 	local plr = self.plr or get_plr()
 	if type(plr) == 'table' then
 		for _, plr in ipairs(plr) do
-			local copy = copy(self)
-			copy.plr = plr
-			table.insert(eases, copy)
+			local new = copy(self)
+			new.plr = plr
+			table.insert(eases, new)
 		end
 	else
 		self.plr = plr
@@ -154,24 +184,40 @@ end
 -- reset {start, [len, eas], [exclude = {mod list}]}
 -- adds a reset to the ease table
 local function reset(self)
+	-- if a length and ease aren't provided, use `0, instant` to make it act like `set`
 	self[2] = self[2] or 0
 	self[3] = self[3] or instant
+
+	-- set flag for the `run_eases` function to know that this is a reset entry
 	self.reset = true
+
 	if self.only then
+		-- you can pass `only` to reset only a specific set of mods
+		-- later code assumes this is a table if present, so here,
+		-- single values need to get wrapped in a table.
 		if type(self.only) == 'string' then
 			self.only = {self.only}
 		end
-	else
-		self.exclude = self.exclude or {}
+	elseif self.exclude then
+		-- you can pass `exclude` to exclude a specific set of mods
+		-- later code assumes this is a table if present, so here,
+		-- single values need to get wrapped in a table.
 		if type(self.exclude) == 'string' then
 			self.exclude = {self.exclude}
 		end
+
+		-- When exclude is passed in, each mod is a value
+		-- but it needs to become a table where each mod is a key
 		local exclude = {}
 		for _, v in ipairs(self.exclude) do
 			exclude[v] = true
 		end
+
+		-- store it back
 		self.exclude = exclude
 	end
+
+	-- just use ease to insert it into the ease table
 	ease(self)
 end
 
@@ -193,6 +239,9 @@ local function func_function(self)
 	end
 	self[2], self[3] = nil, self[2]
 	local persist = self.persist
+	-- convert mode into a regular true or false
+	self.mode = self.mode == 'end' or self.m == 'e'
+
 	if type(persist) == 'number' and self.mode then
 		persist = persist - self[1]
 	end
@@ -208,7 +257,7 @@ local function func_function(self)
 			end
 		end
 	end
-	self.priority = (self.defer and -1 or 1) * table.getn(funcs)
+	self.priority = (self.defer and -1 or 1) * #funcs
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
 	table.insert(funcs, self)
 end
@@ -221,15 +270,17 @@ local function perframe(self, deny_poptions)
 			self.mods[pn] = {}
 		end
 	end
-	self.priority = (self.defer and -1 or 1) * table.getn(funcs)
+	self.priority = (self.defer and -1 or 1) * #funcs
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
 	table.insert(funcs, self)
 end
 
 -- func helper for function eases
 local function func_ease(self)
-	-- use the mode to adjust len
-	if self.mode or self.m then
+	-- convert mode into a regular true or false
+	self.mode = self.mode == 'end' or self.m == 'e'
+	-- convert the ease into relative
+	if self.mode then
 		self[2] = self[2] - self[1]
 	end
 	local fn = table.remove(self)
@@ -258,7 +309,6 @@ local function func_ease(self)
 			end,
 			persist = self.persist,
 			defer = self.defer,
-			mode = self.mode
 		}
 	end
 end
@@ -344,7 +394,7 @@ local function node(self)
 		i = i + 1
 	end
 	local result = {inputs, out, fn}
-	result.priority = (self.defer and -1 or 1) * table.getn(nodes)
+	result.priority = (self.defer and -1 or 1) * #nodes
 	table.insert(nodes, result)
 	return node
 end
@@ -725,6 +775,7 @@ local function compile_nodes()
 			end
 		end
 	end
+	-- TODO what is this
 	for mod, v in pairs(start) do
 		v[locked] = nil
 	end
@@ -737,7 +788,7 @@ end
 if debug_print_applymodifier_input then
 	local old_apply_modifiers = apply_modifiers
 	apply_modifiers = function(str, pn)
-		if debug_print_applymodifier_input == true or debug_print_applymodifier_input < beat then
+		if debug_print_applymodifier_input == true or debug_print_applymodifier_input < GAMESTATE:GetSongBeat() then
 			print('PLAYER ' .. pn .. ': ' .. str)
 			if debug_print_applymodifier_input ~= true then
 				apply_modifiers = old_apply_modifiers
@@ -752,19 +803,49 @@ local active_eases = {}
 
 local function run_eases(beat, time)
 	-- {start_beat, len, ease, p0, m0, p1, m1, p2, m2, p3, m3}
+	-- `eases` is the full sorted timeline of every ease
+	-- `eases_index` is pointing to the next ease in the timeline that hasn't started yet
 	while eases_index <= #eases do
 		local e = eases[eases_index]
+		-- measure by beat by default, or time if time=true was set
 		local measure = e.time and time or beat
+		-- if it's not ready, break out of the loop
+		-- the eases table is sorted, so none of the later eases will be done either
 		if measure < e[1] then break end
+
+		-- At this point, we've already decided we need to add the ease to the active_eases table
+		-- The next step is to prepare the entry to go into the `active_eases` table
+		-- The problem is that the `active_eases` code makes a bunch of assumptions (so it can run faster), so
+		-- the ease entry needs to be normalized.
+		-- A "normalized" ease is basically of the form:
+		--     {beat, len, ease, offset1, mod1, offset2, mod2, ...}
+		--
+		-- Here are some important things that need to be made true for an active ease:
+		-- * It always lists out all mods being affected
+		--     * even a 'reset' one
+		-- * It always has relative numbers for its mods
+		--     * this makes the logic just work when there's more than one ease touching the same mod
+		-- * It is relative to the end point, not the start point.
+		--     * This one is kind of complicated.
+		--       the ease "commits" its changes to the targets table instantly
+		--       and the display value only lags behind visually.
+
+		-- plr is just a number at this point, because of the code in `ease`
 		local plr = e.plr
+
+		-- special cases for reset
 		if e.reset then
 			if e.only then
+				-- Reset only these mods, because only= was set.
 				for _, mod in ipairs(e.only) do
 					table.insert(e, default_mods[mod])
 					table.insert(e, mod)
 				end
-			else
-				for mod, percent in pairs(targets[plr]) do
+			elseif e.exclude then
+				-- Reset any mod that isn't excluded and isn't at its default value.
+				-- The goal is to normalize the reset into a regular ease entry
+				-- by just inserting the default values.
+				for mod in pairs(targets[plr]) do
 					if not e.exclude[mod] and targets[plr][mod] ~= default_mods[mod] then
 						table.insert(e, default_mods[mod])
 						table.insert(e, mod)
@@ -772,41 +853,69 @@ local function run_eases(beat, time)
 				end
 			end
 		end
-		e.offset = e.transient and 0 or 1
+
+		-- If it isn't using relative already, it needs to be adjusted to be relative (ie, like 'add', not like 'ease')
+		-- Adjusted based on what the current target is set to
+		-- This is the reason why the sorting the eases table needs to be stable.
 		if not e.relative then
 			for i = 4, e.n, 2 do
 				local mod = e[i + 1]
 				e[i] = e[i] - targets[plr][mod]
 			end
 		end
-		if not e.transient then
+
+		e.offset = 0
+		-- If the ease value ends with 0.5 or more, the ease should "stick".
+		-- Ie, if you use outExpo, the value should stay on until turned off.
+		-- this is a poor quality comment
+		if e[3](1) >= 0.5 then
+			e.offset = 1
 			for i = 4, e.n, 2 do
 				local mod = e[i + 1]
 				targets[plr][mod] = targets[plr][mod] + e[i]
 			end
 		end
+		-- activate the ease and move to the next one
 		table.insert(active_eases, e)
 		eases_index = eases_index + 1
 	end
 
+	-- Every ease that's active needs to be animated
 	local active_eases_index = 1
 	while active_eases_index <= #active_eases do
 		local e = active_eases[active_eases_index]
 		local plr = e.plr
 		local measure = e.time and time or beat
 		if measure < e[1] + e[2] then
+			-- For every active ease, calculate the current magnitude of the ease
 			local e3 = e[3]((measure - e[1]) / e[2]) - e.offset
+			-- Go through all of the mods in the ease and write the temporary changes
+			-- to the mods table.
 			for i = 4, e.n, 2 do
 				local mod = e[i + 1]
 				mods[plr][mod] = mods[plr][mod] + e3 * e[i]
 			end
 			active_eases_index = active_eases_index + 1
 		else
+			-- If the ease is done, the change to the targets table has already been made
+			-- so the ease only needs to be removed from the active_eases table.
+			-- First, we mark the mods as touched, so that eases with length 0
+			-- will still apply, even while being active for 0 frames.
 			for i = 4, e.n, 2 do
 				local mod = e[i + 1]
 				touch_mod(mod, plr)
 			end
-			active_eases[active_eases_index] = table.remove(active_eases)
+			-- Then, the ease needs to be tossed out.
+			if active_eases_index ~= #active_eases then
+				-- Since the order of the active eases table doesn't matter,
+				-- we can remove an item by moving the last item to the current index.
+				-- For example, turning the list [1, 2, 3, 4, 5] into [1, 5, 3, 4] removes item 2
+				-- This strategy is used because it's faster than calling table.remove with an index
+				active_eases[active_eases_index] = table.remove(active_eases)
+			else
+				-- If it's already at the end of the list, just remove the item with table.remove.
+				table.remove(active_eases)
+			end
 		end
 	end
 end
@@ -906,15 +1015,20 @@ local function run_nodes()
 end
 
 local function run_mods()
+	-- each player is processed separately
 	for pn = 1, max_pn do
+		-- if the player is active
 		if P[pn] and P[pn]:IsAwake() then
 			local buffer = mod_buffer[pn]
+			-- toss everything that isn't an aux into the buffer
 			for mod, percent in pairs(mods[pn]) do
 				if not auxes[mod] then
 					buffer('*-1 '..percent..' '..mod)
 				end
 				mods[pn][mod] = nil
 			end
+			-- if the buffer has at least 1 item in it
+			-- then pass it to ApplyModifiers
 			if buffer[1] then
 				apply_modifiers(buffer:build(','), pn)
 				buffer:clear()
@@ -923,6 +1037,7 @@ local function run_mods()
 	end
 end
 
+-- this if statement won't run unless you are mirin
 if debug_print_mod_targets then
 	func {0, 9e9, function(beat)
 		if debug_print_mod_targets == true or debug_print_mod_targets < beat then

@@ -1,6 +1,7 @@
 ---@diagnostic disable: lowercase-global
 -- Convenience shortcuts
 
+-- TODO test params
 local sqrt = math.sqrt
 local sin = math.sin
 local asin = math.asin
