@@ -5,46 +5,44 @@
 		xero = {
 			MIRIN_VERSION = '4.0.3 dev',
 			foreground = self,
+			dir = GAMESTATE:GetCurrentSong():GetSongDir(),
+			-- TODO
+			loadfile = function(filename)
+				return xero(loadfile(--[[xero.dir..]]'lua/'..filename))
+			end,
 		}
 
 		-- Needed by StepMania, in order to not kill lua mods early
 		self:sleep(9e9)
+
+		-- Load all of the core .lua files
+		-- The order DOES matter here:
+		-- std.lua needs to be loaded first
+		-- template.lua needs to be last
+		loadfile(xero.dir..'template/std.lua')()
+		loadfile(xero.dir..'template/sort.lua')()
+		loadfile(xero.dir..'template/ease.lua')()
+		loadfile(xero.dir..'template/template.lua')()
+
 	end"
 >
 	<children>
 
-		<!--
-			Standard Library
-			Contains function definitions unrelated with StepMania.
-			Also prepares the xero table.
-		-->
-		<Layer File = "std.xml" />
+		<!-- Load the template onto an actor -->
+		<Layer InitCommand = "%xero.init_command"/>
 
-		<!--
-			Sorting algorithms
-			Provides `stable_sort()` and `unstable_sort()`.
-			Used in this template at various places.
-		-->
-		<Layer File = "sort.xml" />
-
-		<!--
-			Easing functions
-			Contains all easing functions, + helpers such as `flip()`.
-		-->
-		<Layer File = "ease.xml" />
-
-		<!-- Load the actual template -->
-		<Layer File = "template.xml"  />
-
-		<!--
-			Template plugins
-			Handles the loading of any XML plugin present
-			in the `plugins/` directory.
-		-->
+		<!-- Template plugins                              -->
+		<!--                                               -->
+		<!-- Handles the loading of any XML plugin present -->
+		<!-- in the `plugins/` directory.                  -->
+		<!-- TODO .lua plugins, do they exist??            -->
 		<Layer File = "plugins.xml" />
 
-		<!-- Load the User's code -->
-		<Layer File = "../lua/mods.xml" />
+		<!-- Load the User's code, using xero.loadfile instead of loadfile -->
+		<Layer
+			File = "../lua/layout.xml"
+			LoadCommand="%xero.loadfile'mods.lua'"
+		/>
 
 	</children>
 </ActorFrame>
