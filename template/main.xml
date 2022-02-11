@@ -1,5 +1,6 @@
 <ActorFrame
 	InitCommand = "%function(self)
+		self:removecommand('Init')
 		-- `xero` is the only global variable written by this template
 		-- Everything, including the modder's variables are stored in it
 		xero = {
