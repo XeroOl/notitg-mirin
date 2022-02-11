@@ -126,8 +126,6 @@ local function ease(self)
 	-- [4 + 2*n]: the target mod value
 	-- [5 + 2*n]: the mod name
 
-	self.n = #self
-
 	-- convert mode into a regular true or false
 	self.mode = self.mode == 'end' or self.m == 'e'
 
@@ -619,7 +617,7 @@ end
 local function resolve_aliases()
 	-- ease
 	for _, e in ipairs(eases) do
-		for i = 5, e.n, 2 do
+		for i = 5, #e, 2 do
 			e[i] = normalize_mod(e[i])
 		end
 		if e.exclude then
@@ -858,7 +856,7 @@ local function run_eases(beat, time)
 		-- Adjusted based on what the current target is set to
 		-- This is the reason why the sorting the eases table needs to be stable.
 		if not e.relative then
-			for i = 4, e.n, 2 do
+			for i = 4, #e, 2 do
 				local mod = e[i + 1]
 				e[i] = e[i] - targets[plr][mod]
 			end
@@ -870,7 +868,7 @@ local function run_eases(beat, time)
 		-- this is a poor quality comment
 		if e[3](1) >= 0.5 then
 			e.offset = 1
-			for i = 4, e.n, 2 do
+			for i = 4, #e, 2 do
 				local mod = e[i + 1]
 				targets[plr][mod] = targets[plr][mod] + e[i]
 			end
@@ -891,7 +889,7 @@ local function run_eases(beat, time)
 			local e3 = e[3]((measure - e[1]) / e[2]) - e.offset
 			-- Go through all of the mods in the ease and write the temporary changes
 			-- to the mods table.
-			for i = 4, e.n, 2 do
+			for i = 4, #e, 2 do
 				local mod = e[i + 1]
 				mods[plr][mod] = mods[plr][mod] + e3 * e[i]
 			end
@@ -901,7 +899,7 @@ local function run_eases(beat, time)
 			-- so the ease only needs to be removed from the active_eases table.
 			-- First, we mark the mods as touched, so that eases with length 0
 			-- will still apply, even while being active for 0 frames.
-			for i = 4, e.n, 2 do
+			for i = 4, #e, 2 do
 				local mod = e[i + 1]
 				touch_mod(mod, plr)
 			end
