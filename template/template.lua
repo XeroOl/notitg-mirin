@@ -850,12 +850,12 @@ local function run_eases(beat, time)
 					table.insert(e, default_mods[mod])
 					table.insert(e, mod)
 				end
-			elseif e.exclude then
+			else
 				-- Reset any mod that isn't excluded and isn't at its default value.
 				-- The goal is to normalize the reset into a regular ease entry
 				-- by just inserting the default values.
 				for mod in pairs(targets[plr]) do
-					if not e.exclude[mod] and targets[plr][mod] ~= default_mods[mod] then
+					if not(e.exclude and e.exclude[mod]) and targets[plr][mod] ~= default_mods[mod] then
 						table.insert(e, default_mods[mod])
 						table.insert(e, mod)
 					end
