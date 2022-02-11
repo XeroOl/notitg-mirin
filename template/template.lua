@@ -255,21 +255,44 @@ local function func_function(self)
 			end
 		end
 	end
-	self.priority = (self.defer and -1 or 1) * #funcs
+	self.priority = (self.defer and -1 or 1) * (#funcs + 1)
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
 	table.insert(funcs, self)
 end
 
+local disallowed_poptions_perframe_persist = setmetatable({}, {__index = function(_)
+	error('you cannot use poptions and persist at the same time. </3')
+end})
+
 -- func helper for scheduling a perframe
 local function perframe(self, deny_poptions)
+	-- convert into relative
+	if self.mode then
+		self[2] = self[2] - self[1]
+	end
 	if not deny_poptions then
 		self.mods = {}
 		for pn = 1, max_pn do
 			self.mods[pn] = {}
 		end
 	end
-	self.priority = (self.defer and -1 or 1) * #funcs
+	self.priority = (self.defer and -1 or 1) * (#funcs + 1)
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
+
+	local persist = self.persist
+	if persist then
+		if type(persist) == 'number' and self.mode then
+			persist = persist - self[1] - self[2]
+		end
+		func {
+			self[1] + self[2],
+			function()
+				self[3](GAMESTATE:GetSongBeat(), disallowed_poptions_perframe_persist)
+			end,
+			persist = self.persist,
+		}
+	end
+
 	table.insert(funcs, self)
 end
 
@@ -277,7 +300,7 @@ end
 local function func_ease(self)
 	-- convert mode into a regular true or false
 	self.mode = self.mode == 'end' or self.m == 'e'
-	-- convert the ease into relative
+	-- convert into relative
 	if self.mode then
 		self[2] = self[2] - self[1]
 	end
@@ -392,7 +415,7 @@ local function node(self)
 		i = i + 1
 	end
 	local result = {inputs, out, fn}
-	result.priority = (self.defer and -1 or 1) * #nodes
+	result.priority = (self.defer and -1 or 1) * (#nodes + 1)
 	table.insert(nodes, result)
 	return node
 end
@@ -666,8 +689,9 @@ local function compile_nodes()
 			terminators[mod] = true
 		end
 	end
+	local priority = -1 * (#nodes + 1)
 	for k, _ in pairs(terminators) do
-		table.insert(nodes, {{k}, {}, nil, nil, nil, nil, nil, true})
+		table.insert(nodes, {{k}, {}, nil, nil, nil, nil, nil, true, priority = priority})
 	end
 	local start = node_start
 	local locked = {}
