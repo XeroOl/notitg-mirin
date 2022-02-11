@@ -80,7 +80,7 @@ xero()
 --- Create the strict environment, forbidding creating any variable
 --- This environment is not related to the xero table, and won't fetch
 --- values from it, unless explicitely prefixed with `xero.`
-strict = setmetatable({}, {
+xero.strict = setmetatable({}, {
 	-- Allow access to _G elements, containing all game methods
 	__index = _G,
 	-- Prevent creating any variable
@@ -95,7 +95,7 @@ strict = setmetatable({}, {
 -- Utility functions
 
 
---- Returns a copy of the table `src`
+--- Returns a shallow copy of the table `src`
 function copy(src)
 	local dest = {}
 	for k, v in pairs(src) do

@@ -20,6 +20,7 @@
 		loadfile(xero.dir..'template/sort.lua')()
 		loadfile(xero.dir..'template/ease.lua')()
 		loadfile(xero.dir..'template/template.lua')()
+		
 
 	end"
 >
@@ -35,11 +36,8 @@
 		<!-- TODO .lua plugins, do they exist??            -->
 		<Layer File = "plugins.xml" />
 
-		<!-- Load the User's code, using xero.loadfile instead of loadfile -->
-		<Layer
-			File = "../lua/layout.xml"
-			LoadCommand="%xero.loadfile'mods.lua'"
-		/>
+		<!-- Load the User's actors -->
+		<Layer File = "../lua/layout.xml" />
 
 	</children>
 </ActorFrame>

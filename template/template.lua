@@ -807,7 +807,9 @@ local function apply_modifiers(str, pn)
 	GAMESTATE:ApplyModifiers(str, pn)
 end
 
+-- this if statement won't run unless you are mirin
 if debug_print_applymodifier_input then
+	-- luacov: disable
 	local old_apply_modifiers = apply_modifiers
 	apply_modifiers = function(str, pn)
 		if debug_print_applymodifier_input == true or debug_print_applymodifier_input < GAMESTATE:GetSongBeat() then
@@ -818,6 +820,7 @@ if debug_print_applymodifier_input then
 		end
 		old_apply_modifiers(str, pn)
 	end
+	-- luacov: enable
 end
 
 local eases_index = 1
@@ -978,6 +981,7 @@ local function run_funcs(beat, time)
 			active_funcs:remove()
 		end
 	end
+
 end
 
 local seen = 1
@@ -1061,6 +1065,7 @@ end
 
 -- this if statement won't run unless you are mirin
 if debug_print_mod_targets then
+	-- luacov: disable
 	func {0, 9e9, function(beat)
 		if debug_print_mod_targets == true or debug_print_mod_targets < beat then
 			for pn = 1, max_pn do
@@ -1081,6 +1086,7 @@ if debug_print_mod_targets then
 			debug_print_mod_targets = (debug_print_mod_targets == true)
 		end
 	end}
+	-- luacov: enable
 end
 
 local is_beyond_load_command = false
@@ -1313,7 +1319,7 @@ local function check_func_function_errors(self, name)
 		return 'the first argument needs to be a number in beats'
 	end
 	if type(fn) ~= 'function' and type(fn) ~= 'string' then
-		return 'the second argument needs to be a function'
+		return 'the second argument needs to be a function\n(maybe try using func_ease or perframe instead)'
 	end
 	if is_beyond_load_command then
 		return 'cannot call '..name..' after LoadCommand finished'
@@ -1494,6 +1500,7 @@ xero.touch_all_mods = touch_all_mods
 
 xero.max_pn = max_pn
 
+
 xero()
 
 scx = SCREEN_CENTER_X
@@ -1538,7 +1545,6 @@ function backToSongWheel(message)
 	end
 	GAMESTATE:FinishSong()
 	-- disable update_command
-	-- TODO test for funnies
 	foreground:hidden(1)
 end
 
@@ -1551,7 +1557,6 @@ function xero.aftsprite(aft, sprite)
 end
 
 -- end UNDOCUMENTED
-
 
 -- This is the entry point of the template.
 -- It sets up all of the commands used to run the template.
