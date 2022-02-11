@@ -258,20 +258,3 @@ function stringbuilder()
 	return setmetatable({}, stringbuilder_mt)
 end
 
--- function that does nothing
-local function noop() end
-
--- load a string as code with the `xero` environment
-function xero_load(code, name)
-	local f, err = loadstring( 'return function(self)' .. code .. '\nend', name)
-	if err then
-		SCREENMAN:SystemMessage(err)
-		return noop
-	end
-	f, err = pcall(f)
-	if err then
-		SCREENMAN:SystemMessage(err)
-		return noop
-	end
-	return xero(f)
-end
