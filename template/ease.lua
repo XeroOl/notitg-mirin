@@ -30,7 +30,7 @@ flip = setmetatable({}, {
 
 -- Mix two easing functions together into a new ease
 -- the new ease starts by acting like the first argument, and then ends like the second argument
--- Example: ease {0, 20, blendease(inQuad, outQuad, 100, 'modname'}
+-- Example: ease {0, 20, blendease(inQuad, outQuad), 100, 'modname'}
 blendease = setmetatable({}, {
 	__index = function(self, key)
 		self[key] = {}
