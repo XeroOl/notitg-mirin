@@ -220,7 +220,7 @@ local function reset(self)
 end
 
 -- func helper for scheduling a function
-local function func_function(self)
+local function func(self)
 	-- func {5, 'P1:xy', 2, 3}
 	if type(self[2]) == 'string' then
 		local args, syms = {}, {}
@@ -319,11 +319,10 @@ local function func_ease(self)
 		fn(start_percent + (end_percent - start_percent) * eas(progress))
 	end
 
-	perframe(self, true)
 	-- it's a function-ease variant, so make it persist
 	if self.persist ~= false then
 		local final_percent = eas(1) > 0.5 and end_percent or start_percent
-		func_function {
+		func {
 			end_beat,
 			function()
 				fn(final_percent)
@@ -332,23 +331,8 @@ local function func_ease(self)
 			defer = self.defer,
 		}
 	end
-end
-
--- func dispatcher
-local function func(self)
-
-	-- scheduled function variant
-	if type(self[2]) == 'string' or #self == 2 then
-		func_function(self)
-
-	-- basic perframe variant
-	elseif #self == 3 then
-		perframe(self)
-
-	-- function ease variant
-	else
-		func_ease(self)
-	end
+	self.persist = false
+	perframe(self, true)
 end
 
 -- alias {'old', 'new'}
@@ -797,7 +781,7 @@ local function compile_nodes()
 			end
 		end
 	end
-	-- TODO what is this
+
 	for mod, v in pairs(start) do
 		v[locked] = nil
 	end
@@ -1227,6 +1211,7 @@ local function check_ease_errors(self, name)
 		end
 		i = i + 2
 	end
+	assert(self[i + 1] == nil, 'invalid mod percent: '..tostring(self[i]))
 	local plr = self.plr or get_plr()
 	if type(plr) ~= 'number' and type(plr) ~= 'table' then
 		return 'invalid plr'
@@ -1280,37 +1265,6 @@ local valid_func_signatures = {
 }
 
 local function check_func_errors(self, name)
-	if type(self) ~= 'table' then
-		return 'curly braces expected'
-	end
-	local types = stringbuilder()
-	for _, v in ipairs(self) do
-		types(type(v))
-	end
-	if #types >= 2 and types[2] == 'string' then
-		types[3] = '?'
-		while types[4] do
-			table.remove(types, 4)
-		end
-	end
-	if #types > 3 then
-		if is_valid_ease(self[3]) then
-			types[3] = 'ease'
-		end
-	end
-	local signature = types:build(', ')
-	if signature == 'number, number, function' and self.persist ~= nil then
-		return 'persist is not supported for perframes'
-	end
-	if not valid_func_signatures[signature] then
-		return 'something is wrong with your func'
-	end
-	if is_beyond_load_command then
-		return 'cannot call '..name..' after LoadCommand finished'
-	end
-end
-
-local function check_func_function_errors(self, name)
 	if type(self) ~= 'table' then
 		return 'curly braces expected'
 	end
@@ -1486,7 +1440,6 @@ export(set, check_ease_errors, 'set')
 export(acc, check_ease_errors, 'acc')
 export(reset, check_reset_errors, 'reset')
 export(func, check_func_errors, 'func')
-export(func_function, check_func_function_errors, 'func_function')
 export(perframe, check_perframe_errors, 'perframe')
 export(func_ease, check_func_ease_errors, 'func_ease')
 export(alias, check_alias_errors, 'alias')
