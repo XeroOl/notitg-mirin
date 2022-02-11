@@ -1089,6 +1089,10 @@ local function ready_command(self)
 	resolve_aliases()
 	compile_nodes()
 
+	for i = 1, max_pn do
+		mod_buffer[i]:clear()
+	end
+
 	-- load command has happened
 	-- Set this variable so that ease{}s get denied past this point
 	is_beyond_load_command = true
