@@ -1068,8 +1068,10 @@ local function ready_command(self)
 	prepare_variables()
 	foreground:hidden(0)
 
-	-- loads both the plugins and the mod.xml due to propagation
+	-- loads both the plugins and the layout.xml due to propagation
 	foreground:playcommand('Load')
+	-- loads mods.lua
+	xero.require 'mods'
 
 	sort_tables()
 	resolve_aliases()
