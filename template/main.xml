@@ -1,29 +1,43 @@
 <ActorFrame
 	InitCommand = "%function(self)
-		_G.xero = { MIRIN_VERSION = '4.0.3' }
-		xero.foreground = self
+		self:removecommand('Init')
+		-- `xero` is the only global variable written by this template
+		-- Everything, including the modder's variables are stored in it
+		xero = {
+			MIRIN_VERSION = '$VERSION',
+			foreground = self,
+			dir = GAMESTATE:GetCurrentSong():GetSongDir(),
+		}
+
+		-- Needed by StepMania, in order to not kill lua mods early
 		self:sleep(9e9)
+
+		-- Load all of the core .lua files
+		-- The order DOES matter here:
+		-- std.lua needs to be loaded first
+		-- template.lua needs to be last
+		loadfile(xero.dir..'template/std.lua')()
+		loadfile(xero.dir..'template/sort.lua')()
+		loadfile(xero.dir..'template/ease.lua')()
+		loadfile(xero.dir..'template/template.lua')()
+		
+
 	end"
 >
 	<children>
 
-		<!-- Std Library -->
-		<Layer File = "std.xml" />
+		<!-- Load the template onto an actor -->
+		<Layer InitCommand = "%xero.init_command"/>
 
-		<!-- Sorting algorithm -->
-		<Layer File = "sort.xml" />
-
-		<!-- All of the eases -->
-		<Layer File = "ease.xml" />
-
-		<!-- Load the actual template -->
-		<Layer File = "template.xml"  />
-
-		<!-- Load the Plugins -->
+		<!-- Template plugins                              -->
+		<!--                                               -->
+		<!-- Handles the loading of any XML plugin present -->
+		<!-- in the `plugins/` directory.                  -->
+		<!-- .lua plugins are dealt with separately        -->
 		<Layer File = "plugins.xml" />
 
-		<!-- Load the User's code -->
-		<Layer File = "../lua/mods.xml" />
+		<!-- Load the User's actors -->
+		<Layer File = "../lua/layout.xml" />
 
 	</children>
 </ActorFrame>
