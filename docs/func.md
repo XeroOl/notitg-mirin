@@ -37,7 +37,7 @@ func {32, function()
 end}
 ```
 
-## `func` for Per-frames
+## `perframe` for Per-frames
 Arguments:
 
 | -------------- | ----------                                                 |
@@ -47,7 +47,7 @@ Arguments:
 
 The given function will be called every frame within the range. This is the only variant that supports [poptions](#poptions).
 
-## `func` for Function Eases
+## `func_ease` for Function Eases
 Arguments:
 
 | --------------            | ----------                                                   |
@@ -62,7 +62,7 @@ The given function will get called repeated. The function will recieve a number,
 These act a lot like eases, except it runs with
 
 ```lua
-func {0, 4, outExpo, 360, 0, function(p)
+func_ease {0, 4, outExpo, 360, 0, function(p)
 	P1:rotationz(p)
 end}
 ```
@@ -72,7 +72,7 @@ For functions that are just a single method call, like the example shown above, 
 
 ```lua
 -- equivalent to the above example
-func {0, 4, outExpo, 360, 0, 'P1:rotationz'}
+func_ease {0, 4, outExpo, 360, 0, 'P1:rotationz'}
 ```
 
 This shorthand only works for actors that are global, and only works if there's only one method to be called. In all other cases, instead of using the shorthand, use the full syntax instead.
