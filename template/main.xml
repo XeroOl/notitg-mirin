@@ -33,7 +33,7 @@
 		<!--                                               -->
 		<!-- Handles the loading of any XML plugin present -->
 		<!-- in the `plugins/` directory.                  -->
-		<!-- TODO .lua plugins, do they exist??            -->
+		<!-- .lua plugins are dealt with separately        -->
 		<Layer File = "plugins.xml" />
 
 		<!-- Load the User's actors -->
