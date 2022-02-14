@@ -22,7 +22,7 @@ If everything went right, you should be able to start up the game by running the
 <a name="download-the-template"/>
 ## Download the Template
 To start, you need to find the folder that NotITG is installed in.
-Download the [Mirin Template Code from GitHub](http://github.com/xerool/notitg-mirin/archive/master.zip) and unzip it into a song pack in your `Songs` folder.
+Download the [Mirin Template Code from GitHub](https://github.com/XeroOl/notitg-mirin/releases/download/v5.0.0/mirin-template-5.0.0.zip) and unzip it into a song pack in your `Songs` folder.
 When you're done, the structure should be something like this (except `My Song Pack` would be filled in with whatever information you want):
 ```
 NotITG
