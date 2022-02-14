@@ -1,7 +1,6 @@
 ---@diagnostic disable: lowercase-global
 -- Convenience shortcuts
 
--- TODO test params
 local sqrt = math.sqrt
 local sin = math.sin
 local asin = math.asin
@@ -91,7 +90,7 @@ end
 
 local param2mt = {
 	__call = function(self, x, param1, param2)
-		return self.fn(x, param1 or self.defaultparam1, param2 or self.defaultparam2)
+		return self.fn(x, param1 or self.dp1, param2 or self.dp2)
 	end,
 	__index = {
 		param=param2cache,
@@ -103,8 +102,9 @@ local param2mt = {
 function with2params(fn, defaultparam1, defaultparam2)
 	return setmetatable({
 		fn = fn,
-		defaultparam1 = defaultparam1,
-		defaultparam2 = defaultparam2,
+		dp1 = defaultparam1,
+		dp2 = defaultparam2,
+		cache = {},
 	}, param2mt)
 end
 
