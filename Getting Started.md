@@ -86,7 +86,7 @@ In NotITG:
 This is the editor view. Use the arrow keys to scroll through the chart. You can use the space bar to select the bounds on a range, and then use the `p` key to play the song at that range. 
 Turn off the measure lines in `Esc>Preferences>Show Measure Lines`.
 
-Open up `lua/mods.xml` in the text editor.
+Open up `lua/mods.lua` in the text editor.
 Under the line `-- your code goes here here:`, add this:
 ```lua
 setdefault {2, 'xmod', 100, 'overhead', 100, 'dizzyholds', 100, 'modtimer'}
