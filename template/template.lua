@@ -95,6 +95,18 @@ local function normalize_mod(name)
 			'\''..string.gsub(name, '[\'\\{}(),;* ]', '')..'\''
 		)
 	end
+	if string.find(name, '^c[0-9]+$') then
+		error(
+			'You can\'t name your mod \''..name..'\'.\n'..
+			'Use \'cmod\' if you want to set a cmod.'
+		)
+	end
+	if string.find(name, '^[0-9.]+x$') then
+		error(
+			'You can\'t name your mod \''..name..'\'.\n'..
+			'Use \'xmod\' if you want to set an xmod.'
+		)
+	end
 	return normalize_mod_no_checks(name)
 end
 

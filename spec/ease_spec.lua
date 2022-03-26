@@ -69,10 +69,22 @@ describe('ease', function()
     it('should detect bad mod magnitudes', function()
         assert.errors(function() xero.ease{0, 1, xero.outExpo, {100}, 'invert'} end)
     end)
-    it('should detect bad mod names', function()
+    it('should detect bad mod names (case 1)', function()
         assert.errors(function()
             -- tricky comma
             xero.ease{0, 1, xero.outExpo, 100, 'invert,'}
+            update()
+        end)
+    end)
+    it('should detect bad mod names (case 2)', function()
+        assert.errors(function()
+            xero.ease{0, 1, xero.outExpo, 100, '1.2x'}
+            update()
+        end)
+    end)
+    it('should detect bad mod names (case 3)', function()
+        assert.errors(function()
+            xero.ease{0, 1, xero.outExpo, 100, 'c500'}
             update()
         end)
     end)

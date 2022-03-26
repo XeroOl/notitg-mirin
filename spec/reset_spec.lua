@@ -125,4 +125,27 @@ describe('reset', function()
         assert.errors(function() xero.reset{0, 1} end)
     end)
 
+    it('works with definemod', function()
+        local modvalue
+        xero.definemod{'mymod', function(mymod) modvalue = mymod end}
+
+        xero.set {0, 100, 'mymod'}
+        xero.reset {2, exclude = {'mymod'}}
+        xero.reset {4}
+        xero.set {6, 100, 'mymod'}
+        xero.reset {8, only = 'mymod'}
+
+        update(1) -- at beat 1
+        assert.equal(modvalue, 100)
+        update(2) -- at beat 3
+        assert.equal(modvalue, 100)
+        update(2) -- at beat 5
+        assert.equal(modvalue, 0)
+        update(2) -- at beat 7
+        assert.equal(modvalue, 100)
+        update(2) -- at beat 9
+        assert.equal(modvalue, 0)
+
+    end)
+
 end)

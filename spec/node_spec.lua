@@ -13,6 +13,5 @@ describe('node', function()
         xero = nil
     end)
 
-    -- TODO
 
 end)
