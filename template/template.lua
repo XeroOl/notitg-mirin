@@ -1532,7 +1532,11 @@ function xero.init_command(self)
 
 	-- Update command is called every frame. It is what sets the mod values every frame,
 	-- and reads through everything that's been queued by the user.
-	self:addcommand('Update', update_command)
+	-- Delay one frame because the escape menu issue
+	self:addcommand('Update', function()
+		self:removecommand('Update')
+		self:addcommand('Update', update_command)
+	end)
 
 	-- NotITG and OpenITG have a long standing bug where the InitCommand on an actor can run twice in certain cases.
 	-- By removing the command here (at the end of init_command), we prevent it from being run again.
