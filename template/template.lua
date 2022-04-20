@@ -81,13 +81,11 @@ local _ = string.gsub('\'\\{}(),;* ', '.', function(t)
 	banned_chars[t] = true
 end)
 
-local function normalize_mod_no_checks(name)
-	name = string.lower(name)
-	return aliases[name] or name
-end
-
--- convert a mod to its lowercase dealiased name
-local function normalize_mod(name)
+-- A mod name isn't valid if it would cause problems when put into
+-- the "*-1 100 {}" format that GAMESTATE:ApplyModifiers expects.
+-- For example, the space in 'invert ' means the game engine would treat
+-- it identically to regular 'invert', which means it should be denied.
+local function ensure_mod_name_is_valid(name)
 	if banned_chars[string.sub(name, 1, 1)] or banned_chars[string.sub(name, #name, #name)] then
 		error(
 			'You have a typo in your mod name. '..
@@ -107,6 +105,16 @@ local function normalize_mod(name)
 			'Use \'xmod\' if you want to set an xmod.'
 		)
 	end
+end
+
+local function normalize_mod_no_checks(name)
+	name = string.lower(name)
+	return aliases[name] or name
+end
+
+-- convert a mod to its lowercase dealiased name
+local function normalize_mod(name)
+	if not auxes[name] then ensure_mod_name_is_valid(name) end
 	return normalize_mod_no_checks(name)
 end
 
@@ -634,6 +642,13 @@ end
 -- runs once during ScreenReadyCommand, after the user code is loaded
 -- replaces aliases with their respective mods
 local function resolve_aliases()
+	-- aux
+	local old_auxes = copy(auxes)
+	clear(auxes)
+	for mod, _ in pairs(old_auxes) do
+		-- auxes bypass name checks
+		auxes[normalize_mod_no_checks(mod)] = true
+	end
 	-- ease
 	for _, e in ipairs(eases) do
 		for i = 5, #e, 2 do
@@ -651,12 +666,6 @@ local function resolve_aliases()
 				e.only[i] = normalize_mod(e.only[i])
 			end
 		end
-	end
-	-- aux
-	local old_auxes = copy(auxes)
-	clear(auxes)
-	for mod, _ in pairs(old_auxes) do
-		auxes[normalize_mod(mod)] = true
 	end
 	-- node
 	for _, node_entry in ipairs(nodes) do
@@ -828,7 +837,7 @@ local function run_eases(beat, time)
 	-- `eases_index` is pointing to the next ease in the timeline that hasn't started yet
 	while eases_index <= #eases do
 		local e = eases[eases_index]
-		-- measure by beat by default, or time if time=true was set
+		-- The ease measures timings by beat by default, or time if time=true was set
 		local measure = e.time and time or beat
 		-- if it's not ready, break out of the loop
 		-- the eases table is sorted, so none of the later eases will be done either
@@ -875,23 +884,25 @@ local function run_eases(beat, time)
 			end
 		end
 
-		-- If it isn't using relative already, it needs to be adjusted to be relative (ie, like 'add', not like 'ease')
-		-- Adjusted based on what the current target is set to
-		-- This is the reason why the sorting the eases table needs to be stable.
-		if not e.relative then
-			for i = 4, #e, 2 do
-				local mod = e[i + 1]
-				e[i] = e[i] - targets[plr][mod]
-			end
-		end
 
-		e.offset = 0
 		-- If the ease value ends with 0.5 or more, the ease should "stick".
 		-- Ie, if you use outExpo, the value should stay on until turned off.
 		-- this is a poor quality comment
-		if e[3](1) >= 0.5 then
-			e.offset = 1
-			for i = 4, #e, 2 do
+		local ease_ends_at_different_position = e[3](1) >= 0.5
+		e.offset = ease_ends_at_different_position and 1 or 0
+
+		for i = 4, #e, 2 do
+			-- If it isn't using relative already, it needs to be adjusted to be relative
+			-- (ie, like 'add', not like 'ease')
+			-- Adjusted based on what the current target is set to
+			-- This is the reason why the sorting the eases table needs to be stable.
+			if not e.relative then
+				local mod = e[i + 1]
+				e[i] = e[i] - targets[plr][mod]
+			end
+
+			-- Update the target if it needs to be updated
+			if ease_ends_at_different_position then
 				local mod = e[i + 1]
 				targets[plr][mod] = targets[plr][mod] + e[i]
 			end

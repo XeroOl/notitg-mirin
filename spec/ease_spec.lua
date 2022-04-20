@@ -117,4 +117,12 @@ describe('ease', function()
         assert.equal(helper.get_mod('movex0'), helper.get_mod('movex1'))
         assert.equal(helper.get_mod('movex0'), helper.get_mod('movex2'))
     end)
+    it('shouldn\'t apply multiple times', function()
+        xero.ease {0, 1, xero.outExpo, 100, 'invert', 100, 'invert'}
+        xero.set {0, 300, 'drunk'}
+        xero.set {1, 0, 'drunk', 0, 'drunk', 0, 'drunk', 0, 'drunk'}
+        update(1)
+        assert.equal(helper.get_mod('invert'), '100')
+        assert.equal(helper.get_mod('drunk'), '0')
+    end)
 end)
