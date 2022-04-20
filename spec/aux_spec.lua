@@ -46,4 +46,12 @@ describe('aux', function()
         assert.equals('100', helper.get_mod('funny2'))
     end)
 
+    it('disables the mod name checks', function()
+        xero.aux {"invert,"}
+
+        xero.ease {0, 1, xero.outExpo, 100, "invert,"}
+
+        update(1)
+    end)
+
 end)

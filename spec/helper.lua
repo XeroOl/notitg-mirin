@@ -55,6 +55,7 @@ function helper.on()
         end
     end
     mock.on_happened = true
+    helper.update(0)
 end
 
 function helper.update(dt)

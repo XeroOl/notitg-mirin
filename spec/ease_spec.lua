@@ -69,10 +69,22 @@ describe('ease', function()
     it('should detect bad mod magnitudes', function()
         assert.errors(function() xero.ease{0, 1, xero.outExpo, {100}, 'invert'} end)
     end)
-    it('should detect bad mod names', function()
+    it('should detect bad mod names (case 1)', function()
         assert.errors(function()
             -- tricky comma
             xero.ease{0, 1, xero.outExpo, 100, 'invert,'}
+            update()
+        end)
+    end)
+    it('should detect bad mod names (case 2)', function()
+        assert.errors(function()
+            xero.ease{0, 1, xero.outExpo, 100, '1.2x'}
+            update()
+        end)
+    end)
+    it('should detect bad mod names (case 3)', function()
+        assert.errors(function()
+            xero.ease{0, 1, xero.outExpo, 100, 'c500'}
             update()
         end)
     end)
@@ -104,5 +116,13 @@ describe('ease', function()
         update(1)
         assert.equal(helper.get_mod('movex0'), helper.get_mod('movex1'))
         assert.equal(helper.get_mod('movex0'), helper.get_mod('movex2'))
+    end)
+    it('shouldn\'t apply multiple times', function()
+        xero.ease {0, 1, xero.outExpo, 100, 'invert', 100, 'invert'}
+        xero.set {0, 300, 'drunk'}
+        xero.set {1, 0, 'drunk', 0, 'drunk', 0, 'drunk', 0, 'drunk'}
+        update(1)
+        assert.equal(helper.get_mod('invert'), '100')
+        assert.equal(helper.get_mod('drunk'), '0')
     end)
 end)
