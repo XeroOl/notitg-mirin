@@ -35,6 +35,7 @@
 | <code class="language-lua">[mod_buffer](#mod_buffer)</code> <br> Does things. |
 | <code class="language-lua">[aftsprite](#aftsprite)</code> <br> Does things. |
 | <code class="language-lua">[xero](#xero)</code> <br> Does things. |
+
 ## Contents
 ### ease
 ```
