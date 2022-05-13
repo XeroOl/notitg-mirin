@@ -54,7 +54,7 @@ jobs:
       uses: emibcn/badge-action@v1
       id: badge
       with:
-        label: "Coverage"
+        label: "luacov"
         status: ${{ steps.coverage.outputs.coverage }}%
         color: ${{
           steps.coverage.outputs.coverage > 90 && 'green'              ||
