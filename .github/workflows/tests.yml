@@ -17,6 +17,7 @@ on:
 
 jobs:
   test:
+    if: ${{ ( github.event_name == 'pull_request' && github.actor == github.repository_owner ) || github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -28,15 +29,49 @@ jobs:
 
     - uses: leafo/gh-actions-luarocks@v4
 
-    - name: setup
+    - name: Prepare busted and luacov
+      id: setup
       run: |
         luarocks install busted
         luarocks install luacov
 
-    - name: test
+    - name: Run Tests with busted
+      id: test
       run: |
         busted -o utfTerminal
 
-    # - name: coverage
-      # run: |
-        # ./check_coverage.sh
+    - name: Check Test Coverage with luacov
+      id: coverage
+      run: |
+        ./check_coverage.sh
+
+    - name: Generate coverage badge
+      uses: emibcn/badge-action@v1
+      id: badge
+      with:
+        label: "Coverage"
+        status: ${{ steps.coverage.outputs.coverage }}"%"
+        color: ${{
+          steps.coverage.outputs.coverage > 90 && 'green'              ||
+          steps.coverage.outputs.coverage > 80 && 'yellow,green'       ||
+          steps.coverage.outputs.coverage > 70 && 'yellow'             ||
+          steps.coverage.outputs.coverage > 60 && 'orange,yellow'      ||
+          steps.coverage.outputs.coverage > 50 && 'orange'             ||
+          steps.coverage.outputs.coverage > 40 && 'red,orange'         ||
+          steps.coverage.outputs.coverage > 30 && 'red,red,orange'     ||
+          steps.coverage.outputs.coverage > 20 && 'red,red,red,orange' ||
+          'red' }}
+        path: "coverage.svg"
+
+    - name: Upload coverage badge
+      id: commit
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add "coverage.svg"
+        git commit -m "Add/Update badge"
+    - name: Push
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: badges
