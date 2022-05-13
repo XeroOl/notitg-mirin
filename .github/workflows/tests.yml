@@ -50,7 +50,7 @@ jobs:
       id: badge
       with:
         label: "Coverage"
-        status: ${{ steps.coverage.outputs.coverage }}"%"
+        status: ${{ steps.coverage.outputs.coverage }}%
         color: ${{
           steps.coverage.outputs.coverage > 90 && 'green'              ||
           steps.coverage.outputs.coverage > 80 && 'yellow,green'       ||
@@ -62,6 +62,12 @@ jobs:
           steps.coverage.outputs.coverage > 20 && 'red,red,red,orange' ||
           'red' }}
         path: "coverage.svg"
+
+    # Switch to badges to push
+    - uses: actions/checkout@v3
+      with:
+        ref: badges
+        path: badges
 
     - name: Upload coverage badge
       id: commit
