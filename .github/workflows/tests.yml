@@ -45,6 +45,11 @@ jobs:
       run: |
         ./check_coverage.sh
 
+    # Switch to badges to push
+    - uses: actions/checkout@v3
+      with:
+        ref: badges
+
     - name: Generate coverage badge
       uses: emibcn/badge-action@v1
       id: badge
@@ -63,15 +68,9 @@ jobs:
           'red' }}
         path: "coverage.svg"
 
-    # Switch to badges to push
-    - uses: actions/checkout@v3
-      with:
-        ref: badges
-
     - name: Upload coverage badge
       id: commit
       run: |
-        git checkout badges --force
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add "coverage.svg"
