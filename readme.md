@@ -1,5 +1,6 @@
 # Mirin Template
 [![busted](https://github.com/XeroOl/notitg-mirin/actions/workflows/tests.yml/badge.svg)](https://github.com/XeroOl/notitg-mirin/actions/workflows/tests.yml)
+![luacov](https://raw.githubusercontent.com/XeroOl/notitg-mirin/badges/coverage.svg)]
 
 [NotITG](https://notitg.heysora.net) is a fork of OpenITG designed to make it easier for mod file creators to implement their ideas. The [Mirin Template](https://www.github.com/XeroOl/notitg-mirin) provides functions that allow creators to use NotITG express their mod ideas and bring them to life in the game.
 
