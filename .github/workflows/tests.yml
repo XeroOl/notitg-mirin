@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: busted
 
 # Controls when the workflow will run
 on:
@@ -37,6 +37,6 @@ jobs:
       run: |
         busted -o utfTerminal
 
-    - name: coverage
-      run: |
-        ./check_coverage.sh
+    # - name: coverage
+      # run: |
+        # ./check_coverage.sh
