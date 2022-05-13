@@ -74,7 +74,9 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add "coverage.svg"
-        git commit -m "Add/Update badge"
+
+        # ignore if the command fails due to file not changing
+        git commit -m "Add/Update badge" || true
     - name: Push
       uses: ad-m/github-push-action@master
       with:
