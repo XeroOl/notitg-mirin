@@ -23,34 +23,62 @@ local instant = xero.instant
 
 -- ===================================================================== --
 
--- Data structures
+-- The global data structures used in the program
+-- These are declared early so that other functions can easily fill them in
 
-
--- the table of eases/add/set
+-- eases :: list of {beat/time, len, ease_, *args, pn = number, start_time = number} and a couple of other optional string keys
+-- table for eases/add/set/acc/reset
+--
+-- pn must be present, and must be a number.
+-- start_time must be present, and is the time that the effect starts *in seconds*
+--
+-- Before ready_command is run:
+-- * Is in the order that the mods have been inserted
+-- * You can insert into this table
+-- After ready_command is run:
+-- * is sorted by start_time with insertion order as tiebreaker
+-- * ease/add/set/acc should not insert anymore, because it will ruin the sort order.
 local eases = {}
 
+-- funcs :: list of {beat, len?, fn}, and a couple of other optional string keys
 -- the table of scheduled functions and perframes
+--
+-- if the len is present, it will be treated as a perframe, otherwise a func.
 local funcs = {}
 
+-- auxes :: table where auxes[modname] = true when modname is auxed
 -- auxilliary variables
+--
+-- when a mod is "auxed", it won't be applied via ApplyModifiers to the game.
+-- This usually means that the mod has an in-template implementation in lua.
+-- When a mod isn't auxed, it will be handled by the c++ game engine source code.
 local auxes = {}
 
--- the table of nodes
+-- nodes :: list of {list<string> inputs, function(inputs) -> outputs, list<string> outputs}
+-- stores nodes / definemods
+--
+-- After the nodes are compiled, it changes format to something different.
 local nodes = {}
 
--- mod aliases
+-- aliases :: table where aliases[old] = new
+-- mods that should be renamed.
+--
+-- The replacement happens in the resolve_aliases function.
+-- This table is stored in lowercase.
 local aliases = {}
 
+-- touched_mods :: table where touched_mods[pn][mod] = true
 -- mods whose values have changed that need to be applied
 local touched_mods = {}
 for pn = 1, max_pn do
 	touched_mods[pn] = {}
 end
 
+-- default_mods :: table where default_mods[mod] = number
 -- store the default values for every mod
 local default_mods = {}
 
--- the default_mods table defaults to 0
+-- use metatables to prefill the default_mods table with 0
 setmetatable(default_mods, {
 	__index = function(self, i)
 		self[i] = 0
@@ -60,7 +88,6 @@ setmetatable(default_mods, {
 
 
 local song = GAMESTATE:GetCurrentSong()
-
 
 -- ===================================================================== --
 
@@ -686,7 +713,7 @@ local function resolve_aliases()
 	end
 end
 
--- runs once during ScreenReadyCommand
+-- runs once during ReadyCommand
 local function compile_nodes()
 	local terminators = {}
 	for _, nd in ipairs(nodes) do
