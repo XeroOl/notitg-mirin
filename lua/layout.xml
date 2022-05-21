@@ -1,8 +1,15 @@
 <Layer Type = "ActorFrame"><children>
+
+	<!-- P1 and P2 Combo Proxies -->
 	<Layer Type = "ActorProxy" Name = "PC[1]" />
 	<Layer Type = "ActorProxy" Name = "PC[2]" />
+
+	<!-- P1 and P2 Judgment Proxies -->
 	<Layer Type = "ActorProxy" Name = "PJ[1]" />
 	<Layer Type = "ActorProxy" Name = "PJ[2]" />
+
+	<!-- P1 and P2 Proxies -->
 	<Layer Type = "ActorProxy" Name = "PP[1]" />
 	<Layer Type = "ActorProxy" Name = "PP[2]" />
+
 </children></Layer>
