@@ -796,7 +796,11 @@ local function compile_nodes()
 
 		local compiled = assert(loadstring(code:build(), 'node_generated'))()
 		nd[6] = compiled(outputs, parents, mods, fn)
-		if not terminator then
+		if terminator then
+			for i, mod in ipairs(inputs) do
+				touch_mod(mod)
+			end
+		else
 			for pn = 1, max_pn do
 				nd[6](pn)
 			end
