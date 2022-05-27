@@ -21,7 +21,7 @@ used under license as follows:
 	DEALINGS IN THE SOFTWARE.
 
 (modifications by Max Cahill 2018, 2020)
-(modifications by XeroOl 2021)
+(aesthetic modifications by XeroOl 2021)
 
 Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
 ]]
@@ -147,6 +147,4 @@ function sort.insertion_sort(array, less)
 	return array
 end
 
--- Exports
-xero.unstable_sort = table.sort
-xero.stable_sort = sort.stable_sort
+return sort

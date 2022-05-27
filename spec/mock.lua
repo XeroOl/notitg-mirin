@@ -36,6 +36,14 @@ function GAMESTATE:GetSongBeat()
     return beat
 end
 
+function GAMESTATE:GetFileStructure(path)
+    local file = io.open(path)
+    if file then
+        file:close()
+        return true
+    end
+end
+
 function mock.advance_time(dt)
     time = time + 1/factor * dt
     beat = beat + dt

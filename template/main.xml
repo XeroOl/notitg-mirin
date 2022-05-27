@@ -1,6 +1,10 @@
 <ActorFrame
 	InitCommand = "%function(self)
 		self:removecommand('Init')
+
+		-- Needed by StepMania, in order to not kill lua mods early
+		self:sleep(9e9)
+
 		-- `xero` is the only global variable written by this template
 		-- Everything, including the modder's variables are stored in it
 		xero = {
@@ -9,25 +13,20 @@
 			dir = GAMESTATE:GetCurrentSong():GetSongDir(),
 		}
 
-		-- Needed by StepMania, in order to not kill lua mods early
-		self:sleep(9e9)
+		-- prepare xero
+		setmetatable(xero, {
+			__index = _G,
+			__call = function(self, f) setfenv(f or 2, self); return f; end
+		})
 
-		-- Load all of the core .lua files
-		-- The order DOES matter here:
-		-- std.lua needs to be loaded first
-		-- template.lua needs to be last
-		loadfile(xero.dir..'template/std.lua')()
-		loadfile(xero.dir..'template/sort.lua')()
-		loadfile(xero.dir..'template/ease.lua')()
-		loadfile(xero.dir..'template/template.lua')()
-		
-
+		-- prepare xero.require
+		loadfile(xero.dir..'template/require.lua')()
 	end"
 >
 	<children>
 
 		<!-- Load the template onto an actor -->
-		<Layer InitCommand = "%xero.init_command"/>
+		<Layer InitCommand = "%xero.require('mirin.commands').init"/>
 
 		<!-- Template plugins                              -->
 		<!--                                               -->

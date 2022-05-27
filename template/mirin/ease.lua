@@ -1,4 +1,3 @@
----@diagnostic disable: lowercase-global
 -- Convenience shortcuts
 
 local sqrt = math.sqrt

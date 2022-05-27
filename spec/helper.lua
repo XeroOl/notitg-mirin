@@ -1,12 +1,6 @@
 local helper = {}
 local mock
 
-local function dummyloadfile(filename)
-    local _ = filename
-    return function()
-    end
-end
-
 function helper.reset()
     mock = dofile('./spec/mock.lua')
     xero = nil
@@ -24,12 +18,11 @@ function helper.init()
     h.foreground = mock.newactorframe()
     initcommand = assert(loadstring(initcommand, "template/main.xml"))()
     initcommand(h.foreground)
-    xero.loadfile = dummyloadfile
+
     xero.package.preload.mods = function() end
 
     h.template = mock.newactor()
-    mock.add_child(h.foreground, h.template)
-    h.template:addcommand('Init', xero.init_command)
+    h.template:addcommand('Init', xero.require('mirin.commands').init)
     h.template:playcommand('Init')
 
     h.layout = mock.newactorframe()
