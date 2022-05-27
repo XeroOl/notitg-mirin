@@ -104,16 +104,17 @@ local function get_plr()
 end
 
 local banned_chars = {}
-local _ = string.gsub('\'\\{}(),;* ', '.', function(t)
-	banned_chars[t] = true
-end)
+local banned_chars_string = '\'\\{}(),;* '
+for i = 1, #banned_chars_string do
+	banned_chars[string.sub(banned_chars_string, i, i)] = true
+end
 
 -- A mod name isn't valid if it would cause problems when put into
 -- the "*-1 100 {}" format that GAMESTATE:ApplyModifiers expects.
 -- For example, the space in 'invert ' means the game engine would treat
--- it identically to regular 'invert', which means it should be denied.
+-- it identically to regular 'invert', which is why 'invert ' should be denied.
 local function ensure_mod_name_is_valid(name)
-	if banned_chars[string.sub(name, 1, 1)] or banned_chars[string.sub(name, #name, #name)] then
+	if banned_chars[string.sub(name, 1, 1)] or banned_chars[string.sub(name, -1, -1)] then
 		error(
 			'You have a typo in your mod name. '..
 			'You wrote \''..name..'\', but you probably meant '..
@@ -1537,23 +1538,6 @@ function aft(self)
 	self:Create()
 end
 
-
-function setupJudgeProxy(proxy, target, pn)
-	proxy:SetTarget(target)
-	proxy:xy(scx * (pn-.5), scy)
-	target:hidden(1)
-	target:sleep(9e9)
-end
-
-function backToSongWheel(message)
-	if message then
-		SCREENMAN:SystemMessage(message)
-		print(message)
-	end
-	GAMESTATE:FinishSong()
-	-- disable update_command
-	foreground:hidden(1)
-end
 
 -- UNDOCUMENTED
 xero.mod_buffer = mod_buffer

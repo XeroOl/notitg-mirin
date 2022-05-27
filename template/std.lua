@@ -104,18 +104,6 @@ function copy(src)
 	return dest
 end
 
---- Returns a copy of the table `src`, copying also every nested table
-function deepcopy(src)
-	local dest = {}
-	for k, v in pairs(src) do
-		local k, v = k, v
-		if type(k) == 'table' then k = deepcopy(k) end
-		if type(v) == 'table' then v = deepcopy(v) end
-		dest[k] = v
-	end
-	return dest
-end
-
 -- Clear a table's contents, leaving it empty.
 -- Useful for resetting a table containing metatables.
 function clear(t)

@@ -93,15 +93,26 @@ describe('perframe', function()
         xero.perframe {0.5, 3, no}
         xero.perframe {0, 0, no, persist = 5}
         xero.perframe {2, 0, no, persist = 3}
-        -- xero.perframe {3, 4, no, persist = 5, mode = 'end'} -- WRONG
-        xero.perframe {0, 0, yes, persist = true} -- WRONG
-        xero.perframe {0, 1, yes, persist = 5} -- WRONG
-        xero.perframe {1, 2, yes, persist = 3} -- WRONG
-        xero.perframe {2, 0, yes, persist = 4} -- WRONG
+        -- xero.perframe {3, 4, no, persist = 5, mode = 'end'}
+        xero.perframe {0, 0, yes, persist = true}
+        xero.perframe {0, 1, yes, persist = 5}
+        xero.perframe {1, 2, yes, persist = 3}
+        xero.perframe {2, 0, yes, persist = 4}
         xero.perframe {3, 4, yes, persist = 6.5, mode = 'end'}
         update(5.75)
 
         assert.equal(5, count, 'Not all persists persisted')
+    end)
+
+    it('shouldn\'t allow poptions and persist', function()
+        assert.errors(function()
+            xero.perframe {0, 1, function(_, poptions)
+                local _ = poptions[1].invert
+            end, persist = true}
+            update(0.5)
+            update(0.5)
+            update(0.5)
+        end)
     end)
 
 end)

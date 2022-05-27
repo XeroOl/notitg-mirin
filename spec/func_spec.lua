@@ -69,4 +69,5 @@ describe('func', function()
 
         assert.equal(4, count, 'Not all persists persisted')
     end)
+
 end)
