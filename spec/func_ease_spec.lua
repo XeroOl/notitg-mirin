@@ -27,6 +27,13 @@ describe('func_ease', function()
         end
     end)
 
+    it('should support mode=', function()
+        xero.func_ease{1, 2, xero.linear, function(p)
+            assert.equal(p, 0.5)
+        end, mode = 'end'}
+        update(1.5)
+    end)
+
     it('should persist', function()
         local last_set_1, last_set_2
         xero.obj = {}

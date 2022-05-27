@@ -13,6 +13,11 @@ describe('definemod', function()
         xero = nil
     end)
 
+    it('should support the fancy syntax', function()
+        xero.definemod {'a', 100, 'b', 100, 'c'}
+        update(1)
+    end)
+
     -- TODO
 
 end)
