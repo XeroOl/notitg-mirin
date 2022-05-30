@@ -20,7 +20,7 @@
 		})
 
 		-- prepare xero.require
-		loadfile(xero.dir..'template/require.lua')()
+		assert(loadfile(xero.dir..'template/require.lua'))()
 	end"
 >
 	<children>
@@ -28,15 +28,11 @@
 		<!-- Load the template onto an actor -->
 		<Layer InitCommand = "%xero.require('mirin.commands').init"/>
 
-		<!-- Template plugins                              -->
-		<!--                                               -->
-		<!-- Handles the loading of any XML plugin present -->
-		<!-- in the `plugins/` directory.                  -->
-		<!-- .lua plugins are dealt with separately        -->
+		<!-- Template plugins -->
 		<Layer File = "plugins.xml" />
 
 		<!-- Load the User's actors -->
-		<Layer File = "../lua/layout.xml" />
+		<Layer File = "@'../'..xero.require('mirin.options').xml_entry_path" />
 
 	</children>
 </ActorFrame>

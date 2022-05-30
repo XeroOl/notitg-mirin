@@ -148,4 +148,6 @@ describe('reset', function()
 
     end)
 
+    -- TODO it should work with setdefault
+
 end)

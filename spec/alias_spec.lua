@@ -26,10 +26,12 @@ describe('alias', function()
         xero.alias{'a', 'b'}
         xero.setdefault {100, 'a'}
         xero.perframe {1, 5, function(beat, mods)
-            success = mods[1].a == 100 and mods[1].b == 100
+            assert.equal(100, mods[1].a)
+            assert.equal(100, mods[1].b)
+            success = true
         end}
         update(3)
-        assert(success, 'mod aliases worked properly')
+        assert(success, 'perframe did not run when expected')
     end)
 
     it('should work with definemod (simple case)', function()

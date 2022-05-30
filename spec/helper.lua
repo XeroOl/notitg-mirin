@@ -10,7 +10,7 @@ function helper.get_mod(mod, pn)
     return mock.get_mod(mod, pn)
 end
 
-function helper.init()
+function helper.init(skip_exports)
     local body = io.open('./template/main.xml'):read('*a')
     local initcommand = 'return '..body:match('"%%(.-)"')
     local h = helper
@@ -39,6 +39,10 @@ function helper.init()
     mock.add_child(h.layout, pc2)
     mock.add_child(h.layout, pj1)
     mock.add_child(h.layout, pj2)
+    if not skip_exports then
+        xero.require('mirin.template')()
+        xero.require('mirin.ease')()
+    end
 end
 
 function helper.on()

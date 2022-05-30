@@ -1,7 +1,10 @@
-local init, on, ready, update
 local core = require('mirin.core')
+local options = require('mirin.options')
 local foreground = xero.foreground
+
 local M = {}
+
+local init, on, ready, update
 
 -- This is the entry point of the template.
 -- It sets up all of the commands used to run the template.
@@ -26,6 +29,14 @@ function init(self)
 		self:addcommand('Update', update)
 	end)
 
+	if options.use_prelude then
+		require('prelude')
+	end
+	if options.lua_pre_entry_path then
+		assert(loadfile(xero.dir..options.lua_pre_entry_path))()
+	end
+
+
 	-- NotITG and OpenITG have a long standing bug where the InitCommand on an actor can run twice in certain cases.
 	-- By removing the command here (at the end of initcommand), we prevent it from being run again.
 	self:removecommand('Init')
@@ -37,7 +48,6 @@ function on(self)
 end
 
 
-
 function ready(self)
 	core.prepare_variables()
 	foreground:hidden(0)
@@ -45,7 +55,6 @@ function ready(self)
 	-- loads both the plugins and the layout.xml due to propagation
 	foreground:playcommand('Load')
 	-- loads mods.lua
-	require('prelude')
 	require('mods')
 
 	core.sort_tables()
@@ -53,7 +62,7 @@ function ready(self)
 	core.compile_nodes()
 
 
-	for i = 1, max_pn do
+	for i = 1, options.max_pn do
 		core.mod_buffer[i]:clear()
 	end
 

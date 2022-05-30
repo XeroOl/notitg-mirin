@@ -64,7 +64,7 @@ end
 -- default_mods :: table where default_mods[mod] = number
 -- store the default values for every mod
 local default_mods = {}
-M.default_mods = {}
+M.default_mods = default_mods
 
 -- use metatables to prefill the default_mods table with 0
 setmetatable(default_mods, {

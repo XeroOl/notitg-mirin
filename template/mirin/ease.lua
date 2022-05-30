@@ -9,8 +9,8 @@ local exp = math.exp
 local pi = math.pi
 local abs = math.abs
 
-xero()
--- ===================================================================== --
+
+local M = require('mirin.utils').module()
 
 -- Utility functions
 
@@ -19,7 +19,7 @@ xero()
 -- ```lua
 -- ease {0, 20, flip(outQuad), 50, 'modname'}
 -- ```
-flip = setmetatable({}, {
+M.flip = setmetatable({}, {
 	__call = function(self, fn)
 		self[fn] = self[fn] or function(x) return 1 - fn(x) end
 		return self[fn]
@@ -29,7 +29,7 @@ flip = setmetatable({}, {
 -- Mix two easing functions together into a new ease
 -- the new ease starts by acting like the first argument, and then ends like the second argument
 -- Example: ease {0, 20, blendease(inQuad, outQuad), 100, 'modname'}
-blendease = setmetatable({}, {
+M.blendease = setmetatable({}, {
 	__index = function(self, key)
 		self[key] = {}
 		return self[key]
@@ -71,13 +71,14 @@ local param1mt = {
 }
 
 -- Declare an easing function taking one custom parameter
-function with1param(fn, defaultparam1)
+local function with1param(fn, defaultparam1)
 	return setmetatable({
 		fn = fn,
 		dp1 = defaultparam1,
 		cache = {},
 	}, param1mt)
 end
+M.with1param = with1param
 
 local function param2cache(self, param1, param2)
 	self.cache[param1] = self.cache[param1] or {}
@@ -98,7 +99,7 @@ local param2mt = {
 }
 
 -- Declare an easing function taking two custom parameters
-function with2params(fn, defaultparam1, defaultparam2)
+local function with2params(fn, defaultparam1, defaultparam2)
 	return setmetatable({
 		fn = fn,
 		dp1 = defaultparam1,
@@ -106,20 +107,24 @@ function with2params(fn, defaultparam1, defaultparam2)
 		cache = {},
 	}, param2mt)
 end
+M.with2params = with2params
 
 -- ===================================================================== --
 
 -- Easing functions
 
-function bounce(t) return 4 * t * (1 - t) end
-function tri(t) return 1 - abs(2 * t - 1) end
-function bell(t) return inOutQuint(tri(t)) end
-function pop(t) return 3.5 * (1 - t) * (1 - t) * sqrt(t) end
-function tap(t) return 3.5 * t * t * sqrt(1 - t) end
-function pulse(t) return t < .5 and tap(t * 2) or -pop(t * 2 - 1) end
+function M.bounce(t) return 4 * t * (1 - t) end
+local function tri(t) return 1 - abs(2 * t - 1) end
+M.tri = tri
+function M.bell(t) return inOutQuint(M.tri(t)) end
+local function pop(t) return 3.5 * (1 - t) * (1 - t) * sqrt(t) end
+M.pop = pop
+local function tap(t) return 3.5 * t * t * sqrt(1 - t) end
+M.tap = tap
+function M.pulse(t) return t < .5 and tap(t * 2) or -pop(t * 2 - 1) end
 
-function spike(t) return exp(-10 * abs(2 * t - 1)) end
-function inverse(t) return t * t * (1 - t) * (1 - t) / (0.5 - t) end
+function M.spike(t) return exp(-10 * abs(2 * t - 1)) end
+function M.inverse(t) return t * t * (1 - t) * (1 - t) / (0.5 - t) end
 
 local function popElasticInternal(t, damp, count)
 	return (1000 ^ -(t ^ damp) - 0.001) * sin(count * pi * t)
@@ -137,20 +142,20 @@ local function pulseElasticInternal(t, damp, count)
 	end
 end
 
-popElastic = with2params(popElasticInternal, 1.4, 6)
-tapElastic = with2params(tapElasticInternal, 1.4, 6)
-pulseElastic = with2params(pulseElasticInternal, 1.4, 6)
+M.popElastic = with2params(popElasticInternal, 1.4, 6)
+M.tapElastic = with2params(tapElasticInternal, 1.4, 6)
+M.pulseElastic = with2params(pulseElasticInternal, 1.4, 6)
 
-impulse = with1param(function(t, damp)
+M.impulse = with1param(function(t, damp)
 	t = t ^ damp
 	return t * (1000 ^ -t - 0.001) * 18.6
 end, 0.9)
 
-function instant() return 1 end
-function linear(t) return t end
-function inQuad(t) return t * t end
-function outQuad(t) return -t * (t - 2) end
-function inOutQuad(t)
+function M.instant() return 1 end
+function M.linear(t) return t end
+function M.inQuad(t) return t * t end
+function M.outQuad(t) return -t * (t - 2) end
+function M.inOutQuad(t)
 	t = t * 2
 	if t < 1 then
 		return 0.5 * t ^ 2
@@ -158,7 +163,7 @@ function inOutQuad(t)
 		return 1 - 0.5 * (2 - t) ^ 2
 	end
 end
-function outInQuad(t)
+function M.outInQuad(t)
 	t = t * 2
 	if t < 1 then
 		return 0.5 - 0.5 * (1 - t) ^ 2
@@ -166,9 +171,9 @@ function outInQuad(t)
 		return 0.5 + 0.5 * (t - 1) ^ 2
 	end
 end
-function inCubic(t) return t * t * t end
-function outCubic(t) return 1 - (1 - t) ^ 3 end
-function inOutCubic(t)
+function M.inCubic(t) return t * t * t end
+function M.outCubic(t) return 1 - (1 - t) ^ 3 end
+function M.inOutCubic(t)
 	t = t * 2
 	if t < 1 then
 		return 0.5 * t ^ 3
@@ -176,7 +181,7 @@ function inOutCubic(t)
 		return 1 - 0.5 * (2 - t) ^ 3
 	end
 end
-function outInCubic(t)
+function M.outInCubic(t)
 	t = t * 2
 	if t < 1 then
 		return 0.5 - 0.5 * (1 - t) ^ 3
@@ -184,9 +189,9 @@ function outInCubic(t)
 		return 0.5 + 0.5 * (t - 1) ^ 3
 	end
 end
-function inQuart(t) return t * t * t * t end
-function outQuart(t) return 1 - (1 - t) ^ 4 end
-function inOutQuart(t)
+function M.inQuart(t) return t * t * t * t end
+function M.outQuart(t) return 1 - (1 - t) ^ 4 end
+function M.inOutQuart(t)
 	t = t * 2
 	if t < 1 then
 		return 0.5 * t ^ 4
@@ -194,7 +199,7 @@ function inOutQuart(t)
 		return 1 - 0.5 * (2 - t) ^ 4
 	end
 end
-function outInQuart(t)
+function M.outInQuart(t)
 	t = t * 2
 	if t < 1 then
 		return 0.5 - 0.5 * (1 - t) ^ 4
@@ -202,9 +207,9 @@ function outInQuart(t)
 		return 0.5 + 0.5 * (t - 1) ^ 4
 	end
 end
-function inQuint(t) return t ^ 5 end
-function outQuint(t) return 1 - (1 - t) ^ 5 end
-function inOutQuint(t)
+function M.inQuint(t) return t ^ 5 end
+function M.outQuint(t) return 1 - (1 - t) ^ 5 end
+function M.inOutQuint(t)
 	t = t * 2
 	if t < 1 then
 		return 0.5 * t ^ 5
@@ -212,7 +217,7 @@ function inOutQuint(t)
 		return 1 - 0.5 * (2 - t) ^ 5
 	end
 end
-function outInQuint(t)
+function M.outInQuint(t)
 	t = t * 2
 	if t < 1 then
 		return 0.5 - 0.5 * (1 - t) ^ 5
@@ -220,9 +225,11 @@ function outInQuint(t)
 		return 0.5 + 0.5 * (t - 1) ^ 5
 	end
 end
-function inExpo(t) return 1000 ^ (t - 1) - 0.001 end
-function outExpo(t) return 1.001 - 1000 ^ -t end
-function inOutExpo(t)
+local function inExpo(t) return 1000 ^ (t - 1) - 0.001 end
+M.inExpo = inExpo
+local function outExpo(t) return 1.001 - 1000 ^ -t end
+M.outExpo = outExpo
+function M.inOutExpo(t)
 	t = t * 2
 	if t < 1 then
 		return 0.5 * 1000 ^ (t - 1) - 0.0005
@@ -230,16 +237,18 @@ function inOutExpo(t)
 		return 1.0005 - 0.5 * 1000 ^ (1 - t)
 	end
 end
-function outInExpo(t)
+function M.outInExpo(t)
 	if t < 0.5 then
 		return outExpo(t * 2) * 0.5
 	else
 		return inExpo(t * 2 - 1) * 0.5 + 0.5
 	end
 end
-function inCirc(t) return 1 - sqrt(1 - t * t) end
-function outCirc(t) return sqrt(-t * t + 2 * t) end
-function inOutCirc(t)
+local function inCirc(t) return 1 - sqrt(1 - t * t) end
+M.inCirc = inCirc
+local function outCirc(t) return sqrt(-t * t + 2 * t) end
+M.outCirc = outCirc
+function M.inOutCirc(t)
 	t = t * 2
 	if t < 1 then
 		return 0.5 - 0.5 * sqrt(1 - t * t)
@@ -248,14 +257,14 @@ function inOutCirc(t)
 		return 0.5 + 0.5 * sqrt(1 - t * t)
 	end
 end
-function outInCirc(t)
+function M.outInCirc(t)
 	if t < 0.5 then
 		return outCirc(t * 2) * 0.5
 	else
 		return inCirc(t * 2 - 1) * 0.5 + 0.5
 	end
 end
-function outBounce(t)
+local function outBounce(t)
 	if t < 1 / 2.75 then
 		return 7.5625 * t * t
 	elseif t < 2 / 2.75 then
@@ -269,27 +278,31 @@ function outBounce(t)
 		return 7.5625 * t * t + 0.984375
 	end
 end
-function inBounce(t) return 1 - outBounce(1 - t) end
-function inOutBounce(t)
+M.outBounce = outBounce
+local function inBounce(t) return 1 - outBounce(1 - t) end
+M.inBounce = inBounce
+function M.inOutBounce(t)
 	if t < 0.5 then
 		return inBounce(t * 2) * 0.5
 	else
 		return outBounce(t * 2 - 1) * 0.5 + 0.5
 	end
 end
-function outInBounce(t)
+function M.outInBounce(t)
 	if t < 0.5 then
 		return outBounce(t * 2) * 0.5
 	else
 		return inBounce(t * 2 - 1) * 0.5 + 0.5
 	end
 end
-function inSine(x) return 1 - cos(x * (pi * 0.5)) end
-function outSine(x) return sin(x * (pi * 0.5)) end
-function inOutSine(x)
+local function inSine(x) return 1 - cos(x * (pi * 0.5)) end
+M.inSine = inSine
+local function outSine(x) return sin(x * (pi * 0.5)) end
+M.outSine = outSine
+function M.inOutSine(x)
 	return 0.5 - 0.5 * cos(x * pi)
 end
-function outInSine(t)
+function M.outInSine(t)
 	if t < 0.5 then
 		return outSine(t * 2) * 0.5
 	else
@@ -297,42 +310,44 @@ function outInSine(t)
 	end
 end
 
-function outElasticInternal(t, a, p)
+local function outElasticInternal(t, a, p)
 	return a * pow(2, -10 * t) * sin((t - p / (2 * pi) * asin(1/a)) * 2 * pi / p) + 1
 end
 local function inElasticInternal(t, a, p)
 	return 1 - outElasticInternal(1 - t, a, p)
 end
-function inOutElasticInternal(t, a, p)
+local function inOutElasticInternal(t, a, p)
 	return t < 0.5
 		and  0.5 * inElasticInternal(t * 2, a, p)
 		or  0.5 + 0.5 * outElasticInternal(t * 2 - 1, a, p)
 end
-function outInElasticInternal(t, a, p)
+local function outInElasticInternal(t, a, p)
 	return t < 0.5
 		and  0.5 * outElasticInternal(t * 2, a, p)
 		or  0.5 + 0.5 * inElasticInternal(t * 2 - 1, a, p)
 end
 
-inElastic = with2params(inElasticInternal, 1, 0.3)
-outElastic = with2params(outElasticInternal, 1, 0.3)
-inOutElastic = with2params(inOutElasticInternal, 1, 0.3)
-outInElastic = with2params(outInElasticInternal, 1, 0.3)
+M.inElastic = with2params(inElasticInternal, 1, 0.3)
+M.outElastic = with2params(outElasticInternal, 1, 0.3)
+M.inOutElastic = with2params(inOutElasticInternal, 1, 0.3)
+M.outInElastic = with2params(outInElasticInternal, 1, 0.3)
 
-function inBackInternal(t, a) return t * t * (a * t + t - a) end
-function outBackInternal(t, a) t = t - 1 return t * t * ((a + 1) * t + a) + 1 end
-function inOutBackInternal(t, a)
+local function inBackInternal(t, a) return t * t * (a * t + t - a) end
+local function outBackInternal(t, a) t = t - 1 return t * t * ((a + 1) * t + a) + 1 end
+local function inOutBackInternal(t, a)
 	return t < 0.5
 		and  0.5 * inBackInternal(t * 2, a)
 		or  0.5 + 0.5 * outBackInternal(t * 2 - 1, a)
 end
-function outInBackInternal(t, a)
+local function outInBackInternal(t, a)
 	return t < 0.5
 		and  0.5 * outBackInternal(t * 2, a)
 		or  0.5 + 0.5 * inBackInternal(t * 2 - 1, a)
 end
 
-inBack = with1param(inBackInternal, 1.70158)
-outBack = with1param(outBackInternal, 1.70158)
-inOutBack = with1param(inOutBackInternal, 1.70158)
-outInBack = with1param(outInBackInternal, 1.70158)
+M.inBack = with1param(inBackInternal, 1.70158)
+M.outBack = with1param(outBackInternal, 1.70158)
+M.inOutBack = with1param(inOutBackInternal, 1.70158)
+M.outInBack = with1param(outInBackInternal, 1.70158)
+
+return M

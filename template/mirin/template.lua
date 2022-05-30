@@ -1,9 +1,13 @@
 -- ===================================================================== --
+local commands = require('mirin.commands')
+local core  = require('mirin.core')
+local utils = require('mirin.utils')
+local max_pn = require('mirin.options').max_pn
+local instant = require('mirin.ease').instant
 
 local song = GAMESTATE:GetCurrentSong()
 
 -- Functions
-
 
 -- the `plr=` system
 local default_plr = {1, 2}
@@ -58,13 +62,13 @@ local function ease(self)
 	local plr = self.plr or get_plr()
 	if type(plr) == 'table' then
 		for _, plr in ipairs(plr) do
-			local new = copy(self)
+			local new = utils.copy(self)
 			new.plr = plr
-			table.insert(eases, new)
+			table.insert(core.eases, new)
 		end
 	else
 		self.plr = plr
-		table.insert(eases, self)
+		table.insert(core.eases, self)
 	end
 
 end
@@ -170,9 +174,9 @@ local function func(self)
 			end
 		end
 	end
-	self.priority = (self.defer and -1 or 1) * (#funcs + 1)
+	self.priority = (self.defer and -1 or 1) * (#core.funcs + 1)
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
-	table.insert(funcs, self)
+	table.insert(core.funcs, self)
 end
 
 local disallowed_poptions_perframe_persist = setmetatable({}, {__index = function(_)
@@ -191,7 +195,7 @@ local function perframe(self, deny_poptions)
 			self.mods[pn] = {}
 		end
 	end
-	self.priority = (self.defer and -1 or 1) * (#funcs + 1)
+	self.priority = (self.defer and -1 or 1) * (#core.funcs + 1)
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
 
 	local persist = self.persist
@@ -208,7 +212,7 @@ local function perframe(self, deny_poptions)
 		}
 	end
 
-	table.insert(funcs, self)
+	table.insert(core.funcs, self)
 end
 
 -- func helper for function eases
@@ -255,14 +259,14 @@ end
 local function alias(self)
 	local a, b = self[1], self[2]
 	a, b = string.lower(a), string.lower(b)
-	aliases[a] = b
+	core.aliases[a] = b
 end
 
 -- setdefault {percent, 'mod'}
 -- set the default value of a mod
 local function setdefault(self)
 	for i = 1, #self, 2 do
-		default_mods[self[i + 1]] = self[i]
+		core.default_mods[self[i + 1]] = self[i]
 	end
 	return setdefault
 end
@@ -272,7 +276,7 @@ end
 local function aux(self)
 	if type(self) == 'string' then
 		local v = self
-		auxes[v] = true
+		core.auxes[v] = true
 	elseif type(self) == 'table' then
 		for i = 1, #self do
 			aux(self[i])
@@ -314,8 +318,8 @@ local function node(self)
 		i = i + 1
 	end
 	local result = {inputs, out, fn}
-	result.priority = (self.defer and -1 or 1) * (#nodes + 1)
-	table.insert(nodes, result)
+	result.priority = (self.defer and -1 or 1) * (#core.nodes + 1)
+	table.insert(core.nodes, result)
 	return node
 end
 
@@ -337,58 +341,6 @@ end
 
 
 ---------------------------------------------------------------------------------------
-GAMESTATE:ApplyModifiers('clearall')
-
-
--- zoom
-aux 'zoom'
-node {
-	'zoom', 'zoomx', 'zoomy',
-	function(zoom, x, y)
-		local m = zoom * 0.01
-		return m * x, m * y
-	end,
-	'zoomx', 'zoomy',
-	defer = true,
-}
-
-setdefault {
-	100, 'zoom',
-	100, 'zoomx',
-	100, 'zoomy',
-	100, 'zoomz',
-}
-
-setdefault {400, 'grain'}
-
--- movex
-local function repeat8(a)
-	return a, a, a, a, a, a, a, a
-end
-
-for _, a in ipairs {'x', 'y', 'z'} do
-	definemod {
-		'move' .. a,
-		repeat8,
-		'move'..a..'0', 'move'..a..'1', 'move'..a..'2', 'move'..a..'3',
-		'move'..a..'4', 'move'..a..'5', 'move'..a..'6', 'move'..a..'7',
-		defer = true,
-	}
-end
-
--- xmod
-setdefault {1, 'xmod'}
-definemod {
-	'xmod', 'cmod',
-	function(xmod, cmod, pn)
-		if cmod == 0 then
-			mod_buffer[pn](string.format('*-1 %fx', xmod))
-		else
-			mod_buffer[pn](string.format('*-1 %fx,*-1 c%f', xmod, cmod))
-		end
-	end,
-	defer = true,
-}
 
 
 -- ===================================================================== --
@@ -471,18 +423,6 @@ local function check_reset_errors(self, name)
 		return 'cannot call '..name..' after LoadCommand finished'
 	end
 end
-
-local valid_func_signatures = {
-	['number, function'] = true,
-	['number, number, function'] = true,
-	['number, number, ease, function'] = true,
-	['number, number, ease, string'] = true,
-	['number, number, ease, number, function'] = true,
-	['number, number, ease, number, string'] = true,
-	['number, number, ease, number, number, function'] = true,
-	['number, number, ease, number, number, string'] = true,
-	['number, string, ?'] = true,
-}
 
 local function check_func_errors(self, name)
 	if type(self) ~= 'table' then
@@ -641,6 +581,9 @@ end
 -- Exports
 
 
+local M = utils.module()
+
+-- TODO distribute the error checking to the right location
 local function export(fn, check_errors, name)
 	local function inner(self)
 		local err = check_errors(self, name)
@@ -651,7 +594,7 @@ local function export(fn, check_errors, name)
 		end
 		return inner
 	end
-	xero[name] = inner
+	M[name] = inner
 end
 
 export(ease, check_ease_errors, 'ease')
@@ -667,8 +610,8 @@ export(setdefault, check_setdefault_errors, 'setdefault')
 export(aux, check_aux_errrors, 'aux')
 export(node, check_node_errors, 'node')
 export(definemod, check_node_errors, 'definemod')
-xero.get_plr = get_plr
-xero.touch_mod = touch_mod
-xero.touch_all_mods = touch_all_mods
+M.get_plr = get_plr
+M.touch_mod = core.touch_mod
+M.touch_all_mods = core.touch_all_mods
 
-xero.max_pn = max_pn
+return M

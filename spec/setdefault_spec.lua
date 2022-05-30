@@ -13,6 +13,16 @@ describe('setdefault', function()
         xero = nil
     end)
 
-    -- TODO
+    it('should work', function()
+        xero.setdefault {100, 'invert'}
+        helper.update(1)
+        assert.equal("100", helper.get_mod('invert'))
+    end)
 
+    it('should take the last result', function()
+        xero.setdefault {100, 'invert'}
+        xero.setdefault {200, 'invert'}
+        helper.update(1)
+        assert.equal("200", helper.get_mod('invert'))
+    end)
 end)

@@ -1,14 +1,10 @@
 xero()
-
+local options = assert(loadfile(xero.dir..'template/mirin/options.lua'))()
 package = {
 	-- mirin template loader path
-	path = table.concat({
-        'template/?.lua','template/?/init.lua',
-        'lua/?.lua', 'lua/?/init.lua',
-        'plugins/?.lua', 'plugins/?/init.lua',
-    }, ';'),
+	path = table.concat(options.package_path,';'),
 	preload = {},
-	loaded = {},
+	loaded = {['mirin.options'] = options},
 	loaders = {
 		function(modname)
 			local preload = xero.package.preload[modname]
