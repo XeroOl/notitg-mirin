@@ -8,7 +8,7 @@ $(FILENAME).zip: lint test
 	mkdir -p build
 	cp -r Song.ogg Song.sm conf.lua lua template build
 	sed 's/$$VERSION/'"$(VERSION)"'/' build/template/main.xml -i
-	(cd build && zip ../"$(FILENAME)".zip . -r)
+	zip "$(FILENAME)".zip build -r
 	rm build -rf
 
 format:
@@ -20,6 +20,8 @@ lint:
 
 test:
 	busted --suppress-pending
+	stylua -c template
+	luacheck template
 
 coverage:
 	busted --coverage --suppress-pending || true
@@ -29,7 +31,9 @@ coverage:
 	rm luacov.stats.out
 
 clean:
+	# from the default target
 	rm -rf build
-	rm -rf $(FILENAME).zip
+	rm -rf $(FILENAME)
+	# from coverage
 	rm -rf luacov.report.out
 	rm -rf luacov.stats.out
