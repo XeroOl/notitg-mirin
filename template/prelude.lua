@@ -1,4 +1,5 @@
 ---@diagnostic disable: lowercase-global
+-- stylua: ignore start
 local template = require('mirin.template')
 local core = require('mirin.core')
 
@@ -40,7 +41,7 @@ end
 GAMESTATE:ApplyModifiers('clearall')
 
 -- zoom
-template.aux 'zoom'
+template.aux('zoom')
 template.node {
 	'zoom', 'zoomx', 'zoomy',
 	function(zoom, x, y)
@@ -65,9 +66,9 @@ local function repeat8(a)
 	return a, a, a, a, a, a, a, a
 end
 
-for _, a in ipairs {'x', 'y', 'z'} do
+for _, a in ipairs { 'x', 'y', 'z' } do
 	template.definemod {
-		'move' .. a,
+		'move'..a,
 		repeat8,
 		'move'..a..'0', 'move'..a..'1', 'move'..a..'2', 'move'..a..'3',
 		'move'..a..'4', 'move'..a..'5', 'move'..a..'6', 'move'..a..'7',
@@ -76,9 +77,10 @@ for _, a in ipairs {'x', 'y', 'z'} do
 end
 
 -- xmod
-template.setdefault {1, 'xmod'}
+template.setdefault { 1, 'xmod' }
 template.definemod {
-	'xmod', 'cmod',
+	'xmod',
+	'cmod',
 	function(xmod, cmod, pn)
 		if cmod == 0 then
 			core.mod_buffer[pn](string.format('*-1 %fx', xmod))
@@ -88,3 +90,4 @@ template.definemod {
 	end,
 	defer = true,
 }
+-- stylua: ignore end

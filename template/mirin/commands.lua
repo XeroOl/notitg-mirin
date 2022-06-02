@@ -33,9 +33,8 @@ function init(self)
 		require('prelude')
 	end
 	if options.lua_pre_entry_path then
-		assert(loadfile(xero.dir..options.lua_pre_entry_path))()
+		assert(loadfile(xero.dir .. options.lua_pre_entry_path))()
 	end
-
 
 	-- NotITG and OpenITG have a long standing bug where the InitCommand on an actor can run twice in certain cases.
 	-- By removing the command here (at the end of initcommand), we prevent it from being run again.
@@ -46,7 +45,6 @@ function on(self)
 	core.scan_named_actors()
 	self:queuecommand('Ready')
 end
-
 
 function ready(self)
 	core.prepare_variables()
@@ -60,7 +58,6 @@ function ready(self)
 	core.sort_tables()
 	core.resolve_aliases()
 	core.compile_nodes()
-
 
 	for i = 1, options.max_pn do
 		core.mod_buffer[i]:clear()

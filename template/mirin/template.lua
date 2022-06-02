@@ -1,6 +1,6 @@
 -- ===================================================================== --
 local commands = require('mirin.commands')
-local core  = require('mirin.core')
+local core = require('mirin.core')
 local utils = require('mirin.utils')
 local max_pn = require('mirin.options').max_pn
 local instant = require('mirin.ease').instant
@@ -10,7 +10,7 @@ local song = GAMESTATE:GetCurrentSong()
 -- Functions
 
 -- the `plr=` system
-local default_plr = {1, 2}
+local default_plr = { 1, 2 }
 
 -- for reading the `plr` variable from the xero environment
 -- without falling back to the global table
@@ -21,7 +21,6 @@ end
 -- ease {start, len, eas, percent, 'mod'}
 -- adds an ease to the ease table
 local function ease(self)
-
 	-- Welcome to Ease!
 	--
 	-- -- Flags set by the user
@@ -70,7 +69,6 @@ local function ease(self)
 		self.plr = plr
 		table.insert(core.eases, self)
 	end
-
 end
 
 -- add {start, len, eas, percent, mod}
@@ -87,7 +85,6 @@ local function set(self)
 	table.insert(self, 3, instant)
 	ease(self)
 end
-
 
 -- acc {start, percent, mod}
 -- adds a relative set to the ease table
@@ -113,14 +110,14 @@ local function reset(self)
 		-- later code assumes this is a table if present, so here,
 		-- single values need to get wrapped in a table.
 		if type(self.only) == 'string' then
-			self.only = {self.only}
+			self.only = { self.only }
 		end
 	elseif self.exclude then
 		-- you can pass `exclude` to exclude a specific set of mods
 		-- later code assumes this is a table if present, so here,
 		-- single values need to get wrapped in a table.
 		if type(self.exclude) == 'string' then
-			self.exclude = {self.exclude}
+			self.exclude = { self.exclude }
 		end
 
 		-- When exclude is passed in, each mod is a value
@@ -148,7 +145,13 @@ local function func(self)
 			args[i] = self[i + 2]
 		end
 		local symstring = table.concat(syms, ', ')
-		local code = 'return function('..symstring..') return function() '..self[2]..'('..symstring..') end end'
+		local code = 'return function('
+			.. symstring
+			.. ') return function() '
+			.. self[2]
+			.. '('
+			.. symstring
+			.. ') end end'
 		self[2] = xero(assert(loadstring(code, 'func_generated')))()(unpack(args))
 		while self[3] do
 			table.remove(self)
@@ -179,9 +182,11 @@ local function func(self)
 	table.insert(core.funcs, self)
 end
 
-local disallowed_poptions_perframe_persist = setmetatable({}, {__index = function(_)
-	error('you cannot use poptions and persist at the same time. </3')
-end})
+local disallowed_poptions_perframe_persist = setmetatable({}, {
+	__index = function(_)
+		error('you cannot use poptions and persist at the same time. </3')
+	end,
+})
 
 -- func helper for scheduling a perframe
 local function perframe(self, deny_poptions)
@@ -208,7 +213,7 @@ local function perframe(self, deny_poptions)
 			function()
 				self[3](GAMESTATE:GetSongBeat(), disallowed_poptions_perframe_persist)
 			end,
-			persist = self.persist,
+			persist = persist,
 		}
 	end
 
@@ -230,7 +235,7 @@ local function func_ease(self)
 	local end_beat = self[1] + self[2]
 
 	if type(fn) == 'string' then
-		fn = xero(assert(loadstring('return function(p) '..fn..'(p) end', 'func_generated')))()
+		fn = xero(assert(loadstring('return function(p) ' .. fn .. '(p) end', 'func_generated')))()
 	end
 
 	self[3] = function(beat)
@@ -288,7 +293,6 @@ end
 -- node {'inputs', function(inputs) return outputs end, 'outputs'}
 -- create a listener that gets run whenever a mod value gets changed
 local function node(self)
-
 	if type(self[2]) == 'number' then
 		-- transform the shorthand into the full version
 		local multipliers = {}
@@ -299,7 +303,7 @@ local function node(self)
 			i = i + 1
 		end
 		local ret = table.concat(multipliers, ', ')
-		local code = 'return function(p) return '..ret..' end'
+		local code = 'return function(p) return ' .. ret .. ' end'
 		local fn = loadstring(code, 'node_generated')()
 		table.insert(self, 2, fn)
 	end
@@ -317,7 +321,7 @@ local function node(self)
 		table.insert(out, self[i])
 		i = i + 1
 	end
-	local result = {inputs, out, fn}
+	local result = { inputs, out, fn }
 	result.priority = (self.defer and -1 or 1) * (#core.nodes + 1)
 	table.insert(core.nodes, result)
 	return node
@@ -336,17 +340,13 @@ local function definemod(self)
 	return definemod
 end
 
-
 -- ===================================================================== --
 
-
 ---------------------------------------------------------------------------------------
-
 
 -- ===================================================================== --
 
 -- Error checking
-
 
 local function is_valid_ease(eas)
 	local err = type(eas) ~= 'function' and (not getmetatable(eas) or not getmetatable(eas).__call)
@@ -383,13 +383,13 @@ local function check_ease_errors(self, name)
 		end
 		i = i + 2
 	end
-	assert(self[i + 1] == nil, 'invalid mod percent: '..tostring(self[i]))
+	assert(self[i + 1] == nil, 'invalid mod percent: ' .. tostring(self[i]))
 	local plr = self.plr or get_plr()
 	if type(plr) ~= 'number' and type(plr) ~= 'table' then
 		return 'invalid plr'
 	end
 	if commands.loaded then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -420,7 +420,7 @@ local function check_reset_errors(self, name)
 		return 'exclude= and only= are mutually exclusive'
 	end
 	if commands.loaded then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -436,7 +436,7 @@ local function check_func_errors(self, name)
 		return 'the second argument needs to be a function\n(maybe try using func_ease or perframe instead)'
 	end
 	if commands.loaded then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -464,7 +464,7 @@ local function check_func_ease_errors(self, name)
 		return 'the second-to-last argument needs to be a number'
 	end
 	if commands.loaded then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -483,7 +483,7 @@ local function check_perframe_errors(self, name)
 		return 'the third argument needs to be a function'
 	end
 	if commands.loaded then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -499,7 +499,7 @@ local function check_alias_errors(self, name)
 		return 'argument 2 should be a string'
 	end
 	if commands.loaded then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -516,7 +516,7 @@ local function check_setdefault_errors(self, name)
 		end
 	end
 	if commands.loaded then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -527,12 +527,12 @@ local function check_aux_errrors(self, name)
 	if type(self) == 'table' then
 		for _, v in ipairs(self) do
 			if type(v) ~= 'string' then
-				return 'invalid mod to aux: '.. tostring(v)
+				return 'invalid mod to aux: ' .. tostring(v)
 			end
 		end
 	end
 	if commands.loaded then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -565,21 +565,19 @@ local function check_node_errors(self, name)
 		i = i + 1
 		while self[i] do
 			if type(self[i]) ~= 'string' then
-				return 'unexpected argument '..tostring(self[i])..', expected a string'
+				return 'unexpected argument ' .. tostring(self[i]) .. ', expected a string'
 			end
 			i = i + 1
 		end
 	end
 	if commands.loaded then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
-
 
 -- ===================================================================== --
 
 -- Exports
-
 
 local M = utils.module()
 
@@ -588,7 +586,7 @@ local function export(fn, check_errors, name)
 	local function inner(self)
 		local err = check_errors(self, name)
 		if err then
-			error(name..': '..err, 2)
+			error(name .. ': ' .. err, 2)
 		else
 			fn(self)
 		end

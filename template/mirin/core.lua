@@ -5,9 +5,12 @@ local sort = require('mirin.utils.sort')
 local foreground = xero.foreground
 local options = require('mirin.options')
 local max_pn = options.max_pn
+local debug_print_mod_targets = options.debug_print_mod_targets
+local debug_print_applymodifier_input = options.debug_print_applymodifier_input
 local M = {}
 
--- eases :: list of {beat/time, len, ease_, *args, pn = number, start_time = number} and a couple of other optional string keys
+-- eases :: list of {beat/time, len, ease_, *args, pn = number, start_time = number}
+--                     and a couple of other optional string keys
 -- table for eases/add/set/acc/reset
 --
 -- pn must be present, and must be a number.
@@ -71,11 +74,11 @@ setmetatable(default_mods, {
 	__index = function(self, i)
 		self[i] = 0
 		return 0
-	end
+	end,
 })
 
 local banned_chars = {}
-local banned_chars_string = '\'\\{}(),;* '
+local banned_chars_string = "'\\{}(),;* "
 for i = 1, #banned_chars_string do
 	banned_chars[string.sub(banned_chars_string, i, i)] = true
 end
@@ -87,22 +90,19 @@ end
 local function ensure_mod_name_is_valid(name)
 	if banned_chars[string.sub(name, 1, 1)] or banned_chars[string.sub(name, -1, -1)] then
 		error(
-			'You have a typo in your mod name. '..
-			'You wrote \''..name..'\', but you probably meant '..
-			'\''..string.gsub(name, '[\'\\{}(),;* ]', '')..'\''
+			'You have a typo in your mod name. '
+				.. "You wrote '"
+				.. name
+				.. "', but you probably meant '"
+				.. string.gsub(name, "['\\{}(),;* ]", '')
+				.. "'"
 		)
 	end
 	if string.find(name, '^c[0-9]+$') then
-		error(
-			'You can\'t name your mod \''..name..'\'.\n'..
-			'Use \'cmod\' if you want to set a cmod.'
-		)
+		error("You can't name your mod '" .. name .. "'.\n" .. "Use 'cmod' if you want to set a cmod.")
 	end
 	if string.find(name, '^[0-9.]+x$') then
-		error(
-			'You can\'t name your mod \''..name..'\'.\n'..
-			'Use \'xmod\' if you want to set an xmod.'
-		)
+		error("You can't name your mod '" .. name .. "'.\n" .. "Use 'xmod' if you want to set an xmod.")
 	end
 end
 
@@ -113,7 +113,9 @@ end
 
 -- convert a mod to its lowercase dealiased name
 function M.normalize_mod(name)
-	if not auxes[name] then ensure_mod_name_is_valid(name) end
+	if not auxes[name] then
+		ensure_mod_name_is_valid(name)
+	end
 	return M.normalize_mod_no_checks(name)
 end
 
@@ -121,7 +123,7 @@ end
 
 -- mod targets are the values that the mod would be at if the current eases finished
 local targets = {}
-local targets_mt = {__index = default_mods}
+local targets_mt = { __index = default_mods }
 for pn = 1, max_pn do
 	targets[pn] = setmetatable({}, targets_mt)
 end
@@ -130,7 +132,7 @@ end
 local mods = {}
 local mods_mt = {}
 for pn = 1, max_pn do
-	mods_mt[pn] = {__index = targets[pn]}
+	mods_mt[pn] = { __index = targets[pn] }
 	mods[pn] = setmetatable({}, mods_mt[pn])
 end
 
@@ -214,18 +216,18 @@ function M.scan_named_actors()
 		end
 		local name = actor:GetName()
 		if name and name ~= '' then
-			if loadstring('t.'..name..'=t') then
+			if loadstring('t.' .. name .. '=t') then
 				table.insert(list, actor)
-				code'actors.'(name)' = list['(#list)']\n'
+				code('actors.')(name)(' = list[')(#list)(']\n')
 			else
-				SCREENMAN:SystemMessage('invalid actor name: \''..name..'\'')
+				SCREENMAN:SystemMessage("invalid actor name: '" .. name .. "'")
 			end
 		end
 	end
 
-	code'return function(list, actors)\n'
+	code('return function(list, actors)\n')
 	sweep(foreground, true)
-	code'end'
+	code('end')
 
 	local load_actors = xero(assert(loadstring(code:build())))()
 	load_actors(list, actors)
@@ -243,19 +245,23 @@ function M.scan_named_actors()
 	for name, actor in pairs(actors) do
 		xero[name] = actor
 	end
-
 end
 
 -- runs once during ScreenReadyCommand, before the user code is loaded
 -- hides various actors that are placed by the theme
 function M.hide_theme_actors()
 	for _, element in ipairs {
-		'Overlay', 'Underlay',
-		'ScoreP1', 'ScoreP2',
-		'LifeP1', 'LifeP2',
+		'Overlay',
+		'Underlay',
+		'ScoreP1',
+		'ScoreP2',
+		'LifeP1',
+		'LifeP2',
 	} do
 		local child = SCREENMAN(element)
-		if child then child:hidden(1) end
+		if child then
+			child:hidden(1)
+		end
 	end
 end
 
@@ -339,8 +345,12 @@ function M.resolve_aliases()
 	for _, node_entry in ipairs(nodes) do
 		local input = node_entry[1]
 		local output = node_entry[2]
-		for i = 1, #input do input[i] = M.normalize_mod(input[i]) end
-		for i = 1, #output do output[i] = M.normalize_mod(output[i]) end
+		for i = 1, #input do
+			input[i] = M.normalize_mod(input[i])
+		end
+		for i = 1, #output do
+			output[i] = M.normalize_mod(output[i])
+		end
 	end
 	-- default_mods
 	local old_default_mods = utils.copy(default_mods)
@@ -370,7 +380,7 @@ function M.compile_nodes()
 	end
 	local priority = -1 * (#nodes + 1)
 	for k, _ in pairs(terminators) do
-		table.insert(nodes, {{k}, {}, nil, nil, nil, nil, nil, true, priority = priority})
+		table.insert(nodes, { { k }, {}, nil, nil, nil, nil, nil, true, priority = priority })
 	end
 	local start = node_start
 	local locked = {}
@@ -420,19 +430,21 @@ function M.compile_nodes()
 		for _, v in ipairs(out) do
 			if reverse_in[v] then
 				start[v][locked] = true
-				last[v] = {nd}
+				last[v] = { nd }
 			elseif not last[v] then
-				last[v] = {nd}
+				last[v] = { nd }
 			else
 				table.insert(last[v], nd)
 			end
 		end
 
 		local function escapestr(s)
-			return '\'' .. string.gsub(s, '[\\\']', '\\%1') .. '\''
+			return "'" .. string.gsub(s, "[\\']", '\\%1') .. "'"
 		end
 		local function list(code, i, sep)
-			if i ~= 1 then code(sep) end
+			if i ~= 1 then
+				code(sep)
+			end
 		end
 
 		local code = stringbuilder.new()
@@ -441,32 +453,35 @@ function M.compile_nodes()
 				list(code, i, ',')
 				for j = 1, #parents[i] do
 					list(code, j, '+')
-					code'parents['(i)']['(j)'][pn]['(escapestr(mod))']'
+					code('parents[')(i)('][')(j)('][pn][')(escapestr(mod))(']')
 				end
 				if not parents[i][0] then
 					list(code, #parents[i] + 1, '+')
-					code'mods[pn]['(escapestr(mod))']'
+					code('mods[pn][')(escapestr(mod))(']')
 				end
 			end
 		end
 		local function emit_outputs()
 			for i, mod in ipairs(out) do
 				list(code, i, ',')
-				code'outputs[pn]['(escapestr(mod))']'
+				code('outputs[pn][')(escapestr(mod))(']')
 			end
 			return out[1]
 		end
-		code
-		'return function(outputs, parents, mods, fn)\n'
-			'return function(pn)\n'
-				if terminator then
-					code'mods[pn]['(escapestr(inputs[1]))'] = ' emit_inputs() code'\n'
-				else
-					if emit_outputs() then code' = ' end code 'fn(' emit_inputs() code', pn)\n'
-				end
-				code
-			'end\n'
-		'end\n'
+		code('return function(outputs, parents, mods, fn)\n')('return function(pn)\n')
+		if terminator then
+			code('mods[pn][')(escapestr(inputs[1]))('] = ')
+			emit_inputs()
+			code('\n')
+		else
+			if emit_outputs() then
+				code(' = ')
+			end
+			code('fn(')
+			emit_inputs()
+			code(', pn)\n')
+		end
+		code('end\n')('end\n')
 
 		local compiled = assert(loadstring(code:build(), 'node_generated'))()
 		nd[6] = compiled(outputs, parents, mods, fn)
@@ -524,7 +539,9 @@ function M.runeases(beat, time)
 		local measure = e.time and time or beat
 		-- if it's not ready, break out of the loop
 		-- the eases table is sorted, so none of the later eases will be done either
-		if measure < e[1] then break end
+		if measure < e[1] then
+			break
+		end
 
 		-- At this point, we've already decided we need to add the ease to the active_eases table
 		-- The next step is to prepare the entry to go into the `active_eases` table
@@ -559,7 +576,7 @@ function M.runeases(beat, time)
 				-- The goal is to normalize the reset into a regular ease entry
 				-- by just inserting the default values.
 				for mod in pairs(targets[plr]) do
-					if not(e.exclude and e.exclude[mod]) and targets[plr][mod] ~= default_mods[mod] then
+					if not (e.exclude and e.exclude[mod]) and targets[plr][mod] ~= default_mods[mod] then
 						table.insert(e, default_mods[mod])
 						table.insert(e, mod)
 					end
@@ -638,7 +655,9 @@ function M.runfuncs(beat, time)
 	while funcs_index <= #funcs do
 		local e = funcs[funcs_index]
 		local measure = e.time and time or beat
-		if measure < e[1] then break end
+		if measure < e[1] then
+			break
+		end
 		if not e[2] then
 			e[3](measure)
 		elseif measure < e[1] + e[2] then
@@ -649,7 +668,9 @@ function M.runfuncs(beat, time)
 
 	while true do
 		local e = active_funcs:next()
-		if not e then break end
+		if not e then
+			break
+		end
 		local measure = e.time and time or beat
 		if measure < e[1] + e[2] then
 			poptions_logging_target = e.mods
@@ -731,7 +752,7 @@ function M.runmods()
 			-- toss everything that isn't an aux into the buffer
 			for mod, percent in pairs(mods[pn]) do
 				if not auxes[mod] then
-					buffer('*-1 '..percent..' '..mod)
+					buffer('*-1 ' .. percent .. ' ' .. mod)
 				end
 				mods[pn][mod] = nil
 			end
@@ -748,26 +769,30 @@ end
 -- this if statement won't run unless you are mirin
 if debug_print_mod_targets then
 	-- luacov: disable
-	func {0, 9e9, function(beat)
-		if debug_print_mod_targets == true or debug_print_mod_targets < beat then
-			for pn = 1, max_pn do
-				if P[pn] and P[pn]:IsAwake() then
-					local outputs = {}
-					local i = 0
-					for k, v in pairs(targets[pn]) do
-						if v ~= default_mods[k] then
-							i = i + 1
-							outputs[i] = tostring(k)..': '..tostring(v)
+	func {
+		0,
+		9e9,
+		function(beat)
+			if debug_print_mod_targets == true or debug_print_mod_targets < beat then
+				for pn = 1, max_pn do
+					if P[pn] and P[pn]:IsAwake() then
+						local outputs = {}
+						local i = 0
+						for k, v in pairs(targets[pn]) do
+							if v ~= default_mods[k] then
+								i = i + 1
+								outputs[i] = tostring(k) .. ': ' .. tostring(v)
+							end
 						end
+						print('Player ' .. pn .. ' at beat ' .. beat .. ' --> ' .. table.concat(outputs, ', '))
+					else
+						print('Player ' .. pn .. ' is asleep or missing')
 					end
-					print('Player '..pn..' at beat '..beat..' --> '..table.concat(outputs, ', '))
-				else
-					print('Player '..pn..' is asleep or missing')
 				end
+				debug_print_mod_targets = (debug_print_mod_targets == true)
 			end
-			debug_print_mod_targets = (debug_print_mod_targets == true)
-		end
-	end}
+		end,
+	}
 	-- luacov: enable
 end
 

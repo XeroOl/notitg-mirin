@@ -1,14 +1,14 @@
 xero()
-local options = assert(loadfile(xero.dir..'template/mirin/options.lua'))()
+local options = assert(loadfile(xero.dir .. 'template/mirin/options.lua'))()
 package = {
 	-- mirin template loader path
-	path = table.concat(options.package_path,';'),
+	path = table.concat(options.package_path, ';'),
 	preload = {},
-	loaded = {['mirin.options'] = options},
+	loaded = { ['mirin.options'] = options },
 	loaders = {
 		function(modname)
 			local preload = xero.package.preload[modname]
-			return preload or 'no field xero.package.preload[\''..modname..'\']'
+			return preload or "no field xero.package.preload['" .. modname .. "']"
 		end,
 		function(modname)
 			local errors = {}
@@ -19,7 +19,7 @@ package = {
 				local filepath = xero.dir .. string.gsub(path, '%?', filename)
 				-- check if file exists
 				if not GAMESTATE:GetFileStructure(filepath) then
-					table.insert(errors, 'no file \''..filepath..'\'')
+					table.insert(errors, "no file '" .. filepath .. "'")
 				else
 					local loader, err = loadfile(filepath)
 					-- check if file loads properly
@@ -38,7 +38,7 @@ package = {
 function require(modname)
 	local loaded = xero.package.loaded
 	if not loaded[modname] then
-		local errors = {'module \''..modname..'\' not found:'}
+		local errors = { "module '" .. modname .. "' not found:" }
 		local chunk
 		for _, loader in ipairs(xero.package.loaders) do
 			local result = loader(modname)
@@ -59,7 +59,6 @@ function require(modname)
 	end
 	return loaded[modname]
 end
-
 
 -- current module has been loaded
 package.loaded.require = require

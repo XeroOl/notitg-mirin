@@ -22,7 +22,9 @@ function M:remove()
 end
 
 function M:next()
-	if self.n == 0 then return end
+	if self.n == 0 then
+		return
+	end
 
 	local swap = self.swap
 	local stage = self.stage
@@ -68,15 +70,17 @@ function M:next()
 	return swap[swap.n]
 end
 
-local mt = {__index = M}
+local mt = { __index = M }
 
 function M.new(comparator)
 	return setmetatable({
 		comparator = comparator,
-		reverse_comparator = function(a, b) return comparator(b, a) end,
-		stage = {n = 0},
-		list = {n = 0},
-		swap = {n = 0},
+		reverse_comparator = function(a, b)
+			return comparator(b, a)
+		end,
+		stage = { n = 0 },
+		list = { n = 0 },
+		swap = { n = 0 },
 		n = 0,
 	}, mt)
 end

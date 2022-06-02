@@ -1,7 +1,7 @@
 local M = {}
 local iclear = require('mirin.utils').iclear
 -- the behavior of a stringbuilder
-local stringbuilder_mt =  {
+local stringbuilder_mt = {
 	__index = {
 		-- :build() method converts a stringbuilder into a string, with optional delimiter
 		build = table.concat,
