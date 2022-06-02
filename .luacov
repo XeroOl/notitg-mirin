@@ -1,5 +1,14 @@
 modules = {
-    ["template.template"] = "./template/template.lua",
-    ["template.ease"] = "./template/ease.lua",
-    ["template.std"] = "./template/std.lua",
+    ["mirin.commands"] = "./template/mirin/commands.lua",
+    ["mirin.core"] = "./template/mirin/core.lua",
+    ["mirin.ease"] = "./template/mirin/ease.lua",
+    ["mirin.options"] = "./template/mirin/options.lua",
+    ["mirin.perframedatastructure"] = "./template/mirin/perframedatastructure.lua",
+    ["mirin.setup"] = "./template/mirin/setup.lua",
+    ["mirin.stringbuilder"] = "./template/mirin/stringbuilder.lua",
+    ["mirin.template"] = "./template/mirin/template.lua",
+    ["mirin.utils"] = "./template/mirin/utils/init.lua",
+    ["mirin.utils.sort"] = "./template/mirin/utils/sort.lua",
+    ["prelude"] = "./template/prelude.lua",
+    ["require"] = "./template/require.lua",
 }
