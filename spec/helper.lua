@@ -52,6 +52,7 @@ function helper.on()
         end
     end
     mock.on_happened = true
+    xero.require('mirin.actors')()
     helper.update(0)
 end
 

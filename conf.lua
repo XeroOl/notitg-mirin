@@ -29,23 +29,7 @@ return {
     --     -- ie, playing on the left side of the machine
     --     max_pn = 1,
     --
-    -- max_pn = 8,
-    --
-
-    ---------------------------------------------------------------------
-    -- actors_in_global_table : Whether or not actors with a Name XML tag
-    --     should be placed accessible directly by its name.
-    --
-    -- When set, an XML object like <Layer Name="foo"/> can be
-    -- referenced in lua as `foo`.
-    --
-    -- When unset, the actor will only be accessable with the actors module,
-    -- ie, can be referenced in lua as `require('mirin.actors').foo`, but not
-    -- as `foo`.
-    --
-    -- Expected Type: boolean
-    --
-    -- actors_in_global_table = true,
+    max_pn = 8,
 
     ---------------------------------------------------
     -- use_prelude : Whether or not to use the prelude.
@@ -56,7 +40,7 @@ return {
     --
     -- Expected Type: boolean
     --
-    -- use_prelude = true,
+    use_prelude = true,
 
     -------------------------------------------------------------------
     -- lua_entry_path : Which lua file will be loaded to run user code.

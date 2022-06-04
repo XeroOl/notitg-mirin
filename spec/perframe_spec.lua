@@ -115,4 +115,5 @@ describe('perframe', function()
         end)
     end)
 
+    -- TODO test persist in time mode more
 end)

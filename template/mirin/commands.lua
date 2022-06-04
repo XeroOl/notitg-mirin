@@ -85,6 +85,10 @@ function update(self)
 	core.runnodes()
 	core.runmods()
 
+	if options.debug_print_mod_targets then
+		core.printtargets(beat)
+	end
+
 	-- if no errors have occurred, unhide self
 	-- to make the updatecommand run again next frame
 	self:hidden(0)

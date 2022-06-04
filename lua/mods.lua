@@ -1,5 +1,6 @@
-require('mirin.ease')()
 require('mirin.template')()
+require('mirin.ease')()
+require('mirin.actors')()
 
 if not P1 or not P2 then
 	SCREENMAN:SystemMessage('Two Player Mode Required')

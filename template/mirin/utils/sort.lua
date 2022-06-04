@@ -57,8 +57,8 @@ function sort._merge(array, workspace, low, middle, high, less)
 	local i, j, k
 	i = 1
 	-- copy first half of array to auxiliary array
-	for j = low, middle do
-		workspace[i] = array[j]
+	for m = low, middle do
+		workspace[i] = array[m]
 		i = i + 1
 	end
 	-- sieve through
@@ -79,8 +79,8 @@ function sort._merge(array, workspace, low, middle, high, less)
 		k = k + 1
 	end
 	-- copy back any remaining elements of first half
-	for k = k, j - 1 do
-		array[k] = workspace[i]
+	for m = k, j - 1 do
+		array[m] = workspace[i]
 		i = i + 1
 	end
 end
@@ -121,9 +121,9 @@ end
 
 -- Public method: merge sort on an array. If the array length is
 -- less than `max_chunk_size`, an insertion sort will be done instead.
-function sort.stable_sort(array, less)
+function sort.stable_sort(array, less_)
 	--setup
-	local trivial, n, less = sort._sort_setup(array, less)
+	local trivial, n, less = sort._sort_setup(array, less_)
 	if not trivial then
 		--temp storage; allocate ahead of time
 		local workspace = {}
@@ -136,9 +136,9 @@ function sort.stable_sort(array, less)
 end
 
 -- Public method (currently not exposed): insertion sort
-function sort.insertion_sort(array, less)
+function sort.insertion_sort(array, less_)
 	--setup
-	local trivial, n, less = sort._sort_setup(array, less)
+	local trivial, n, less = sort._sort_setup(array, less_)
 	if not trivial then
 		sort._insertion_sort_impl(array, 1, n, less)
 	end

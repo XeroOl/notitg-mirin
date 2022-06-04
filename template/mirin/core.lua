@@ -170,8 +170,8 @@ local function touch_mod(mod, pn)
 		mods[pn][mod] = mods[pn][mod]
 	else
 		-- if no player is provided, run for every player
-		for pn = 1, max_pn do
-			touch_mod(mod, pn)
+		for each_pn = 1, max_pn do
+			touch_mod(mod, each_pn)
 		end
 	end
 end
@@ -186,10 +186,41 @@ function M.touch_all_mods(pn)
 			touch_mod(mod, pn)
 		end
 	else
-		for pn = 1, max_pn do
-			for mod in pairs(targets[pn]) do
-				touch_mod(mod, pn)
+		for each_pn = 1, max_pn do
+			for mod in pairs(targets[each_pn]) do
+				touch_mod(mod, each_pn)
 			end
+		end
+	end
+end
+
+local function sweep(actors, actor)
+	local name = actor:GetName()
+	if name and name ~= '' then
+		if loadstring('t.' .. name .. '=t') then
+			loadstring('return function(actors, actor) actors.' .. name .. ' = actor end')()(actors, actor)
+		else
+			SCREENMAN:SystemMessage("invalid actor name: '" .. name .. "'")
+		end
+	end
+	if actor.GetNumChildren then
+		for i = 0, actor:GetNumChildren() - 1 do
+			sweep(actors, actor:GetChildAt(i))
+		end
+	end
+end
+
+local viral_mt = {}
+function viral_mt.__index(self, k)
+	self[k] = setmetatable({}, viral_mt)
+	return self[k]
+end
+
+local function clear_viral_metatables(tab)
+	setmetatable(tab, nil)
+	for _, obj in pairs(tab) do
+		if type(obj) == 'table' and getmetatable(obj) == viral_mt then
+			clear_viral_metatables(obj)
 		end
 	end
 end
@@ -197,54 +228,13 @@ end
 -- runs once during OnCommand
 -- takes Name= actors and places them in the xero table
 function M.scan_named_actors()
-	local mt = {}
-	function mt.__index(self, k)
-		self[k] = setmetatable({}, mt)
-		return self[k]
-	end
-	local actors = setmetatable({}, mt)
-	local list = {}
-	local code = stringbuilder.new()
-	local function sweep(actor, skip)
-		if actor.GetNumChildren then
-			for i = 0, actor:GetNumChildren() - 1 do
-				sweep(actor:GetChildAt(i))
-			end
-		end
-		if skip then
-			return
-		end
-		local name = actor:GetName()
-		if name and name ~= '' then
-			if loadstring('t.' .. name .. '=t') then
-				table.insert(list, actor)
-				code('actors.')(name)(' = list[')(#list)(']\n')
-			else
-				SCREENMAN:SystemMessage("invalid actor name: '" .. name .. "'")
-			end
-		end
-	end
+	local actors = setmetatable({}, viral_mt)
 
-	code('return function(list, actors)\n')
-	sweep(foreground, true)
-	code('end')
+	sweep(actors, foreground)
+	clear_viral_metatables(actors)
 
-	local load_actors = xero(assert(loadstring(code:build())))()
-	load_actors(list, actors)
-
-	local function clear_metatables(tab)
-		setmetatable(tab, nil)
-		for _, obj in pairs(tab) do
-			if type(obj) == 'table' and getmetatable(obj) == mt then
-				clear_metatables(obj)
-			end
-		end
-	end
-	clear_metatables(actors)
-
-	for name, actor in pairs(actors) do
-		xero[name] = actor
-	end
+	-- expose the list of actors as a package
+	package.loaded['mirin.actors'] = utils.module(actors)
 end
 
 -- runs once during ScreenReadyCommand, before the user code is loaded
@@ -766,34 +756,25 @@ function M.runmods()
 	end
 end
 
--- this if statement won't run unless you are mirin
-if debug_print_mod_targets then
-	-- luacov: disable
-	func {
-		0,
-		9e9,
-		function(beat)
-			if debug_print_mod_targets == true or debug_print_mod_targets < beat then
-				for pn = 1, max_pn do
-					if P[pn] and P[pn]:IsAwake() then
-						local outputs = {}
-						local i = 0
-						for k, v in pairs(targets[pn]) do
-							if v ~= default_mods[k] then
-								i = i + 1
-								outputs[i] = tostring(k) .. ': ' .. tostring(v)
-							end
-						end
-						print('Player ' .. pn .. ' at beat ' .. beat .. ' --> ' .. table.concat(outputs, ', '))
-					else
-						print('Player ' .. pn .. ' is asleep or missing')
+function M.printtargets(beat)
+	if debug_print_mod_targets == true or debug_print_mod_targets < beat then
+		for pn = 1, max_pn do
+			if P[pn] and P[pn]:IsAwake() then
+				local outputs = {}
+				local i = 0
+				for k, v in pairs(targets[pn]) do
+					if v ~= default_mods[k] then
+						i = i + 1
+						outputs[i] = tostring(k) .. ': ' .. tostring(v)
 					end
 				end
-				debug_print_mod_targets = (debug_print_mod_targets == true)
+				print('Player ' .. pn .. ' at beat ' .. beat .. ' --> ' .. table.concat(outputs, ', '))
+			else
+				print('Player ' .. pn .. ' is asleep')
 			end
-		end,
-	}
-	-- luacov: enable
+		end
+		debug_print_mod_targets = (debug_print_mod_targets == true)
+	end
 end
 
 return M

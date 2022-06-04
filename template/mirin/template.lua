@@ -60,9 +60,9 @@ local function ease(self)
 	-- The table is then stored into `eases` for later
 	local plr = self.plr or get_plr()
 	if type(plr) == 'table' then
-		for _, plr in ipairs(plr) do
+		for i, pn in ipairs(plr) do
 			local new = utils.copy(self)
-			new.plr = plr
+			new.plr = pn
 			table.insert(core.eases, new)
 		end
 	else
@@ -123,7 +123,7 @@ local function reset(self)
 		-- When exclude is passed in, each mod is a value
 		-- but it needs to become a table where each mod is a key
 		local exclude = {}
-		for _, v in ipairs(self.exclude) do
+		for i, v in ipairs(self.exclude) do
 			exclude[v] = true
 		end
 

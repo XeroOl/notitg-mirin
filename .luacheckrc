@@ -3,7 +3,6 @@ cache = true
 std = "max"
 globals = { "xero" }
 max_line_length = 120
-max_cyclomatic_complexity = 20
 read_globals = {
     "GAMESTATE";
     "DISPLAYMAN";
