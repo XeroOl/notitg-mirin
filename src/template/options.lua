@@ -7,8 +7,8 @@ local defaults = {
 	lua_entry_path = 'lua/mods.lua',
 	xml_entry_path = 'lua/layout.xml',
 	package_path = {
-		'template/?.lua',
-		'template/?/init.lua',
+		'src/?.lua',
+		'src/?/init.lua',
 		'lua/?.lua',
 		'lua/?/init.lua',
 		'plugins/?.lua',

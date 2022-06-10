@@ -68,11 +68,11 @@ return {
     -- See https://www.lua.org/manual/5.1/manual.html#pdf-package.loaders
     -- for more details.
     --
-    -- package_path = {
-    --     'template/?.lua', 'template/?/init.lua',
-    --     'lua/?.lua', 'lua/?/init.lua',
-    --     'plugins/?.lua', 'plugins/?/init.lua'
-    -- },
+    package_path = {
+        'src/?.lua', 'src/?/init.lua',
+        'lua/?.lua', 'lua/?/init.lua',
+        'plugins/?.lua', 'plugins/?/init.lua'
+    },
 
     -------------------------------------------------------------
     -- lua_pre_entry_path : A lua file to load before layout.xml is loaded.
@@ -94,8 +94,8 @@ return {
     --
     -- strict = false,
 
-    -------------------------------------------------------
-    -- danger : if you are prefixOl, then you love globals.
+    ------------------------------------------------------------------
+    -- danger : if you often spill your tables, then you love globals.
     --
     -- When set, `local` will be a syntax error, and all
     -- writes to to the `xero` table will write back to _G.

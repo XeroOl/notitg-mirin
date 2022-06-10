@@ -1,7 +1,15 @@
 ---@diagnostic disable: lowercase-global
 -- stylua: ignore start
+local core = require('template.core')
 local template = require('mirin.template')
-local core = require('mirin.core')
+local eases = require('mirin.eases')
+local utils = require('mirin.utils')
+
+function LoadTemplate()
+	-- this has to be loaded here to avoid grabing actors before they are loaded.
+	local actors = require('mirin.actors')
+	utils.spill(template)(eases)(actors)(utils)
+end
 
 max_pn = require('mirin.options').max_pn
 
@@ -32,11 +40,12 @@ function aft(self)
 	self:Create()
 end
 
--- UNDOCUMENTED
-
-function xero.aftsprite(aft, sprite)
+function aftsprite(aft, sprite)
 	sprite:SetTexture(aft:GetTexture())
 end
+
+--- Loads the modules `mirin.template`, `mirin.eases`, `mirin.actors`, and `mirin.utils`
+--- and dumps them into the global table.
 
 GAMESTATE:ApplyModifiers('clearall')
 
@@ -90,4 +99,5 @@ template.definemod {
 	end,
 	defer = true,
 }
+
 -- stylua: ignore end

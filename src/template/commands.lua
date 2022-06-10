@@ -1,5 +1,6 @@
-local core = require('mirin.core')
-local options = require('mirin.options')
+local core = require('template.core')
+local options = require('template.options')
+
 local foreground = xero.foreground
 
 local M = {}

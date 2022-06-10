@@ -8,7 +8,7 @@
 		-- `xero` is the only global variable written by this template
 		-- Everything, including the modder's variables are stored in it
 		xero = {
-			MIRIN_VERSION = '$VERSION',
+			MIRIN_VERSION = 'git-d04ee2c',
 			foreground = self,
 			dir = GAMESTATE:GetCurrentSong():GetSongDir(),
 		}
@@ -20,19 +20,19 @@
 		})
 
 		-- prepare xero.require
-		assert(loadfile(xero.dir..'template/require.lua'))()
+		assert(loadfile(xero.dir..'src/require.lua'))()
 	end"
 >
 	<children>
 
 		<!-- Load the template onto an actor -->
-		<Layer InitCommand = "%xero.require('mirin.commands').init"/>
+		<Layer InitCommand = "%xero.require('template.commands').init"/>
 
 		<!-- Template plugins -->
 		<Layer File = "plugins.xml" />
 
 		<!-- Load the User's actors -->
-		<Layer File = "@'../'..xero.require('mirin.options').xml_entry_path" />
+		<Layer File = "@'../'..xero.require('template.options').xml_entry_path" />
 
 	</children>
 </ActorFrame>

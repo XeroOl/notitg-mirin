@@ -9,7 +9,7 @@ local exp = math.exp
 local pi = math.pi
 local abs = math.abs
 
-local M = require('mirin.utils').module()
+local M = {}
 
 -- Utility functions
 

@@ -1,5 +1,7 @@
-local M = {}
 local iclear = require('mirin.utils').iclear
+
+local M = {}
+
 -- the behavior of a stringbuilder
 local stringbuilder_mt = {
 	__index = {

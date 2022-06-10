@@ -6,17 +6,17 @@ FILENAME=mirin-template-$(VERSION)
 
 $(FILENAME).zip: lint test
 	mkdir -p build
-	cp -r Song.ogg Song.sm conf.lua lua template build
-	sed 's/$$VERSION/'"$(VERSION)"'/' build/template/main.xml -i
+	cp -r Song.ogg Song.sm conf.lua lua src build
+	sed 's/$$VERSION/'"$(VERSION)"'/' build/src/main.xml -i
 	zip "$(FILENAME)".zip build -r
 	rm build -rf
 
 format:
-	stylua template
+	stylua src
 
 lint:
-	stylua -c template
-	luacheck template
+	stylua -c src
+	luacheck src
 
 test:
 	busted
@@ -31,7 +31,7 @@ coverage:
 clean:
 	# from the default target
 	rm -rf build
-	rm -rf $(FILENAME)
+	rm -rf $(FILENAME).zip
 	# from coverage
 	rm -rf luacov.report.out
 	rm -rf luacov.stats.out

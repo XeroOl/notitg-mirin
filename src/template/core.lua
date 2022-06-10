@@ -1,12 +1,14 @@
-local stringbuilder = require('mirin.stringbuilder')
-local perframedatastructure = require('mirin.perframedatastructure')
+local perframedatastructure = require('template.perframedatastructure')
+local stringbuilder = require('template.stringbuilder')
+local options = require('template.options')
+local sort = require('template.sort')
 local utils = require('mirin.utils')
-local sort = require('mirin.utils.sort')
+
 local foreground = xero.foreground
-local options = require('mirin.options')
 local max_pn = options.max_pn
 local debug_print_mod_targets = options.debug_print_mod_targets
 local debug_print_applymodifier_input = options.debug_print_applymodifier_input
+
 local M = {}
 
 -- eases :: list of {beat/time, len, ease_, *args, pn = number, start_time = number}
@@ -234,7 +236,7 @@ function M.scan_named_actors()
 	clear_viral_metatables(actors)
 
 	-- expose the list of actors as a package
-	package.loaded['mirin.actors'] = utils.module(actors)
+	package.loaded['mirin.actors'] = actors
 end
 
 -- runs once during ScreenReadyCommand, before the user code is loaded
@@ -576,7 +578,6 @@ function M.runeases(beat, time)
 
 		-- If the ease value ends with 0.5 or more, the ease should "stick".
 		-- Ie, if you use outExpo, the value should stay on until turned off.
-		-- this is a poor quality comment
 		local ease_ends_at_different_position = e[3](1) >= 0.5
 		e.offset = ease_ends_at_different_position and 1 or 0
 
