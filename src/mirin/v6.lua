@@ -151,8 +151,8 @@ local function check_setdefault_errors(mod, opt)
 	-- TODO FIXME funny
 end
 
-function M.mod(beat, len, ease, mods, opts)
-	local err = check_mod_errors(beat, len, ease, mods, opts, 'mod')
+function M.mod(beat, len, eas, mods, opts)
+	local err = check_mod_errors(beat, len, eas, mods, opts, 'mod')
 	if err then
 		error(err, 2)
 	end
@@ -166,7 +166,7 @@ function M.mod(beat, len, ease, mods, opts)
 	end
 
 	-- The entry that will eventually be passed into the template's mods table
-	local entry = { beat, len, ease }
+	local entry = { beat, len, eas }
 
 	-- Convert the start time to seconds if it is provided in beats.
 	entry.start_time = opts.time and beat or song:GetElapsedTimeFromBeat(beat)
@@ -203,25 +203,32 @@ function M.set(beat, mods, opts)
 	if err then
 		error(err, 2)
 	end
+
 	M.mod(beat, 0, instant, mods, opts)
 end
 
-function M.add(beat, len, eas, mod, opts)
-	local err = check_mod_errors(beat, len, eas, mod, opts, 'add')
+function M.add(beat, len, eas, mods, opts)
+	local err = check_mod_errors(beat, len, eas, mods, opts, 'add')
 	if err then
 		error(err, 2)
 	end
 
-	-- change which table is the options table based on if we have an ease function or not.
-	if is_valid_ease(eas) then
-		opts = opts or {}
-		opts.relative = true
-	else
-		eas = eas or {}
-		eas.relative = true
+	opts = opts or {}
+	opts.relative = true
+
+	M.mod(beat, len, eas, mods, opts)
+end
+
+function M.acc(beat, mods, opts)
+	local err = check_set_errors(beat, mods, opts, 'acc')
+	if err then
+		error(err, 2)
 	end
 
-	M.mod(beat, len, eas, mod, opts)
+	opts = opts or {}
+	opts.relative = true
+
+	M.set(beat, mods, opts)
 end
 
 function M.reset(beat, len, eas, opts)
