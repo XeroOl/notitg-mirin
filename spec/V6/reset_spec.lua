@@ -55,40 +55,36 @@ describe('reset', function()
 		assert.equal('0', helper.get_mod('invert', 2))
 	end)
 
-	it('should detect missing beat', function()
+	it('should detect errors', function()
+		-- missing start beat
 		assert.errors(function() xero.reset(nil) end, 'invalid start beat')
 		assert.errors(function() xero.reset(nil, 1, xero.outCirc) end, 'invalid start beat')
-	end)
 
-	it('should detect missing length', function()
+		-- missing length
 		assert.errors(function() xero.reset(0, nil, xero.outCirc) end, 'invalid length')
-	end)
 
-	it('should detect missing ease function', function()
+		-- missing ease function
 		assert.errors(function() xero.reset(0, 1, nil) end, 'invalid ease function')
-	end)
 
-	it('should detect invalid options table', function()
+		-- invalid options table
 		assert.errors(function() xero.reset(0, 1, xero.outCirc, 1) end, 'invalid options table')
 		assert.errors(function() xero.reset(0, '1') end, 'invalid options table')
-	end)
 
-	it('should detect invalid plr option', function()
+		-- invalid plr option
 		assert.errors(function() xero.reset(0,{plr = '1'}) end, 'invalid plr option')
-	end)
 
-	it('should have the options only and exclude be mutually exclusive', function()
+		-- mutually exclusive only and exclude
 		assert.errors(function() xero.reset(0,{only = 'bumpy', exclude = 'invert'}) end, 'only and exclude options are mutually exclusive')
-	end)
 
-	it('should detect invalid only and exclude options', function()
+		-- invalid exclude option
 		assert.errors(function() xero.reset(0, {exclude = 1}) end, 'invalid exclude option')
-		assert.errors(function() xero.reset(0, {only = 1}) end, 'invalid only option')
-	end)
 
-	it('should not be callable after beat 0', function()
+		-- invalid only option
+		assert.errors(function() xero.reset(0, {only = 1}) end, 'invalid only option')
+
+		-- not callable after beat 0
 		update()
 		assert.errors(function() xero.reset(0) end, 'cannot call reset after LoadCommand finished')
 	end)
-
+	
 end)

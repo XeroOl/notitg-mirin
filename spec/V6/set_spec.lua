@@ -18,31 +18,26 @@ describe('set', function()
 		assert.equal('100', helper.get_mod('bumpy'))
 	end)
 
-	it('should detect missing beat', function()
+	it('should detect errors', function()
+		-- missing beat
 		assert.errors(function() xero.set(nil, {bumpy = 100}) end, 'invalid start beat')
-	end)
 
-	it('should detect missing mods table', function()
+		-- missing mods table
 		assert.errors(function() xero.set(0, nil) end, 'invalid mods table')
-	end)
 
-	it('should detect invalid mod names', function()
+		-- invalid mod name
 		assert.errors(function() xero.set(0, {[1] = 100}) end, 'invalid mod: 1')
-	end)
 
-	it('should detect invalid mod percents', function()
+		-- invalid mod percent
 		assert.errors(function() xero.set(0, {bumpy = '100'}) end, 'bumpy has invalid percent')
-	end)
 
-	it('should detect invalid options table', function()
+		-- invalid options table
 		assert.errors(function() xero.set(0, {bumpy = 100}, 1) end, 'invalid options table')
-	end)
 
-	it('should detect invalid plr options', function()
+		-- invalid plr options
 		assert.errors(function() xero.set(0, {bumpy = 100}, {plr = '1'}) end, 'invalid plr option')
-	end)
 
-	it('should not be callable after beat 0', function()
+		-- not callable after beat 0
 		update()
 		assert.errors(function() xero.set(0, {bumpy = 100}) end, 'cannot call set after LoadCommand finished')
 	end)

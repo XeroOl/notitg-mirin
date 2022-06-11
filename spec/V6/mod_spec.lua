@@ -54,39 +54,32 @@ describe('mod', function()
 		assert.equal('100', helper.get_mod('bumpy'))
 	end)
 
-	it('should detect missing beat', function()
+	it('should detect errors', function()
+		-- missing beat
 		assert.errors(function() xero.mod(nil, 1, xero.outCirc, {bumpy = 100}) end, 'invalid start beat')
-	end)
 
-	it('should detect missing length', function()
+		-- missing length
 		assert.errors(function() xero.mod(0, nil, xero.outCirc, {bumpy = 100}) end, 'invalid length')
-	end)
 
-	it('should detect missing ease function', function()
+		-- missing ease function
 		assert.errors(function() xero.mod(0, 1, nil, {bumpy = 100}) end, 'invalid ease function')
-	end)
-
-	it('should detect missing mods table', function()
+			
+		-- missing mods table
 		assert.errors(function() xero.mod(0, 1, xero.outCirc, nil) end, 'invalid mods table')
-	end)
 
-	it('should detect invlaid mod names', function()
+		-- invalid mod name
 		assert.errors(function() xero.mod(0, 1, xero.outCirc, {[1] = 100}) end, 'invalid mod: 1')
-	end)
 
-	it('should detect invalid mod percents', function()
+		-- invalid mod percent
 		assert.errors(function() xero.mod(0, 1, xero.outCirc, {bumpy = '100'}) end, 'bumpy has invalid percent')
-	end)
 
-	it('should detect invalid options table type', function()
+		-- invalid option table
 		assert.errors(function() xero.mod(0, 1, xero.outCirc, {bumpy = 100}, 1) end, 'invalid options table')
-	end)
 
-	it('should detect invalid plr option', function()
+		-- invalid plr option
 		assert.errors(function() xero.mod(0, 1, xero.outCirc, {bumpy = 100}, {plr = '1'}) end, 'invalid plr option')
-	end)
 
-	it('should not be callable after beat 0', function()
+		-- not callable after beat 0
 		update()
 		assert.errors(function() xero.mod(0, 0, xero.instant, {bumpy = 100}) end, 'cannot call mod after LoadCommand finished')
 	end)
