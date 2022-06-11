@@ -8,6 +8,7 @@ describe('add', function()
 		helper.reset()
 		helper.init(false, true)
 	end)
+
 	after_each(function()
 		xero = nil
 	end)

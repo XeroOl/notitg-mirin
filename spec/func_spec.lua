@@ -43,10 +43,6 @@ describe('func', function()
 		assert(runs)
 	end)
 
-	it('should support delay=', function()
-		pending()
-	end)
-
 	it('should have proper persist semantics', function()
 		local count = 0
 		local function no()

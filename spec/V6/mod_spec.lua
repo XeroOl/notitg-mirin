@@ -8,6 +8,7 @@ describe('mod', function()
 		helper.reset()
 		helper.init(false, true)
 	end)
+
 	after_each(function()
 		xero = nil
 	end)
@@ -61,7 +62,7 @@ describe('mod', function()
 		assert.errors(function() xero.mod(0, nil, xero.outCirc, {bumpy = 100}) end, 'invalid length')
 	end)
 
-	it('should detect missing ease', function()
+	it('should detect missing ease function', function()
 		assert.errors(function() xero.mod(0, 1, nil, {bumpy = 100}) end, 'invalid ease function')
 	end)
 

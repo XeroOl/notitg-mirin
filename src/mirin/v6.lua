@@ -92,10 +92,13 @@ local function check_reset_errors(beat, len, eas, opts, name)
 		return 'invalid start beat'
 	end
 	if type(len) ~= 'number' then
+		if is_valid_ease(eas) then
+			return 'invalid length'
+		end
 		opts = len
 	else
 		if not is_valid_ease(eas) then
-			return 'invalid ease func'
+			return 'invalid ease function'
 		end
 	end
 	if opts and type(opts) ~= 'table' then
@@ -105,14 +108,16 @@ local function check_reset_errors(beat, len, eas, opts, name)
 	if type(plr) ~= 'number' and type(plr) ~= 'table' then
 		return 'invalid plr option'
 	end
-	if opts and opts.only and opts.exclude then
-		return 'only and exlude options are mutually exclusive'
+	if opts ~= nil and opts.only and opts.exclude then
+		return 'only and exclude options are mutually exclusive'
 	end
-	if opts.exclude and type(opts.exclude) ~= 'string' and type(opts.exclude) ~= 'table' then
-		return 'invalid exclude option'
-	end
-	if opts.only and type(opts.only) ~= 'string' and type(opts.only) ~= 'table' then
-		return 'invalid only option'
+	if opts then
+		if opts.exclude and type(opts.exclude) ~= 'string' and type(opts.exclude) ~= 'table' then
+			return 'invalid exclude option'
+		end
+		if opts.only and type(opts.only) ~= 'string' and type(opts.only) ~= 'table' then
+			return 'invalid only option'
+		end
 	end
 	if commands.loaded then
 		return 'cannot call ' .. name .. ' after LoadCommand finished'
@@ -237,12 +242,14 @@ function M.reset(beat, len, eas, opts)
 		error(err, 2)
 	end
 
-	if type(len) == 'number' then
-		opts = eas
+	if type(len) == 'nil' or type(len) == 'table' then
+		opts = len
+		len = 0
+		eas = instant
 	end
 
 	opts = opts or {}
-	opts.relative = true
+	opts.reset = true
 
 	if opts.only then
 		if type(opts.only) == 'string' then
