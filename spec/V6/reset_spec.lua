@@ -86,5 +86,5 @@ describe('reset', function()
 		update()
 		assert.errors(function() xero.reset(0) end, 'cannot call reset after LoadCommand finished')
 	end)
-	
+
 end)

@@ -124,8 +124,19 @@ local function check_reset_errors(beat, len, eas, opts, name)
 	end
 end
 
-local function check_func_errors(beat, fn, opt, name)
-	-- TODO FIXME funny
+local function check_func_errors(beat, fn, opts, name)
+	if type(beat) ~= 'number' then
+		return 'invalid start beat'
+	end
+	if type(fn) ~= 'function' and type(fn) ~= 'string' then
+		return 'invalid function'
+	end
+	if type(opts) ~= 'nil' and type(opts) ~= 'table' then
+		return 'invalid options table'
+	end
+	if commands.loaded then
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
+	end
 end
 
 local function check_fease_errors(beat, len, eas, fn, opt)
@@ -155,6 +166,8 @@ end
 local function check_setdefault_errors(mod, opt)
 	-- TODO FIXME funny
 end
+
+-- ======================================================================= --
 
 function M.mod(beat, len, eas, mods, opts)
 	local err = check_mod_errors(beat, len, eas, mods, opts, 'mod')
@@ -270,55 +283,72 @@ function M.reset(beat, len, eas, opts)
 	M.mod(beat, len, eas, {}, opts)
 end
 
-function M.func(beat, fn, opt)
-	check_func_errors(beat, fn, opt, 'func')
-
-	-- TODO sugar
-
-	-- grab the persist
-	local persist = opt.persist
-
-	-- adjust to len
-	if opt.mode == 'end' and type(persist) == 'number' then
-		persist = persist - beat
+function M.func(beat, fn, opts)
+	local err = check_func_errors(beat, fn, opts, 'func')
+	if err then
+		error(err, 2)
 	end
 
-	-- false means very small persist
+	opts = opts or {}
+
+	-- TODO: Tell xero that I would like this removed from the new syntax - Chegg
+	if type(fn) == 'string' then
+		local args = {}
+		local paramlist = {}
+		for i, arg in ipairs(opts) do
+			table.insert(args, arg)
+			table.insert(paramlist, 'arg' .. i)
+		end
+		local paramstring = table.concat(paramlist, ',')
+		local code = 'return function('
+			.. paramstring
+			.. ') return function() '
+			.. fn
+			.. '('
+			.. paramstring
+			.. ') end end'
+		fn = xero(assert(loadstring(code, 'generated_func')))()(unpack(args))
+	end
+
+	local entry = { beat }
+
+	entry[3] = fn
+
+	-- Convert the mode into a boolean and add it to the entry
+	entry.mode = opts.mode == 'end' or opts.mode == 'e'
+
+	-- Convert persist into a number
+	local persist = opts.persist
+	if type(persist) == 'number' and entry.mode then
+		persist = persist - beat
+	end
 	if persist == false then
 		persist = 0.5
 	end
 
-	-- TODO get chegg feedback
-	-- if persist is set, rebuild the function
+	-- Recreate the function with the persist
 	if type(persist) == 'number' then
-		local original_fn = fn
-		local final_time = beat + persist
-		function fn(real_beat)
-			if beat < final_time then
-				original_fn(real_beat)
+		local oldfn = entry[3]
+		local endtime = beat + persist
+		entry[3] = function(b)
+			if b <= endtime then
+				oldfn(b)
 			end
 		end
 	end
 
-	local entry = { beat, nil, fn }
+	-- Give the func priority a based on defer
+	entry.priority = (opts.defer and -1 or 1) * (#core.funcs + 1)
 
-	for k, v in pairs(opt) do
-		entry[k] = v
-	end
+	-- Convert beat to time if using time based
+	entry.start_time = opts.time and beat or song:GetElapsedTimeFromBeat(beat)
 
-	entry.priority = (opt.defer and -1 or 1) * (#core.funcs + 1)
-	entry.start_time = opt.time and beat or song:GetElapsedTimeFromBeat(beat)
 	table.insert(core.funcs, entry)
 end
 
--- TODO consider merge with func
 function M.fease(beat, len, eas, fn, opt) end
 
-function M.perframe(beat, len, fn, opt)
-	local entry = { beat, len, fn }
-
-	table.insert(core.funcs, entry)
-end
+function M.perframe(beat, len, fn, opt) end
 
 -- TODO consider swap output and fn
 function M.definemod(input, fn, output, opt) end
