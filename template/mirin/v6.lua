@@ -1,8 +1,7 @@
-local core = require('template.core')
-local commands = require('template.commands')
-local max_pn = require('template.options').max_pn
+local core = require('core')
+local commands = require('core.commands')
 
-local utils = require('template.utils')
+local utils = require('core.utils')
 local instant = require('mirin.eases').instant
 
 local M = {}
@@ -290,25 +289,6 @@ function M.func(beat, fn, opts)
 	end
 
 	opts = opts or {}
-
-	-- TODO: Tell xero that I would like this removed from the new syntax - Chegg
-	if type(fn) == 'string' then
-		local args = {}
-		local paramlist = {}
-		for i, arg in ipairs(opts) do
-			table.insert(args, arg)
-			table.insert(paramlist, 'arg' .. i)
-		end
-		local paramstring = table.concat(paramlist, ',')
-		local code = 'return function('
-			.. paramstring
-			.. ') return function() '
-			.. fn
-			.. '('
-			.. paramstring
-			.. ') end end'
-		fn = xero(assert(loadstring(code, 'generated_func')))()(unpack(args))
-	end
 
 	local entry = { beat }
 

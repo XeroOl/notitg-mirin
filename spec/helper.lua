@@ -15,19 +15,21 @@ function helper.round(num, numDecimalPlaces)
 	return math.floor(num * mult + 0.5) / mult
 end
 
+
+local body = io.open('./template/main.xml'):read('*a')
+local initcommand = 'return ' .. body:match('"%%(.-)"')
+initcommand = assert(loadstring(initcommand, "template/main.xml"))()
+
 function helper.init(skip_exports, v6)
-	local body = io.open('./template/main.xml'):read('*a')
-	local initcommand = 'return ' .. body:match('"%%(.-)"')
 	local h = helper
 
 	h.foreground = mock.newactorframe()
-	initcommand = assert(loadstring(initcommand, "template/main.xml"))()
 	initcommand(h.foreground)
 
 	xero.package.preload.mods = function() end
 
 	h.template = mock.newactor()
-	h.template:addcommand('Init', xero.require('template.commands').init)
+	h.template:addcommand('Init', xero.require('core.commands').init)
 	h.template:playcommand('Init')
 
 	h.layout = mock.newactorframe()
@@ -45,12 +47,12 @@ function helper.init(skip_exports, v6)
 	mock.add_child(h.layout, pj1)
 	mock.add_child(h.layout, pj2)
 	if not skip_exports then
-		local spill = xero.require('template.utils').spill
-		spill(xero.require('mirin.eases'))
+		local copy = xero.require('core.utils').copy
+		copy(xero.require('mirin.eases'), xero)
 		if not v6 then
-			spill(xero.require('mirin.template'))
+			copy(xero.require('mirin.template'), xero)
 		else
-			spill(xero.require('mirin.v6'))
+			copy(xero.require('mirin.v6'), xero)
 		end
 	end
 end
@@ -62,8 +64,8 @@ function helper.on()
 		end
 	end
 	mock.on_happened = true
-	local spill = xero.require('template.utils').spill
-	spill(xero.require('mirin.actors'))
+	local copy = xero.require('core.utils').copy
+	copy(xero.require('mirin.actors'), xero)
 	helper.update(0)
 end
 

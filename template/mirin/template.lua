@@ -1,10 +1,10 @@
 local M = {}
 
-local commands = require('template.commands')
-local core = require('template.core')
-local max_pn = require('template.options').max_pn
+local commands = require('core.commands')
+local core = require('core')
+local max_pn = require('core.options').max_pn
 
-local utils = require('template.utils')
+local utils = require('core.utils')
 local instant = require('mirin.eases').instant
 
 local song = GAMESTATE:GetCurrentSong()

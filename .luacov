@@ -1,16 +1,3 @@
-modules = {
-    ["mirin.actors"] = "./template/mirin/actors.lua",
-    ["mirin.template"] = "./template/mirin/template.lua",
-	["mirin.v6"] = "./template/mirin/v6.lua",
-    ["mirin.eases"] = "./template/mirin/eases.lua",
-    ["mirin.utils"] = "./template/mirin/utils.lua",
-    ["template.commands"] = "./template/template/commands.lua",
-    ["template.core"] = "./template/template/core.lua",
-    ["template.options"] = "./template/template/options.lua",
-    ["template.perframedatastructure"] = "./template/template/perframedatastructure.lua",
-    ["template.setup"] = "./template/template/setup.lua",
-    ["template.stringbuilder"] = "./template/template/stringbuilder.lua",
-    ["template.sort"] = "./template/template/sort.lua",
-    ["prelude"] = "./template/prelude.lua",
-    ["require"] = "./template/require.lua",
+include = {
+    "^template",
 }

@@ -15,7 +15,7 @@ format:
 	stylua template
 
 lint:
-	stylua -c template
+	stylua -c template || (echo "If this fails, run 'make format' to reformat the code" && false)
 	luacheck template
 
 test:

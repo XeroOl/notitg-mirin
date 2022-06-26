@@ -1,4 +1,4 @@
-local iclear = require('template.utils').iclear
+local iclear = require('core.utils').iclear
 
 local M = {}
 

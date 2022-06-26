@@ -26,13 +26,13 @@
 	<children>
 
 		<!-- Load the template onto an actor -->
-		<Layer InitCommand = "%xero.require('template.commands').init"/>
+		<Layer InitCommand = "%xero.require('core.commands').init"/>
 
 		<!-- Template plugins -->
 		<Layer File = "plugins.xml" />
 
 		<!-- Load the User's actors -->
-		<Layer File = "@'../'..xero.require('template.options').xml_entry_path" />
+		<Layer File = "@'../'..xero.require('core.options').xml_entry_path" />
 
 	</children>
 </ActorFrame>

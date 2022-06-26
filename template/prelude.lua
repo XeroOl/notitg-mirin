@@ -1,15 +1,7 @@
 ---@diagnostic disable: lowercase-global
 -- stylua: ignore start
-local core = require('template.core')
+local core = require('core')
 local template = require('mirin.template')
-local eases = require('mirin.eases')
-local utils = require('template.utils')
-
-function LoadTemplate()
-	-- this has to be loaded here to avoid grabing actors before they are loaded.
-	local actors = require('mirin.actors')
-	utils.spill(template)(eases)(actors)(utils)
-end
 
 max_pn = require('mirin.options').max_pn
 

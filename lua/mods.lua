@@ -1,12 +1,9 @@
-LoadTemplate()
-
-if not P1 or not P2 then
-	SCREENMAN:SystemMessage('Two Player Mode Required')
-	print('Two Player Mode Required')
-	GAMESTATE:FinishSong()
-	foreground:hidden(1)
-	return
-end
+local copy = require('core.utils').copy
+copy(require('mirin.actors'), xero)
+copy(require('mirin.eases'), xero)
+copy(require('mirin.template'), xero)
+require('extra.renumbering')
+require('extra.hideoverlay')
 
 -- judgment proxies
 for pn = 1, 2 do

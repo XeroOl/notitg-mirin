@@ -1,8 +1,8 @@
 local M = {}
 
 --- Returns a shallow copy of the table `src`
-function M.copy(src)
-	local dest = {}
+function M.copy(src, dest)
+	dest = dest or {}
 	for k, v in pairs(src) do
 		dest[k] = v
 	end
@@ -25,15 +25,6 @@ function M.iclear(t)
 		table.remove(t)
 	end
 	return t
-end
-
---- Spill every value in table `t` into the global environment.
-----@param t the table
-function M.spill(t)
-	for k, v in pairs(t) do
-		xero[k] = v
-	end
-	return M.spill
 end
 
 return M

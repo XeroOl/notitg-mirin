@@ -20,19 +20,6 @@ describe('func', function()
 		assert.equal(true, ran)
 	end)
 
-	it('should accept syntax sugar', function()
-		local ran = false
-		local out = nil
-		function xero.test(a)
-			ran = true
-			out = a
-		end
-		xero.func(0, 'test', {true})
-		update()
-		assert.equal(true, ran)
-		assert.equal(true, out)
-	end)
-
 	it('should have working persist option', function()
 		local ran = false
 		xero.func(0, function() ran = true end, {persist = 2})
@@ -59,7 +46,7 @@ describe('func', function()
 
 		-- missing function
 		assert.errors(function() xero.func(0, nil) end, 'invalid function')
-		
+
 		-- invalid options table
 		assert.errors(function() xero.func(0, function() end, 1) end, 'invalid options table')
 

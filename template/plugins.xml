@@ -37,7 +37,7 @@
 	p.m = math.log10(p.n) -- Max recursion depth
 
 	-- Sort plugins alphabetically
-	require('template.utils.sort').stable_sort(p)
+	require('core.utils.sort').stable_sort(p)
 
 	-- If no plugins are present, do not continue
 	if p.n == 0 then

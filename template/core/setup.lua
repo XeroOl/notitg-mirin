@@ -1,4 +1,4 @@
-local utils = require('template.utils')
+local utils = require('core.utils')
 
 -- Move global functions to the xero table, allowing for slightly faster
 -- performance due to not having to go back and forth between xero and _G.

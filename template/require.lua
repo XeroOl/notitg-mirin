@@ -1,5 +1,5 @@
 xero()
-local options = assert(loadfile(xero.dir .. 'template/template/options.lua'))()
+local options = assert(loadfile(xero.dir .. 'template/core/options.lua'))()
 package = {
 	-- mirin template loader path
 	path = table.concat(options.package_path, ';'),

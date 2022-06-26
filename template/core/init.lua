@@ -1,8 +1,8 @@
-local options = require('template.options')
-local utils = require('template.utils')
-local sort = require('template.utils.sort')
-local stringbuilder = require('template.utils.stringbuilder')
-local perframedatastructure = require('template.utils.perframedatastructure')
+local options = require('core.options')
+local utils = require('core.utils')
+local sort = require('core.utils.sort')
+local stringbuilder = require('core.utils.stringbuilder')
+local perframedatastructure = require('core.utils.perframedatastructure')
 
 local foreground = xero.foreground
 local max_pn = options.max_pn
@@ -237,24 +237,6 @@ function M.scan_named_actors()
 
 	-- expose the list of actors as a package
 	package.loaded['mirin.actors'] = actors
-end
-
--- runs once during ScreenReadyCommand, before the user code is loaded
--- hides various actors that are placed by the theme
-function M.hide_theme_actors()
-	for _, element in ipairs {
-		'Overlay',
-		'Underlay',
-		'ScoreP1',
-		'ScoreP2',
-		'LifeP1',
-		'LifeP2',
-	} do
-		local child = SCREENMAN(element)
-		if child then
-			child:hidden(1)
-		end
-	end
 end
 
 -- runs once during ScreenReadyCommand, before the user code is loaded

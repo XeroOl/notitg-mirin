@@ -1,5 +1,5 @@
-local core = require('template.core')
-local options = require('template.options')
+local core = require('core')
+local options = require('core.options')
 
 local foreground = xero.foreground
 
