@@ -13,20 +13,20 @@ ignore = {
     "213";
 }
 
-files['src/prelude.lua'] = {
+files['template/prelude.lua'] = {
     ignore = {
         "111"; -- read unknown global
         "113"; -- write unknown global
     }
 }
-files['src/require.lua'] = {
+files['template/require.lua'] = {
     globals = {
         "require";
         "package";
     }
 }
 
-files['src/mirin/v6.lua'] = {
+files['template/mirin/v6.lua'] = {
 	ignore = {
 		"212"; -- unused argument
 		"211"; -- unused function

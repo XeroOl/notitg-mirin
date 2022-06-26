@@ -16,7 +16,7 @@ function helper.round(num, numDecimalPlaces)
 end
 
 function helper.init(skip_exports, v6)
-	local body = io.open('./src/main.xml'):read('*a')
+	local body = io.open('./template/main.xml'):read('*a')
 	local initcommand = 'return ' .. body:match('"%%(.-)"')
 	local h = helper
 
@@ -45,7 +45,7 @@ function helper.init(skip_exports, v6)
 	mock.add_child(h.layout, pj1)
 	mock.add_child(h.layout, pj2)
 	if not skip_exports then
-		local spill = xero.require('mirin.utils').spill
+		local spill = xero.require('template.utils').spill
 		spill(xero.require('mirin.eases'))
 		if not v6 then
 			spill(xero.require('mirin.template'))
@@ -62,7 +62,7 @@ function helper.on()
 		end
 	end
 	mock.on_happened = true
-	local spill = xero.require('mirin.utils').spill
+	local spill = xero.require('template.utils').spill
 	spill(xero.require('mirin.actors'))
 	helper.update(0)
 end

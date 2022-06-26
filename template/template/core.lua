@@ -1,8 +1,8 @@
-local perframedatastructure = require('template.perframedatastructure')
-local stringbuilder = require('template.stringbuilder')
 local options = require('template.options')
-local sort = require('template.sort')
-local utils = require('mirin.utils')
+local utils = require('template.utils')
+local sort = require('template.utils.sort')
+local stringbuilder = require('template.utils.stringbuilder')
+local perframedatastructure = require('template.utils.perframedatastructure')
 
 local foreground = xero.foreground
 local max_pn = options.max_pn

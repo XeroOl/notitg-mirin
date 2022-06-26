@@ -3,7 +3,7 @@
 local core = require('template.core')
 local template = require('mirin.template')
 local eases = require('mirin.eases')
-local utils = require('mirin.utils')
+local utils = require('template.utils')
 
 function LoadTemplate()
 	-- this has to be loaded here to avoid grabing actors before they are loaded.
@@ -44,7 +44,7 @@ function aftsprite(aft, sprite)
 	sprite:SetTexture(aft:GetTexture())
 end
 
---- Loads the modules `mirin.template`, `mirin.eases`, `mirin.actors`, and `mirin.utils`
+--- Loads the modules `mirin.template`, `mirin.eases`, `mirin.actors`, and `template.utils`
 --- and dumps them into the global table.
 
 GAMESTATE:ApplyModifiers('clearall')

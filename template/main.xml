@@ -20,7 +20,7 @@
 		})
 
 		-- prepare xero.require
-		assert(loadfile(xero.dir..'src/require.lua'))()
+		assert(loadfile(xero.dir..'template/require.lua'))()
 	end"
 >
 	<children>

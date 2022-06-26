@@ -69,7 +69,7 @@ return {
     -- for more details.
     --
     package_path = {
-        'src/?.lua', 'src/?/init.lua',
+        'template/?.lua', 'template/?/init.lua',
         'lua/?.lua', 'lua/?/init.lua',
         'plugins/?.lua', 'plugins/?/init.lua'
     },

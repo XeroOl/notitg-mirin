@@ -1,4 +1,4 @@
-local sort = require('template.sort')
+local sort = require('template.utils.sort')
 
 -- Data structure for all the `func` declarations.
 -- This custom data structure smartly handles func priorities, so the order

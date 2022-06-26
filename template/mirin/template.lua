@@ -4,7 +4,7 @@ local commands = require('template.commands')
 local core = require('template.core')
 local max_pn = require('template.options').max_pn
 
-local utils = require('mirin.utils')
+local utils = require('template.utils')
 local instant = require('mirin.eases').instant
 
 local song = GAMESTATE:GetCurrentSong()
