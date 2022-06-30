@@ -1,8 +1,17 @@
 local helper = {}
 local mock
 
+-- state
+local cached_preload
+
 function helper.reset()
 	mock = dofile('./spec/mock.lua')
+	if xero then
+		if xero.package.preload then
+			cached_preload = xero.package.preload
+			cached_preload.actors = nil
+		end
+	end
 	xero = nil
 end
 
@@ -26,6 +35,12 @@ function helper.init(skip_exports, v6)
 	h.foreground = mock.newactorframe()
 	initcommand(h.foreground)
 
+	if cached_preload then
+		xero.package.preload = cached_preload
+		for _, package in pairs(xero.package.preload) do
+			xero(package)
+		end
+	end
 	xero.package.preload.mods = function() end
 
 	h.template = mock.newactor()

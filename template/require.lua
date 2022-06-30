@@ -7,14 +7,14 @@ package = {
 	loaded = { ['mirin.options'] = options },
 	loaders = {
 		function(modname)
-			local preload = xero.package.preload[modname]
+			local preload = package.preload[modname]
 			return preload or "no field xero.package.preload['" .. modname .. "']"
 		end,
 		function(modname)
 			local errors = {}
 			-- get the filename
 			local filename = string.gsub(modname, '%.', '/')
-			for path in (string.gfind or string.gmatch)(xero.package.path, '[^;]+') do
+			for path in (string.gfind or string.gmatch)(package.path, '[^;]+') do
 				-- get the file path
 				local filepath = xero.dir .. string.gsub(path, '%?', filename)
 				-- check if file exists
@@ -36,8 +36,7 @@ package = {
 }
 
 function require(modname)
-	local loaded = xero.package.loaded
-	if not loaded[modname] then
+	if not package.loaded[modname] then
 		local errors = { "module '" .. modname .. "' not found:" }
 		local chunk
 		for _, loader in ipairs(xero.package.loaders) do
@@ -52,12 +51,13 @@ function require(modname)
 		if not chunk then
 			error(table.concat(errors, '\n'), 2)
 		end
-		loaded[modname] = chunk()
-		if loaded[modname] == nil then
-			loaded[modname] = true
+		package.preload[modname] = chunk
+		package.loaded[modname] = chunk()
+		if package.loaded[modname] == nil then
+			package.loaded[modname] = true
 		end
 	end
-	return loaded[modname]
+	return package.loaded[modname]
 end
 
 -- current module has been loaded
