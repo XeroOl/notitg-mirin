@@ -1,5 +1,6 @@
 local core = require('core')
 local options = require('core.options')
+local utils = require('core.utils')
 
 local foreground = xero.foreground
 
@@ -61,7 +62,7 @@ function ready(self)
 	core.compile_nodes()
 
 	for i = 1, options.max_pn do
-		core.mod_buffer[i]:clear()
+		utils.iclear(core.mod_buffer[i])
 	end
 
 	-- load command has happened

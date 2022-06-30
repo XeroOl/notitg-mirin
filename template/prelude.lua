@@ -83,10 +83,11 @@ template.definemod {
 	'xmod',
 	'cmod',
 	function(xmod, cmod, pn)
+		local buffer = core.mod_buffer[pn]
 		if cmod == 0 then
-			core.mod_buffer[pn](string.format('*-1 %fx', xmod))
+			buffer[#buffer + 1] = string.format('*-1 %fx', xmod)
 		else
-			core.mod_buffer[pn](string.format('*-1 %fx,*-1 c%f', xmod, cmod))
+			buffer[#buffer + 1] = string.format('*-1 %fx,*-1 c%f', xmod, cmod)
 		end
 	end,
 	defer = true,

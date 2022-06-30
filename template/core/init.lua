@@ -141,7 +141,7 @@ end
 -- a stringbuilder of the modstring that is being applied
 local mod_buffer = {}
 for pn = 1, max_pn do
-	mod_buffer[pn] = stringbuilder.new()
+	mod_buffer[pn] = {}
 end
 M.mod_buffer = mod_buffer
 
@@ -725,15 +725,15 @@ function M.runmods()
 			-- toss everything that isn't an aux into the buffer
 			for mod, percent in pairs(mods[pn]) do
 				if not auxes[mod] then
-					buffer('*-1 ' .. percent .. ' ' .. mod)
+					buffer[#buffer + 1] = '*-1 ' .. percent .. ' ' .. mod
 				end
 				mods[pn][mod] = nil
 			end
 			-- if the buffer has at least 1 item in it
 			-- then pass it to ApplyModifiers
 			if buffer[1] then
-				apply_modifiers(buffer:build(','), pn)
-				buffer:clear()
+				apply_modifiers(table.concat(buffer, ','), pn)
+				utils.iclear(buffer)
 			end
 		end
 	end
