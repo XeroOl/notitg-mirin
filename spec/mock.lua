@@ -172,15 +172,26 @@ function Player:IsAwake()
 	return self._name == "PlayerP1" or self._name == "PlayerP2"
 end
 
+function Player:SetInputPlayer(pn)
+end
+
 local screen_world = {}
+local deleted_players = {}
 SCREENMAN = setmetatable({}, {__call = function(self, arg)
-	if arg and arg:match('^PlayerP[1-8]$') then
+	if arg and arg:match('^PlayerP[1-8]$')then
+		if deleted_players[tonumber(arg:match('^PlayerP([1-8])'))] then
+			return nil
+		end
 		screen_world[arg] = screen_world[arg] or mock.newplayer(arg)
 	end
 	screen_world[arg] = screen_world[arg] or mock.newactor(arg)
 	local thing_to_hide = screen_world[arg]
 	return thing_to_hide
 end})
+
+function mock.delete_player(pn)
+	deleted_players[pn] = true
+end
 
 function SCREENMAN:SystemMessage(message)
 	error(message)

@@ -4,8 +4,9 @@ local mock
 -- state
 local cached_preload
 
+local mockrunner = assert(loadfile('spec/mock.lua'))
 function helper.reset()
-	mock = dofile('./spec/mock.lua')
+	mock = mockrunner()
 	if xero then
 		if xero.package.preload then
 			cached_preload = xero.package.preload
@@ -23,7 +24,6 @@ function helper.round(num, numDecimalPlaces)
 	local mult = 10 ^ (numDecimalPlaces or 0)
 	return math.floor(num * mult + 0.5) / mult
 end
-
 
 local body = io.open('./template/main.xml'):read('*a')
 local initcommand = 'return ' .. body:match('"%%(.-)"')
@@ -96,6 +96,10 @@ function helper.update(dt)
 			v:playcommand(v._effect)
 		end
 	end
+end
+
+function helper.mock()
+	return mock
 end
 
 return helper

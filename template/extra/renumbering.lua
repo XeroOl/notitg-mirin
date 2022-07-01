@@ -1,14 +1,13 @@
--- runs once during ScreenReadyCommand, before the user code is loaded
--- sets up the player tables
 local P = xero.P
-local i = 1
 
 if not xero.P1 or not xero.P2 then
 	local real_player = xero.P1 and 0 or 1
 
-	for pn = 1, require('core.options').max_pn do
+	local i = 1
+	local max_pn = require('core.options').max_pn
+	for pn = 1, max_pn do
 		local player
-		while not player and i < 100 do
+		while not player and i <= 8 do
 			player = SCREENMAN('PlayerP' .. i)
 			i = i + 1
 		end
