@@ -31,11 +31,26 @@ function init(self)
 		self:addcommand('Update', update)
 	end)
 
+	-- syntax error
+	require('core.setup')
 	if options.use_prelude then
 		require('prelude')
 	end
 	if options.lua_pre_entry_path then
 		assert(loadfile(xero.dir .. options.lua_pre_entry_path))()
+	end
+	if options.strict then
+		local error, tostring, _G = error, tostring, _G
+		local mt = getmetatable(xero)
+		function mt.__newindex(_self, k, _v)
+			error('Writing global in strict mode: ' .. tostring(k), 2)
+		end
+		function mt.__index(_self, k)
+			if _G[k] ~= nil then
+				return _G[k]
+			end
+			error('Reading bad global in strict mode: ' .. tostring(k), 2)
+		end
 	end
 
 	-- NotITG and OpenITG have a long standing bug where the InitCommand on an actor can run twice in certain cases.
@@ -54,13 +69,15 @@ function ready(self)
 
 	-- loads both the plugins and the layout.xml due to propagation
 	foreground:playcommand('Load')
-	-- loads mods.lua
-	require('mods')
+
+	-- load the user code
+	xero(assert(loadfile(xero.dir .. options.lua_entry_path)))()
 
 	core.sort_tables()
 	core.resolve_aliases()
 	core.compile_nodes()
 
+	-- TODO can we remove this or move it into compile_nodes
 	for i = 1, options.max_pn do
 		utils.iclear(core.mod_buffer[i])
 	end

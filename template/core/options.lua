@@ -1,4 +1,4 @@
-local conf = assert(loadfile(xero.dir .. 'conf.lua'))() or {}
+local conf = assert(loadfile(xero.dir .. 'conf.lua'))()
 
 local defaults = {
 	max_pn = 8,

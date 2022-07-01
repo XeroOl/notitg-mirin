@@ -3,42 +3,6 @@
 local core = require('core')
 local template = require('mirin.template')
 
-max_pn = require('mirin.options').max_pn
-
-scx = SCREEN_CENTER_X
-scy = SCREEN_CENTER_Y
-sw = SCREEN_WIDTH
-sh = SCREEN_HEIGHT
-
-dw = DISPLAY:GetDisplayWidth()
-dh = DISPLAY:GetDisplayHeight()
-
-e = 'end'
-
-function sprite(self)
-	self:basezoomx(sw / dw)
-	self:basezoomy(-sh / dh)
-	self:x(scx)
-	self:y(scy)
-end
-
-function aft(self)
-	self:SetWidth(dw)
-	self:SetHeight(dh)
-	self:EnableDepthBuffer(false)
-	self:EnableAlphaBuffer(false)
-	self:EnableFloat(false)
-	self:EnablePreserveTexture(true)
-	self:Create()
-end
-
-function aftsprite(aft, sprite)
-	sprite:SetTexture(aft:GetTexture())
-end
-
---- Loads the modules `mirin.template`, `mirin.eases`, `mirin.actors`, and `template.utils`
---- and dumps them into the global table.
-
 GAMESTATE:ApplyModifiers('clearall')
 
 -- zoom

@@ -25,7 +25,7 @@ end
 
 local function card(t)
 	if not spellcards[1] then
-		require('core.template').func { 0, addspellcards }
+		require('mirin.template').func { 0, addspellcards }
 	end
 	table.insert(spellcards, t)
 	return card

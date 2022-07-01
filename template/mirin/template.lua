@@ -446,8 +446,10 @@ function M.func(self)
 			end
 		end
 	end
+
 	self.priority = (self.defer and -1 or 1) * (#core.funcs + 1)
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
+
 	table.insert(core.funcs, self)
 	return M.func
 end

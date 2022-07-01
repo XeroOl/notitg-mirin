@@ -13,7 +13,7 @@ ignore = {
     "213";
 }
 
-files['template/prelude.lua'] = {
+files['template/core/setup.lua'] = {
     ignore = {
         "111"; -- read unknown global
         "113"; -- write unknown global

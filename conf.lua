@@ -47,14 +47,14 @@ return {
     --
     -- This is the path to the file with the user code.
     --
-    -- lua_entry_path = 'lua/mods.lua',
+    lua_entry_path = 'lua/mods.lua',
 
     -----------------------------------------------------------------------
     -- xml_entry_path : Which XML file will be loaded for the actor layout.
     --
     -- This is the path to the file the user code.
     --
-    -- xml_entry_path = 'lua/layout.xml',
+    xml_entry_path = 'lua/layout.xml',
 
     ---------------------------------------------------------------------
     -- package_path : This is the search path that is used by the require
@@ -82,7 +82,7 @@ return {
     -- Example:
     --     lua_pre_entry_path = 'lua/pre.lua',
     --
-    -- lua_pre_entry_path = nil,
+    lua_pre_entry_path = nil,
 
     -----------------------------------------------------
     -- strict : if you are XeroOl, then you hate globals.

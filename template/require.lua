@@ -1,10 +1,9 @@
-xero()
 local options = assert(loadfile(xero.dir .. 'template/core/options.lua'))()
 package = {
 	-- mirin template loader path
 	path = table.concat(options.package_path, ';'),
 	preload = {},
-	loaded = { ['mirin.options'] = options },
+	loaded = { ['core.options'] = options },
 	loaders = {
 		function(modname)
 			local preload = package.preload[modname]

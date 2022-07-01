@@ -39,6 +39,7 @@ function GAMESTATE:GetSongBeat()
 end
 
 function GAMESTATE:GetFileStructure(path)
+	if mock.file_override[path] then return true end
 	local file = io.open(path)
 	if file then
 		file:close()
@@ -178,7 +179,7 @@ end
 local screen_world = {}
 local deleted_players = {}
 SCREENMAN = setmetatable({}, {__call = function(self, arg)
-	if arg and arg:match('^PlayerP[1-8]$')then
+	if arg and arg:match('^PlayerP[1-8]$') then
 		if deleted_players[tonumber(arg:match('^PlayerP([1-8])'))] then
 			return nil
 		end

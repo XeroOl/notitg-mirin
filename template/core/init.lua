@@ -246,10 +246,10 @@ M.P = P
 function M.prepare_variables()
 	for pn = 1, max_pn do
 		local player = SCREENMAN('PlayerP' .. pn)
-		xero['P' .. pn] = player
+		rawset(xero, 'P' .. pn, player)
 		P[pn] = player
 	end
-	xero.P = P
+	rawset(xero, 'P', P)
 end
 
 -- runs once during ScreenReadyCommand, after the user code is loaded

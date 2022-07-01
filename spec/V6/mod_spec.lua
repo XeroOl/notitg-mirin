@@ -6,7 +6,7 @@ describe('mod', function()
 
 	before_each(function()
 		helper.reset()
-		helper.init(false, true)
+		helper.init(true)
 	end)
 
 	after_each(function()

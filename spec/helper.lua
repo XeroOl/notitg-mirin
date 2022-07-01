@@ -1,19 +1,33 @@
 local helper = {}
 local mock
 
--- state
-local cached_preload
+local cache = {}
+local old_loadfile = loadfile
 
-local mockrunner = assert(loadfile('spec/mock.lua'))
+function loadfile(filename)
+	if mock.file_override[filename] then
+		return mock.file_override[filename]
+	elseif cache[filename] then
+		return cache[filename]
+	else
+		local file, err = old_loadfile(filename)
+		if err then
+			return file, err
+		end
+		cache[filename] = file
+		return file
+	end
+end
+
+local mockrunner = assert(old_loadfile('spec/mock.lua'))
 function helper.reset()
 	mock = mockrunner()
-	if xero then
-		if xero.package.preload then
-			cached_preload = xero.package.preload
-			cached_preload.actors = nil
-		end
-	end
+	mock.file_override = {['lua/mods.lua'] = function() end}
 	xero = nil
+end
+
+function helper.putfile(path, impl)
+	mock.file_override[path] = impl
 end
 
 function helper.get_mod(mod, pn)
@@ -29,19 +43,11 @@ local body = io.open('./template/main.xml'):read('*a')
 local initcommand = 'return ' .. body:match('"%%(.-)"')
 initcommand = assert(loadstring(initcommand, "template/main.xml"))()
 
-function helper.init(skip_exports, v6)
+function helper.init(v6)
 	local h = helper
 
 	h.foreground = mock.newactorframe()
 	initcommand(h.foreground)
-
-	if cached_preload then
-		xero.package.preload = cached_preload
-		for _, package in pairs(xero.package.preload) do
-			xero(package)
-		end
-	end
-	xero.package.preload.mods = function() end
 
 	h.template = mock.newactor()
 	h.template:addcommand('Init', xero.require('core.commands').init)
@@ -61,14 +67,12 @@ function helper.init(skip_exports, v6)
 	mock.add_child(h.layout, pc2)
 	mock.add_child(h.layout, pj1)
 	mock.add_child(h.layout, pj2)
-	if not skip_exports then
-		local copy = xero.require('core.utils').copy
-		copy(xero.require('mirin.eases'), xero)
-		if not v6 then
-			copy(xero.require('mirin.template'), xero)
-		else
-			copy(xero.require('mirin.v6'), xero)
-		end
+	local copy = xero.require('core.utils').copy
+	copy(xero.require('mirin.eases'), xero)
+	if not v6 then
+		copy(xero.require('mirin.template'), xero)
+	else
+		copy(xero.require('mirin.v6'), xero)
 	end
 end
 

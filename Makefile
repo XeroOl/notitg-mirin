@@ -19,7 +19,7 @@ lint:
 	luacheck template
 
 test:
-	busted
+	busted --suppress-pending
 
 coverage:
 	busted --coverage --suppress-pending || true

@@ -19,12 +19,13 @@ describe('extra.renumbering', function()
 		end
 
 		local s1, s2
+		local spy = spy
 
-		xero.package.preload['mods'] = function()
-			s1 = spy.on(xero.P2, 'SetInputPlayer')
-			s2 = spy.on(xero.P4, 'SetInputPlayer')
+		helper.putfile('lua/mods.lua', function()
+			s1 = spy.on(P2, 'SetInputPlayer')
+			s2 = spy.on(P4, 'SetInputPlayer')
 			xero.require('extra.renumbering')
-		end
+		end)
 
 		update()
 		assert(xero.P1, 'missing P1')
@@ -53,12 +54,13 @@ describe('extra.renumbering', function()
 		end
 
 		local s1, s2
+		local spy = spy
 
-		xero.package.preload['mods'] = function()
-			s1 = spy.on(xero.P1, 'SetInputPlayer')
-			s2 = spy.on(xero.P3, 'SetInputPlayer')
+		helper.putfile('lua/mods.lua', function()
+			s1 = spy.on(P1, 'SetInputPlayer')
+			s2 = spy.on(P3, 'SetInputPlayer')
 			xero.require('extra.renumbering')
-		end
+		end)
 
 		update()
 		assert(xero.P1, 'missing P1')
