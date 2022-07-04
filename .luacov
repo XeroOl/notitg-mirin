@@ -1,5 +1,4 @@
-modules = {
-    ["template.template"] = "./template/template.lua",
-    ["template.ease"] = "./template/ease.lua",
-    ["template.std"] = "./template/std.lua",
+exclude = {
+    "^spec", "^%./spec",
+    "^/",
 }
