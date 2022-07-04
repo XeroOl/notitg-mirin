@@ -3,6 +3,7 @@ copy(require('mirin.actors'), xero)
 copy(require('mirin.eases'), xero)
 copy(require('mirin.template'), xero)
 require('extra.hideoverlay')
+-- local card = require('card')
 
 -- judgment proxies
 for pn = 1, 2 do

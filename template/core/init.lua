@@ -242,10 +242,14 @@ end
 local P = {}
 M.P = P
 local default_inputs = {
-	[1] = "P1", [2] = "P2",
-	[3] = "P1", [4] = "P2",
-	[5] = "P1", [6] = "P2",
-	[7] = "P1", [8] = "P2",
+	[1] = 'P1',
+	[2] = 'P2',
+	[3] = 'P1',
+	[4] = 'P2',
+	[5] = 'P1',
+	[6] = 'P2',
+	[7] = 'P1',
+	[8] = 'P2',
 }
 
 local function setup_player_inputs()
@@ -260,7 +264,7 @@ local function setup_player_inputs()
 		if player then
 			local input_player = input_names[inputs[pn] or default_inputs[pn]]
 			if not input_player then
-				error("Unknown input in configuration: " .. tostring(inputs[pn]))
+				error('Unknown input in configuration: ' .. tostring(inputs[pn]))
 			end
 			player:SetInputPlayer(input_player)
 		end

@@ -25,10 +25,10 @@ local init, on, ready, update
 -- This is the entry point of the template.
 -- It sets up all of the commands used to run the template.
 function init(self)
--- This sets up a trick to get the Song time during the update command
-self:effectclock('music')
+	-- This sets up a trick to get the Song time during the update command
+	self:effectclock('music')
 
--- Register the commands to the actor
+	-- Register the commands to the actor
 
 	-- OnCommand is for resolving Name= on all the actors
 	self:addcommand('On', on)
@@ -47,9 +47,15 @@ self:effectclock('music')
 
 	-- syntax error
 	require('core.setup')
-	if options.use_prelude then require('prelude') end
-	if options.lua_pre_entry_path then assert(loadfile(xero.dir .. options.lua_pre_entry_path))() end
-	if options.strict then enable_strict_mode() end
+	if options.use_prelude then
+		require('prelude')
+	end
+	if options.lua_pre_entry_path then
+		assert(loadfile(xero.dir .. options.lua_pre_entry_path))()
+	end
+	if options.strict then
+		enable_strict_mode()
+	end
 
 	-- NotITG and OpenITG have a long standing bug where the InitCommand on an actor can run twice in certain cases.
 	-- By removing the command here (at the end of initcommand), we prevent it from being run again.
