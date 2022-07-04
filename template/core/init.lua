@@ -239,65 +239,99 @@ function M.scan_named_actors()
 	package.loaded['mirin.actors'] = actors
 end
 
--- runs once during ScreenReadyCommand, before the user code is loaded
--- sets up the player tables
 local P = {}
 M.P = P
-function M.prepare_variables()
+local default_inputs = {
+	[1] = "P1", [2] = "P2",
+	[3] = "P1", [4] = "P2",
+	[5] = "P1", [6] = "P2",
+	[7] = "P1", [8] = "P2",
+}
+
+local function setup_player_inputs()
+	local inputs = options.inputs or default_inputs
+	local input_names = {
+		P1 = SCREENMAN('PlayerP1') and 0 or 1,
+		P2 = SCREENMAN('PlayerP2') and 1 or 0,
+		AUTO = 2,
+	}
 	for pn = 1, max_pn do
-		local player = SCREENMAN('PlayerP' .. pn)
+		local player = xero.P[pn]
+		if player then
+			local input_player = input_names[inputs[pn] or default_inputs[pn]]
+			if not input_player then
+				error("Unknown input in configuration: " .. tostring(inputs[pn]))
+			end
+			player:SetInputPlayer(input_player)
+		end
+	end
+end
+
+function M.setup_players()
+	local i = 1
+	for pn = 1, max_pn do
+		local player
+		while not player and i <= 8 do
+			player = SCREENMAN('PlayerP' .. i)
+			i = i + 1
+		end
 		rawset(xero, 'P' .. pn, player)
 		P[pn] = player
 	end
 	rawset(xero, 'P', P)
+	setup_player_inputs()
 end
 
 -- runs once during ScreenReadyCommand, after the user code is loaded
 -- sorts the mod tables so that things can be processed in order
 -- after the mod tables are sorted, no more calls to table-inserting functions are allowed
 function M.sort_tables()
-	-- sort eases by their start time, with resets running first if there's a tie break
-	-- it's a stable sort, so other ties are broken based on insertion order
-	sort.stable_sort(eases, function(a, b)
-		if a.start_time == b.start_time then
+	local function priority_comparator(a, b)
+		-- For priorities, negative numbers trump positive numbers,
+		-- so -1 is the greatest priority, and 1 is the smallest priority
+		if a < 0 and b >= 0 then
+			return false
+		end
+		if a >= 0 and b < 0 then
+			return true
+		end
+		return a < b
+	end
+
+	local function eases_comparator(a, b)
+		if a.start_time ~= b.start_time then
+			return a.start_time < b.start_time
+		else
+			-- resets win the tie breaker
 			return a.reset and not b.reset
-		else
-			return a.start_time < b.start_time
 		end
-	end)
+	end
+	sort.stable_sort(eases, eases_comparator)
 
-	-- sort the funcs by their start time and priority
-	-- the priority matches the insertion order unless the user added `defer = true`,
-	-- in which case the priority will be negative
-	sort.stable_sort(funcs, function(a, b)
-		if a.start_time == b.start_time then
-			local x, y = a.priority, b.priority
-			return x * x * y < x * y * y
-		else
+	local function funcs_comparator(a, b)
+		if a.start_time ~= b.start_time then
 			return a.start_time < b.start_time
+		else
+			return priority_comparator(a.priority, b.priority)
 		end
-	end)
+	end
+	sort.stable_sort(funcs, funcs_comparator)
 
-	-- sort the nodes by their priority
-	-- the priority matches the insertion order unless the user added `defer = true`,
-	-- in which case the priority will be negative
 	sort.stable_sort(nodes, function(a, b)
-		local x, y = a.priority, b.priority
-		return x * x * y < x * y * y
+		return priority_comparator(a.priority, b.priority)
 	end)
 end
 
--- runs once during ScreenReadyCommand, after the user code is loaded
--- replaces aliases with their respective mods
-function M.resolve_aliases()
-	-- aux
+local function resolve_aliases_for_aux()
 	local old_auxes = utils.copy(auxes)
 	utils.clear(auxes)
 	for mod, _ in pairs(old_auxes) do
 		-- auxes bypass name checks
 		auxes[M.normalize_mod_no_checks(mod)] = true
 	end
-	-- ease
+end
+
+local function resolve_aliases_for_ease()
 	for _, e in ipairs(eases) do
 		for i = 5, #e, 2 do
 			e[i] = M.normalize_mod(e[i])
@@ -315,7 +349,9 @@ function M.resolve_aliases()
 			end
 		end
 	end
-	-- node
+end
+
+local function resolve_aliases_for_node()
 	for _, node_entry in ipairs(nodes) do
 		local input = node_entry[1]
 		local output = node_entry[2]
@@ -326,7 +362,9 @@ function M.resolve_aliases()
 			output[i] = M.normalize_mod(output[i])
 		end
 	end
-	-- default_mods
+end
+
+local function resolve_aliases_for_default_mods()
 	local old_default_mods = utils.copy(default_mods)
 	utils.clear(default_mods)
 	for mod, percent in pairs(old_default_mods) do
@@ -336,6 +374,15 @@ function M.resolve_aliases()
 			touched_mods[pn][normalized] = true
 		end
 	end
+end
+
+-- runs once during ScreenReadyCommand, after the user code is loaded
+-- replaces aliases with their respective mods
+function M.resolve_aliases()
+	resolve_aliases_for_aux()
+	resolve_aliases_for_ease()
+	resolve_aliases_for_node()
+	resolve_aliases_for_default_mods()
 end
 
 -- data structure for nodes
@@ -672,6 +719,7 @@ function propagateAll(nodes_to_propagate)
 		end
 	end
 end
+
 function propagate(nd)
 	if nd[9] ~= seen then
 		nd[9] = seen
@@ -683,6 +731,7 @@ function propagate(nd)
 		end
 	end
 end
+
 function M.runnodes()
 	for pn = 1, max_pn do
 		if P[pn] and P[pn]:IsAwake() then

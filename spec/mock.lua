@@ -174,6 +174,11 @@ function Player:IsAwake()
 end
 
 function Player:SetInputPlayer(pn)
+	self._input_player = pn
+end
+
+function Player:GetInputPlayer()
+	return self._input_player
 end
 
 local screen_world = {}

@@ -39,6 +39,16 @@ function helper.round(num, numDecimalPlaces)
 	return math.floor(num * mult + 0.5) / mult
 end
 
+function helper.add_config_options(conf)
+	local prev_conf = loadfile('conf.lua')()
+	for k, v in pairs(conf) do
+		prev_conf[k] = v
+	end
+	helper.putfile('conf.lua', function()
+		return prev_conf
+	end)
+end
+
 local body = io.open('./template/main.xml'):read('*a')
 local initcommand = 'return ' .. body:match('"%%(.-)"')
 initcommand = assert(loadstring(initcommand, "template/main.xml"))()

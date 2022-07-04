@@ -6,15 +6,29 @@ local foreground = xero.foreground
 
 local M = {}
 
+local function enable_strict_mode()
+	local error, tostring, _G = error, tostring, _G
+	local mt = getmetatable(xero)
+	function mt.__newindex(_self, k, _v)
+		error('Writing global in strict mode: ' .. tostring(k), 2)
+	end
+	function mt.__index(_self, k)
+		if _G[k] ~= nil then
+			return _G[k]
+		end
+		error('Reading bad global in strict mode: ' .. tostring(k), 2)
+	end
+end
+
 local init, on, ready, update
 
 -- This is the entry point of the template.
 -- It sets up all of the commands used to run the template.
 function init(self)
-	-- This sets up a trick to get the Song time during the update command
-	self:effectclock('music')
+-- This sets up a trick to get the Song time during the update command
+self:effectclock('music')
 
-	-- Register the commands to the actor
+-- Register the commands to the actor
 
 	-- OnCommand is for resolving Name= on all the actors
 	self:addcommand('On', on)
@@ -33,25 +47,9 @@ function init(self)
 
 	-- syntax error
 	require('core.setup')
-	if options.use_prelude then
-		require('prelude')
-	end
-	if options.lua_pre_entry_path then
-		assert(loadfile(xero.dir .. options.lua_pre_entry_path))()
-	end
-	if options.strict then
-		local error, tostring, _G = error, tostring, _G
-		local mt = getmetatable(xero)
-		function mt.__newindex(_self, k, _v)
-			error('Writing global in strict mode: ' .. tostring(k), 2)
-		end
-		function mt.__index(_self, k)
-			if _G[k] ~= nil then
-				return _G[k]
-			end
-			error('Reading bad global in strict mode: ' .. tostring(k), 2)
-		end
-	end
+	if options.use_prelude then require('prelude') end
+	if options.lua_pre_entry_path then assert(loadfile(xero.dir .. options.lua_pre_entry_path))() end
+	if options.strict then enable_strict_mode() end
 
 	-- NotITG and OpenITG have a long standing bug where the InitCommand on an actor can run twice in certain cases.
 	-- By removing the command here (at the end of initcommand), we prevent it from being run again.
@@ -64,7 +62,7 @@ function on(self)
 end
 
 function ready(self)
-	core.prepare_variables()
+	core.setup_players()
 	foreground:hidden(0)
 
 	-- loads both the plugins and the layout.xml due to propagation

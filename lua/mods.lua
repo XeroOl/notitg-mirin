@@ -2,7 +2,6 @@ local copy = require('core.utils').copy
 copy(require('mirin.actors'), xero)
 copy(require('mirin.eases'), xero)
 copy(require('mirin.template'), xero)
-require('extra.renumbering')
 require('extra.hideoverlay')
 
 -- judgment proxies

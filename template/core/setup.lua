@@ -2,11 +2,7 @@ local utils = require('core.utils')
 
 -- Move global functions to the xero table, allowing for slightly faster
 -- performance due to not having to go back and forth between xero and _G.
-local old = _G.xero
-assert(xero.xero == _G.xero)
 xero.xero = _G.xero
-assert(old == _G.xero)
-
 xero.type = _G.type
 xero.print = _G.print
 xero.pairs = _G.pairs
