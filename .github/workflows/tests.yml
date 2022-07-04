@@ -33,17 +33,17 @@ jobs:
       id: setup
       run: |
         luarocks install busted
-        luarocks install luacov
+        luarocks install cluacov
 
     - name: Run Tests with busted
       id: test
       run: |
-        busted -o utfTerminal
+        make test
 
     - name: Check Test Coverage with luacov
       id: coverage
       run: |
-        ./check_coverage.sh
+        make coverage
 
     # Switch to badges to push
     - uses: actions/checkout@v3

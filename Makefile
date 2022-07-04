@@ -29,9 +29,7 @@ coverage:
 	rm luacov.stats.out
 
 clean:
-	# from the default target
 	rm -rf build
 	rm -rf $(FILENAME).zip
-	# from coverage
 	rm -rf luacov.report.out
 	rm -rf luacov.stats.out
