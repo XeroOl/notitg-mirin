@@ -22,7 +22,7 @@ end
 -- (as in: contiguous numerical indexes from 1 to #table)
 function M.iclear(t)
 	for i = 1, #t do
-		table.remove(t)
+		t[i] = nil
 	end
 	return t
 end
