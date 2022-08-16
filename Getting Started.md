@@ -124,7 +124,7 @@ Here's an example that that turns `invert` on at beat 12, and turns it back off 
 ease {12, 2, outExpo, 100, 'invert'}
 
 -- on beat 16, for 2 beats, use the `outExpo` animation to set 0% invert
-ease {12, 2, outExpo, 0, 'invert'}
+ease {16, 2, outExpo, 0, 'invert'}
 ```
 This example used a length of `2`, and the `outExpo` ease, but you can try changing the ease to another one from [the ease list](docs/eases.md), and you can change the length.
 You can find more information about `ease` on [its documentation page](docs/ease.md).
