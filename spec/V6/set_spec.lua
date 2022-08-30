@@ -14,7 +14,7 @@ describe('set', function()
 	end)
 
 	it('should set the mod', function()
-		xero.set(0,{bumpy = 100})
+		xero.set(0, {bumpy = 100})
 		update()
 		assert.equal('100', helper.get_mod('bumpy'))
 	end)

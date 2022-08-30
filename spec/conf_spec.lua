@@ -27,7 +27,7 @@ describe('conf_options', function()
 	end)
 
 	it('should support changing max_pn', function()
-		helper.add_config_options { max_pn = 4 }
+		helper.add_config_options {max_pn = 4}
 		helper.init()
 		local options = xero.require('core.options')
 		assert(options.max_pn == 4)
@@ -44,7 +44,7 @@ describe('conf_options', function()
 
 	it('should support lua entry path', function()
 		local ran = false
-		helper.add_config_options { lua_entry_path = 'other_path.lua' }
+		helper.add_config_options {lua_entry_path = 'other_path.lua'}
 		putfile('other_path.lua', function() ran = true end)
 		putfile('lua/mods.lua', function() error('loaded the original') end)
 		helper.init()
@@ -67,7 +67,7 @@ describe('conf_options', function()
 	end)
 
 	it('should support lua_pre_entry_path', function()
-		helper.add_config_options { lua_pre_entry_path = 'my_pre.lua' }
+		helper.add_config_options {lua_pre_entry_path = 'my_pre.lua'}
 		local ran = false
 		putfile('my_pre.lua', function()
 			ran = true
@@ -79,7 +79,7 @@ describe('conf_options', function()
 	end)
 
 	it('should support strict mode', function()
-		helper.add_config_options { strict = true }
+		helper.add_config_options {strict = true}
 		helper.init()
 		helper.update()
 		helper.update()
@@ -87,9 +87,9 @@ describe('conf_options', function()
 	end)
 
 	it('should enforce strict mode (disallow writing unknown globals)', function()
-		helper.add_config_options { strict = true }
+		helper.add_config_options {strict = true}
 		putfile('lua/mods.lua', function()
-			my_global = 5
+			My_global = 5
 		end)
 		helper.init()
 		assert.errors(function()
@@ -98,7 +98,7 @@ describe('conf_options', function()
 	end)
 
 	it('should enforce strict mode (disallow reading unknown globals)', function()
-		helper.add_config_options { strict = true }
+		helper.add_config_options {strict = true}
 		putfile('lua/mods.lua', function()
 			print(unknown_global_or_a_word_with_a_typo_in_it)
 		end)
@@ -175,10 +175,10 @@ describe('conf_options', function()
 	it('Configuration should change the player inputs', function()
 		helper.add_config_options {
 			inputs = {
-				[1] = 'P1',   [2] = 'P2',
+				[1] = 'P1', [2] = 'P2',
 				[3] = 'AUTO', [4] = 'P2',
 				[5] = 'AUTO', [6] = 'AUTO',
-				[7] = 'P2',   [8] = 'P1',
+				[7] = 'P2', [8] = 'P1',
 			},
 		}
 		init()

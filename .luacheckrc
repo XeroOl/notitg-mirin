@@ -19,6 +19,7 @@ files['template/core/setup.lua'] = {
         "113"; -- write unknown global
     }
 }
+
 files['template/require.lua'] = {
     globals = {
         "require";

@@ -32,5 +32,5 @@ describe('acc', function()
 	it('should throw errors', function()
 		assert.errors(function() xero.acc() end)
 	end)
-	
+
 end)

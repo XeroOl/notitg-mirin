@@ -617,12 +617,12 @@ function M.node(self)
 	end
 	local fn = self[i]
 	i = i + 1
-	local out = {}
+	local outputs = {}
 	while self[i] do
-		table.insert(out, self[i])
+		table.insert(outputs, self[i])
 		i = i + 1
 	end
-	local result = { inputs, out, fn }
+	local result = { inputs, outputs, fn }
 	result.priority = (self.defer and -1 or 1) * (#core.nodes + 1)
 	table.insert(core.nodes, result)
 	return M.node

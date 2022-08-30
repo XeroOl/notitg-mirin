@@ -71,10 +71,11 @@ describe('reset', function()
 		assert.errors(function() xero.reset(0, '1') end, 'invalid options table')
 
 		-- invalid plr option
-		assert.errors(function() xero.reset(0,{plr = '1'}) end, 'invalid plr option')
+		assert.errors(function() xero.reset(0, {plr = '1'}) end, 'invalid plr option')
 
 		-- mutually exclusive only and exclude
-		assert.errors(function() xero.reset(0,{only = 'bumpy', exclude = 'invert'}) end, 'only and exclude options are mutually exclusive')
+		assert.errors(function() xero.reset(0, {only = 'bumpy', exclude = 'invert'}) end,
+			'only and exclude options are mutually exclusive')
 
 		-- invalid exclude option
 		assert.errors(function() xero.reset(0, {exclude = 1}) end, 'invalid exclude option')

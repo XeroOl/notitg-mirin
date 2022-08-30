@@ -389,11 +389,11 @@ function M.resolve_aliases()
 	resolve_aliases_for_default_mods()
 end
 
--- data structure for nodes
-local node_start = {}
-
 -- keep track of which players are awake
 local last_seen_awake = {}
+
+-- data structure for nodes
+local node_start = {}
 
 -- runs once during ReadyCommand
 function M.compile_nodes()
@@ -412,15 +412,15 @@ function M.compile_nodes()
 	local last = {}
 	for _, nd in ipairs(nodes) do
 		-- struct node {
-		--     list<string> inputs;
-		--     list<string> out;
-		--     lua_function fn;
-		--     list<struct node> children;
-		--     list<list<struct node>> parents; // the inner lists also have a [0] field that is a boolean
-		--     lua_function real_fn;
-		--     list<map<string, float>> outputs;
-		--     bool terminator;
-		--     int seen;
+		--    1  list<string> inputs;
+		--    2  list<string> out;
+		--    3  lua_function fn;
+		--    4  list<struct node> children;
+		--    5  list<list<struct node>> parents; // the inner lists also have a [0] field that is a boolean
+		--    6  lua_function real_fn;
+		--    7  list<map<string, float>> outputs;
+		--    8  bool terminator;
+		--    9  int seen;
 		-- }
 		local terminator = nd[8]
 		if not terminator then
@@ -441,11 +441,10 @@ function M.compile_nodes()
 			reverse_in[v] = true
 			start[v] = start[v] or {}
 			parents[i] = {}
-			if not start[v][locked] then
-				table.insert(start[v], nd)
-			end
 			if start[v][locked] then
 				parents[i][0] = true
+			else
+				table.insert(start[v], nd)
 			end
 			for _, pre in ipairs(last[v] or {}) do
 				table.insert(pre[4], nd)
@@ -525,6 +524,9 @@ function M.compile_nodes()
 		v[locked] = nil
 	end
 end
+
+--function M.compile_nodes() end
+
 local function apply_modifiers(str, pn)
 	GAMESTATE:ApplyModifiers(str, pn)
 end

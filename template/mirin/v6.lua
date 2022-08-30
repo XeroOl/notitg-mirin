@@ -43,7 +43,15 @@ local function check_mod_errors(beat, len, eas, mods, opts, name)
 		if type(mod) ~= 'string' then
 			return 'invalid mod: ' .. tostring(mod)
 		end
-		if type(percent) ~= 'number' then
+		if type(percent) == 'table' then
+			local percent1, percent2 = percent[1], percent[2]
+			if type(percent1) ~= 'number' then
+				return tostring(mod) .. ' has invalid start percent'
+			end
+			if type(percent2) ~= 'number' then
+				return tostring(mod) .. ' has invalid end percent'
+			end
+		elseif type(percent) ~= 'number' then
 			return tostring(mod) .. ' has invalid percent'
 		end
 	end
@@ -183,33 +191,57 @@ function M.mod(beat, len, eas, mods, opts)
 	end
 
 	-- The entry that will eventually be passed into the template's mods table
+	local setentry
 	local entry = { beat, len, eas }
-
-	-- Convert the start time to seconds if it is provided in beats.
-	entry.start_time = opts.time and beat or song:GetElapsedTimeFromBeat(beat)
 
 	-- Convert the provided mods table from `{key = percent}` to `{percent, key}`.
 	for mod, percent in pairs(mods) do
-		table.insert(entry, percent)
-		table.insert(entry, mod)
+		if type(percent) == 'table' then
+			setentry = setentry or { beat, 0, instant }
+			table.insert(setentry, percent[1])
+			table.insert(setentry, mod)
+			table.insert(entry, opts.relative and percent[2] - percent[1] or percent[2])
+			table.insert(entry, mod)
+		else
+			table.insert(entry, percent)
+			table.insert(entry, mod)
+		end
+	end
+
+	-- Convert the start time to seconds if it is provided in beats.
+	entry.start_time = opts.time and beat or song:GetElapsedTimeFromBeat(beat)
+	if setentry then
+		setentry.start_time = opts.time and beat or song:GetElapsedTimeFromBeat(beat)
 	end
 
 	-- Parse all the optional parameters, besides plr into the mod entry.
 	for opt, v in pairs(opts) do
 		if opt ~= 'plr' then
 			entry[opt] = v
+			if setentry then
+				setentry[opt] = v
+			end
 		end
 	end
 
 	-- Parse the plr option if provided and insert new entries for all players needed.
 	local plr = opts.plr or get_plr()
 	if type(plr) == 'table' then
-		for i, pn in ipairs(plr) do
+		for _, pn in ipairs(plr) do
+			if setentry then
+				local newset = utils.copy(setentry)
+				newset.plr = pn
+				table.insert(core.eases, newset)
+			end
 			local new = utils.copy(entry)
 			new.plr = pn
 			table.insert(core.eases, new)
 		end
 	else
+		if setentry then
+			setentry.plr = plr
+			table.insert(core.eases, setentry)
+		end
 		entry.plr = plr
 		table.insert(core.eases, entry)
 	end
