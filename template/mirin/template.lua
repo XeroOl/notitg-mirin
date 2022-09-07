@@ -603,7 +603,7 @@ function M.node(self)
 			table.insert(multipliers, amt)
 			i = i + 1
 		end
-		local ret = table.concat(multipliers, ', ')
+		local ret = table.concat(multipliers, ',')
 		local code = 'return function(p) return ' .. ret .. ' end'
 		local fn = loadstring(code, 'node_generated')()
 		table.insert(self, 2, fn)
@@ -622,7 +622,7 @@ function M.node(self)
 		table.insert(outputs, self[i])
 		i = i + 1
 	end
-	local result = { inputs, outputs, fn }
+	local result = { inputs = inputs, outputs = outputs, fn = fn }
 	result.priority = (self.defer and -1 or 1) * (#core.nodes + 1)
 	table.insert(core.nodes, result)
 	return M.node

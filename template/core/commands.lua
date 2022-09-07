@@ -79,7 +79,7 @@ function ready(self)
 
 	core.sort_tables()
 	core.resolve_aliases()
-	core.compile_nodes()
+	core.process_nodes()
 
 	-- TODO can we remove this or move it into compile_nodes
 	for i = 1, options.max_pn do

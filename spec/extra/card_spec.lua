@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global
 local helper = require 'spec.helper'
 local update = helper.update
 

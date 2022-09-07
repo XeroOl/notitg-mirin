@@ -356,14 +356,12 @@ local function resolve_aliases_for_ease()
 end
 
 local function resolve_aliases_for_node()
-	for _, node_entry in ipairs(nodes) do
-		local input = node_entry[1]
-		local output = node_entry[2]
-		for i = 1, #input do
-			input[i] = M.normalize_mod(input[i])
+	for _, node in ipairs(nodes) do
+		for i = 1, #node.inputs do
+			node.inputs[i] = M.normalize_mod(node.inputs[i])
 		end
-		for i = 1, #output do
-			output[i] = M.normalize_mod(output[i])
+		for i = 1, #node.outputs do
+			node.outputs[i] = M.normalize_mod(node.outputs[i])
 		end
 	end
 end
@@ -393,139 +391,165 @@ end
 local last_seen_awake = {}
 
 -- data structure for nodes
-local node_start = {}
+local startnodes = {}
 
--- runs once during ReadyCommand
-function M.compile_nodes()
-	local terminators = {}
-	for _, nd in ipairs(nodes) do
-		for _, mod in ipairs(nd[2]) do
-			terminators[mod] = true
-		end
-	end
-	local priority = -1 * (#nodes + 1)
-	for k, _ in pairs(terminators) do
-		table.insert(nodes, { { k }, {}, nil, nil, nil, nil, nil, true, priority = priority })
-	end
-	local start = node_start
-	local locked = {}
-	local last = {}
-	for _, nd in ipairs(nodes) do
-		-- struct node {
-		--    1  list<string> inputs;
-		--    2  list<string> out;
-		--    3  lua_function fn;
-		--    4  list<struct node> children;
-		--    5  list<list<struct node>> parents; // the inner lists also have a [0] field that is a boolean
-		--    6  lua_function real_fn;
-		--    7  list<map<string, float>> outputs;
-		--    8  bool terminator;
-		--    9  int seen;
-		-- }
-		local terminator = nd[8]
-		if not terminator then
-			nd[4] = {} -- children
-			nd[7] = {} -- outputs
-			for pn = 1, max_pn do
-				nd[7][pn] = {}
-			end
-		end
-		nd[5] = {} -- parents
-		local inputs = nd[1]
-		local out = nd[2]
-		local fn = nd[3]
-		local parents = nd[5]
-		local outputs = nd[7]
-		local reverse_in = {}
-		for i, v in ipairs(inputs) do
-			reverse_in[v] = true
-			start[v] = start[v] or {}
-			parents[i] = {}
-			if start[v][locked] then
-				parents[i][0] = true
-			else
-				table.insert(start[v], nd)
-			end
-			for _, pre in ipairs(last[v] or {}) do
-				table.insert(pre[4], nd)
-				table.insert(parents[i], pre[7])
-			end
-		end
-		for _, v in ipairs(out) do
-			if reverse_in[v] then
-				start[v][locked] = true
-				last[v] = { nd }
-			elseif not last[v] then
-				last[v] = { nd }
-			else
-				table.insert(last[v], nd)
+do -- all code related to processing nodes -- redone by chegg
+	local function add_terminators()
+		local terminators = {}
+		for _, node in ipairs(nodes) do
+			for _, mod in ipairs(node.outputs) do
+				terminators[mod] = mod
 			end
 		end
 
+		for _, mod in pairs(terminators) do
+			table.insert(nodes, {
+				inputs = { mod },
+				outputs = {},
+				terminator = true,
+			})
+		end
+	end
+
+	local function create_edges()
+		local writers = {}
+		for _, node in ipairs(nodes) do
+			node.children = {}
+			node.parents = {}
+			if not node.terminators then
+				node.results = {}
+			end
+			for _, mod in ipairs(node.outputs) do
+				writers[mod] = writers[mod] or {}
+				table.insert(writers[mod], node)
+				node.results[mod] = {}
+			end
+		end
+
+		for _, node in ipairs(nodes) do
+			for _, mod in ipairs(node.inputs) do
+				startnodes[mod] = startnodes[mod] or {}
+				table.insert(startnodes[mod], node)
+
+				if writers[mod] then
+					for _, parent in ipairs(writers[mod]) do
+						node.parents[mod] = node.parents[mod] or {}
+
+						table.insert(parent.children, node)
+						table.insert(node.parents[mod], parent.results[mod])
+					end
+				end
+			end
+		end
+	end
+
+	local function sort_nodes()
+		local sorted = {}
+		local seen = 0
+		local function visit(node)
+			if node.seen == 2 then
+				return
+			end
+			if node.seen == 1 then
+				local err = stringbuilder.new()
+				err('Node Complilation Error: Recursive node dependency detected in node with inputs (')
+				err(table.concat(node.inputs), ', ')
+				err(') and outputs (')
+				err(table.concat(node.outputs), ', ')
+				err(').')
+				error(err)
+			end
+			node.seen = 1
+
+			for _, child in ipairs(node.children) do
+				visit(child)
+			end
+
+			node.seen = 2
+			seen = seen + 1
+			table.insert(sorted, node)
+		end
+		local i = 1
+		while seen ~= #nodes do
+			visit(nodes[i])
+			i = (i % #nodes) + 1
+		end
+		return sorted
+	end
+
+	local function compile_nodes()
 		local function escapestr(s)
 			return "'" .. string.gsub(s, "[\\']", '\\%1') .. "'"
 		end
-		local function list(code, i, sep)
-			if i ~= 1 then
-				code(sep)
+
+		local function list(code, str, i)
+			if i > 1 then
+				code(str)
 			end
 		end
 
-		local code = stringbuilder.new()
-		local function emit_inputs()
-			for i, mod in ipairs(inputs) do
-				list(code, i, ',')
-				for j = 1, #parents[i] do
-					list(code, j, '+')
-					code('parents[')(i)('][')(j)('][pn][')(escapestr(mod))(']')
-				end
-				if not parents[i][0] then
-					list(code, #parents[i] + 1, '+')
-					code('mods[pn][')(escapestr(mod))(']')
-				end
+		local function append_outputs(code, node)
+			for i, mod in ipairs(node.outputs) do
+				list(code, ',', i)
+				code('results[')(escapestr(mod))('][pn]')
 			end
 		end
-		local function emit_outputs()
-			for i, mod in ipairs(out) do
-				list(code, i, ',')
-				code('outputs[pn][')(escapestr(mod))(']')
-			end
-			return out[1]
-		end
-		code('return function(outputs, parents, mods, fn)\n')('return function(pn)\n')
-		if terminator then
-			code('mods[pn][')(escapestr(inputs[1]))('] = ')
-			emit_inputs()
-			code('\n')
-		else
-			if emit_outputs() then
-				code(' = ')
-			end
-			code('fn(')
-			emit_inputs()
-			code(', pn)\n')
-		end
-		code('end\n')('end\n')
 
-		local compiled = assert(loadstring(code:build(), 'node_generated'))()
-		nd[6] = compiled(outputs, parents, mods, fn)
-		if terminator then
-			for i, mod in ipairs(inputs) do
-				touch_mod(mod)
+		local function append_inputs(code, node)
+			for i, mod in ipairs(node.inputs) do
+				list(code, ',', i)
+				if node.parents[mod] then
+					for j = 1, #node.parents[mod] do
+						list(code, '+', j)
+						code('parents[')(escapestr(mod))('][')(j)('][pn]')
+					end
+					list(code, '+', #node.parents[mod] + 1)
+				end
+				code('mods[pn][')(escapestr(mod))(']')
 			end
-		else
-			for pn = 1, max_pn do
-				nd[6](pn)
+		end
+
+		for i = #nodes, 1, -1 do
+			local node = nodes[i]
+			local code = stringbuilder:new()
+			code('return function(parents, results, fn, mods) return function(pn)')
+			if not node.terminator then
+				if #node.outputs > 0 then
+					append_outputs(code, node)
+					code('=')
+				end
+				code('fn(')
+				append_inputs(code, node)
+				code(', pn)')
+			else
+				code('mods[pn][')(escapestr(node.inputs[1]))('] = \n')
+				append_inputs(code, node)
+			end
+			code('end end')
+
+			local compiled = assert(loadstring(code:build(), 'node_generated'))()
+			node.compfn = compiled(node.parents, node.results, node.fn, mods)
+			if not node.terminator then
+				for pn = 1, max_pn do
+					node.compfn(pn)
+				end
+			else
+				touch_mod(node.inputs[1])
 			end
 		end
 	end
 
-	for mod, v in pairs(start) do
-		v[locked] = nil
+	function M.process_nodes()
+		add_terminators()
+
+		create_edges()
+
+		nodes = sort_nodes()
+		M.nodes = nodes
+
+		compile_nodes()
 	end
 end
-
---function M.compile_nodes() end
 
 local function apply_modifiers(str, pn)
 	GAMESTATE:ApplyModifiers(str, pn)
@@ -714,26 +738,26 @@ function M.runfuncs(beat, time)
 	end
 end
 
-local seen = 1
+local seen = 0
 local active_nodes = {}
 local active_terminators = {}
 local propagateAll, propagate
 function propagateAll(nodes_to_propagate)
 	if nodes_to_propagate then
-		for _, nd in ipairs(nodes_to_propagate) do
-			propagate(nd)
+		for _, node in ipairs(nodes_to_propagate) do
+			propagate(node)
 		end
 	end
 end
 
-function propagate(nd)
-	if nd[9] ~= seen then
-		nd[9] = seen
-		if nd[8] then
-			table.insert(active_terminators, nd)
+function propagate(node)
+	if node.seen ~= seen then
+		node.seen = seen
+		if node.terminator then
+			table.insert(active_terminators, node)
 		else
-			propagateAll(nd[4])
-			table.insert(active_nodes, nd)
+			propagateAll(node.children)
+			table.insert(active_nodes, node)
 		end
 	end
 end
@@ -751,15 +775,15 @@ function M.runnodes()
 			seen = seen + 1
 			for k in pairs(mods[pn]) do
 				-- identify all nodes to execute this frame
-				propagateAll(node_start[k])
+				propagateAll(startnodes[k])
 			end
 			for _ = 1, #active_nodes do
 				-- run all the nodes
-				table.remove(active_nodes)[6](pn)
+				table.remove(active_nodes).compfn(pn)
 			end
 			for _ = 1, #active_terminators do
 				-- run all the nodes marked as 'terminator'
-				table.remove(active_terminators)[6](pn)
+				table.remove(active_terminators).compfn(pn)
 			end
 		else
 			last_seen_awake[pn] = false

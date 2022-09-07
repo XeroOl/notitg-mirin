@@ -6,15 +6,16 @@ local template = require('mirin.template')
 GAMESTATE:ApplyModifiers('clearall')
 
 -- zoom
-template.aux('zoom')
-template.node {
+template.definemod {
 	'zoom', 'zoomx', 'zoomy',
-	function(zoom, x, y)
+	function(zoom, x, y, pn)
+		local buffer = core.mod_buffer[pn]
 		local m = zoom * 0.01
-		return m * x, m * y
+		local zoomx, zoomy = m * x, m * y
+		buffer[#buffer+1] = string.format('*-1 %f zoomx', zoomx)
+		buffer[#buffer+1] = string.format('*-1 %f zoomy', zoomy)
 	end,
-	'zoomx', 'zoomy',
-	defer = true,
+	defer = true
 }
 
 template.setdefault {
