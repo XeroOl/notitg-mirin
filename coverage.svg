@@ -1,5 +1,5 @@
-<svg width="81.5" height="20" viewBox="0 0 815 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="luacov: 90%">
-  <title>luacov: 90%</title>
+<svg width="81.5" height="20" viewBox="0 0 815 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="luacov: 91%">
+  <title>luacov: 91%</title>
   <linearGradient id="a" x2="0" y2="100%">
     <stop offset="0" stop-opacity=".1" stop-color="#EEE"/>
     <stop offset="1" stop-opacity=".1"/>
@@ -7,18 +7,14 @@
   <mask id="m"><rect width="815" height="200" rx="30" fill="#FFF"/></mask>
   <g mask="url(#m)">
     <rect width="455" height="200" fill="#555"/>
-    <rect width="360" height="200" fill="url(#x)" x="455"/>
+    <rect width="360" height="200" fill="#3C1" x="455"/>
     <rect width="815" height="200" fill="url(#a)"/>
   </g>
   <g aria-hidden="true" fill="#fff" text-anchor="start" font-family="Verdana,DejaVu Sans,sans-serif" font-size="110">
     <text x="60" y="148" textLength="355" fill="#000" opacity="0.25">luacov</text>
     <text x="50" y="138" textLength="355">luacov</text>
-    <text x="510" y="148" textLength="260" fill="#000" opacity="0.25">90%</text>
-    <text x="500" y="138" textLength="260">90%</text>
+    <text x="510" y="148" textLength="260" fill="#000" opacity="0.25">91%</text>
+    <text x="500" y="138" textLength="260">91%</text>
   </g>
   
-  <linearGradient id="x" x1="0%" y1="0%" x2="100%" y2="0%">
-    <stop offset="0%" style="stop-color:#DB1" />
-    <stop offset="100%" style="stop-color:#3C1" />
-  </linearGradient>
 </svg>
