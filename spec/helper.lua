@@ -59,17 +59,20 @@ function helper.on()
 end
 
 function helper.update(dt)
-    if not mock.on_happened then helper.on() end
-    mock.advance_time(dt or 1/60)
-    for _, v in ipairs(mock.actors) do
-        while #v._queue >= 1 do
-            local queued = table.remove(v._queue, 1)
-            v:playcommand(queued)
-        end
-        if v._effect then
-            v:playcommand(v._effect)
-        end
-     end
+	if not mock.on_happened then helper.on() end
+	mock.advance_time(dt or 1 / 60)
+	for _, v in ipairs(mock.actors) do
+		while #v._queue >= 1 do
+			local queued = table.remove(v._queue, 1)
+			v:playcommand(queued)
+		end
+		if v._effect then
+			v:playcommand(v._effect)
+		end
+		if v._tween then
+			v._tween()
+		end
+	end
 end
 
 return helper

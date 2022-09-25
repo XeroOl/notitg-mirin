@@ -1181,7 +1181,10 @@ local function ready_command(self)
 	run_nodes()
 	run_mods()
 
-	self:luaeffect('Update')
+	self:tween(9e9, function()
+		self:playcommand('Update')
+		return 0
+	end)
 end
 
 local function update_command(self)

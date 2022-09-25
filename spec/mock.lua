@@ -143,6 +143,10 @@ function Actor:luaeffect(name)
     self._effect = name
 end
 
+function Actor:tween(dur, fn)
+	self._tween = fn
+end
+
 function Actor:effectclock()
 end
 
