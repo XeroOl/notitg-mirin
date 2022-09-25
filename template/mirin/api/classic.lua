@@ -7,6 +7,8 @@ local max_pn = require('mirin.options').max_pn
 local utils = require('mirin.utils')
 local instant = require('mirin.api.eases').instant
 
+local stringbuilder = require('mirin.utils.stringbuilder')
+
 local song = GAMESTATE:GetCurrentSong()
 
 -- the `plr=` system
@@ -399,59 +401,63 @@ function M.reset(self)
 	return M.reset
 end
 
--- func helper for scheduling a function
-function M.func(self)
-	local err = check_func_errors(self, 'func')
-	if err then
-		error(err, 2)
-	end
-
-	-- func {5, 'P1:xy', 2, 3}
-	if type(self[2]) == 'string' then
-		local args, syms = {}, {}
-		for i = 1, #self - 2 do
-			syms[i] = 'arg' .. i
-			args[i] = self[i + 2]
+do
+	local compiled = {}
+	-- func helper for scheduling a function
+	function M.func(self)
+		local err = check_func_errors(self, 'func')
+		if err then
+			error(err, 2)
 		end
-		local symstring = table.concat(syms, ', ')
-		local code = 'return function('
-			.. symstring
-			.. ') return function() '
-			.. self[2]
-			.. '('
-			.. symstring
-			.. ') end end'
-		self[2] = xero(assert(loadstring(code, 'func_generated')))()(unpack(args))
-		while self[3] do
-			table.remove(self)
-		end
-	end
-	self[2], self[3] = nil, self[2]
-	local persist = self.persist
-	-- convert mode into a regular true or false
-	self.mode = self.mode == 'end' or self.m == 'e'
 
-	if type(persist) == 'number' and self.mode then
-		persist = persist - self[1]
-	end
-	if persist == false then
-		persist = 0.5
-	end
-	if type(persist) == 'number' then
-		local fn = self[3]
-		local final_time = self[1] + persist
-		self[3] = function(beat)
-			if beat < final_time then
-				fn(beat)
+		-- func {5, 'P1:xy', 2, 3}
+		if type(self[2]) == 'string' then
+			local args, syms = {}, {}
+			for i = 1, #self - 2 do
+				syms[i] = 'arg' .. i
+				args[i] = self[i + 2]
+			end
+
+			compiled[self[2]] = compiled[self[2]] or {}
+			if not compiled[self[2]][#syms] then
+				local symstring = table.concat(syms, ',')
+				local code = stringbuilder.new()
+				code('return function(')(symstring)(') return function()')(self[2])('(')(symstring)(') end end')
+				compiled[self[2]][#syms] = xero(assert(loadstring(code:build(), 'func_generated')))()
+			end
+
+			self[2] = compiled[self[2]][#syms](unpack(args))
+			while self[3] do
+				table.remove(self)
 			end
 		end
+		self[2], self[3] = nil, self[2]
+		local persist = self.persist
+		-- convert mode into a regular true or false
+		self.mode = self.mode == 'end' or self.m == 'e'
+
+		if type(persist) == 'number' and self.mode then
+			persist = persist - self[1]
+		end
+		if persist == false then
+			persist = 0.5
+		end
+		if type(persist) == 'number' then
+			local fn = self[3]
+			local final_time = self[1] + persist
+			self[3] = function(beat)
+				if beat < final_time then
+					fn(beat)
+				end
+			end
+		end
+
+		self.priority = (self.defer and -1 or 1) * (#mirin.funcs + 1)
+		self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
+
+		table.insert(mirin.funcs, self)
+		return M.func
 	end
-
-	self.priority = (self.defer and -1 or 1) * (#mirin.funcs + 1)
-	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
-
-	table.insert(mirin.funcs, self)
-	return M.func
 end
 
 local disallowed_poptions_perframe_persist = setmetatable({}, {
@@ -499,48 +505,54 @@ function M.perframe(self, deny_poptions)
 end
 
 -- func helper for function eases
-function M.func_ease(self)
-	local err = check_func_ease_errors(self, 'func_ease')
-	if err then
-		error(err, 2)
-	end
+do
+	local compiled = {}
+	function M.func_ease(self)
+		local err = check_func_ease_errors(self, 'func_ease')
+		if err then
+			error(err, 2)
+		end
 
-	-- convert mode into a regular true or false
-	self.mode = self.mode == 'end' or self.m == 'e'
-	-- convert into relative
-	if self.mode then
-		self[2] = self[2] - self[1]
-	end
-	local fn = table.remove(self)
-	local eas = self[3]
-	local start_percent = #self >= 5 and table.remove(self, 4) or 0
-	local end_percent = #self >= 4 and table.remove(self, 4) or 1
-	local end_beat = self[1] + self[2]
+		-- convert mode into a regular true or false
+		self.mode = self.mode == 'end' or self.m == 'e'
+		-- convert into relative
+		if self.mode then
+			self[2] = self[2] - self[1]
+		end
+		local fn = table.remove(self)
+		local eas = self[3]
+		local start_percent = #self >= 5 and table.remove(self, 4) or 0
+		local end_percent = #self >= 4 and table.remove(self, 4) or 1
+		local end_beat = self[1] + self[2]
 
-	if type(fn) == 'string' then
-		fn = xero(assert(loadstring('return function(p) ' .. fn .. '(p) end', 'func_generated')))()
-	end
+		if type(fn) == 'string' then
+			if not compiled[fn] then
+				compiled[fn] = xero(assert(loadstring('return function(p)' .. fn .. '(p) end', 'func_generated')))()
+			end
+			fn = compiled[fn]
+		end
 
-	self[3] = function(beat)
-		local progress = (beat - self[1]) / self[2]
-		fn(start_percent + (end_percent - start_percent) * eas(progress))
-	end
+		self[3] = function(beat)
+			local progress = (beat - self[1]) / self[2]
+			fn(start_percent + (end_percent - start_percent) * eas(progress))
+		end
 
-	-- it's a function-ease variant, so make it persist
-	if self.persist ~= false then
-		local final_percent = eas(1) > 0.5 and end_percent or start_percent
-		M.func {
-			end_beat,
-			function()
-				fn(final_percent)
-			end,
-			persist = self.persist,
-			defer = self.defer,
-		}
+		-- it's a function-ease variant, so make it persist
+		if self.persist ~= false then
+			local final_percent = eas(1) > 0.5 and end_percent or start_percent
+			M.func {
+				end_beat,
+				function()
+					fn(final_percent)
+				end,
+				persist = self.persist,
+				defer = self.defer,
+			}
+		end
+		self.persist = false
+		M.perframe(self, true)
+		return M.func_ease
 	end
-	self.persist = false
-	M.perframe(self, true)
-	return M.func_ease
 end
 
 -- alias {'old', 'new'}
