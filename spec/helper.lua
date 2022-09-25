@@ -109,6 +109,9 @@ function helper.update(dt)
 		if v._effect then
 			v:playcommand(v._effect)
 		end
+		if v._tween then
+			v._tween()
+		end
 	end
 end
 

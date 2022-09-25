@@ -94,7 +94,10 @@ function ready(self)
 	mirin.runnodes()
 	mirin.runmods()
 
-	self:luaeffect('Update')
+	self:tween(9e9, function()
+		self:playcommand('Update')
+		return 0
+	end)
 end
 
 function update(self)
