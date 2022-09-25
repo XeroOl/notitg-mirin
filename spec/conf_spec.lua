@@ -22,14 +22,14 @@ describe('conf_options', function()
 		local conf = loadfile('conf.lua')()
 		putfile('conf.lua', function() return {} end)
 		helper.init()
-		local defaults = xero.require('core.options')
+		local defaults = xero.require('mirin.options')
 		assert.same(defaults, conf)
 	end)
 
 	it('should support changing max_pn', function()
 		helper.add_config_options {max_pn = 4}
 		helper.init()
-		local options = xero.require('core.options')
+		local options = xero.require('mirin.options')
 		assert(options.max_pn == 4)
 		xero.set {1, 100, 'invert', plr = 5}
 		update()

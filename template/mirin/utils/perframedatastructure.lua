@@ -1,4 +1,4 @@
-local sort = require('core.utils.sort')
+local sort = require('mirin.utils.sort')
 
 -- Data structure for all the `func` declarations.
 -- This custom data structure smartly handles func priorities, so the order

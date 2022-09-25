@@ -1,8 +1,8 @@
-local core = require('core')
-local commands = require('core.commands')
+local mirin = require('mirin')
+local commands = require('mirin.commands')
 
-local utils = require('core.utils')
-local instant = require('mirin.eases').instant
+local utils = require('mirin.utils')
+local instant = require('mirin.api.eases').instant
 
 local M = {}
 
@@ -231,19 +231,19 @@ function M.mod(beat, len, eas, mods, opts)
 			if setentry then
 				local newset = utils.copy(setentry)
 				newset.plr = pn
-				table.insert(core.eases, newset)
+				table.insert(mirin.eases, newset)
 			end
 			local new = utils.copy(entry)
 			new.plr = pn
-			table.insert(core.eases, new)
+			table.insert(mirin.eases, new)
 		end
 	else
 		if setentry then
 			setentry.plr = plr
-			table.insert(core.eases, setentry)
+			table.insert(mirin.eases, setentry)
 		end
 		entry.plr = plr
-		table.insert(core.eases, entry)
+		table.insert(mirin.eases, entry)
 	end
 end
 
@@ -350,12 +350,12 @@ function M.func(beat, fn, opts)
 	end
 
 	-- Give the func priority a based on defer
-	entry.priority = (opts.defer and -1 or 1) * (#core.funcs + 1)
+	entry.priority = (opts.defer and -1 or 1) * (#mirin.funcs + 1)
 
 	-- Convert beat to time if using time based
 	entry.start_time = opts.time and beat or song:GetElapsedTimeFromBeat(beat)
 
-	table.insert(core.funcs, entry)
+	table.insert(mirin.funcs, entry)
 end
 
 function M.fease(beat, len, eas, fn, opt) end

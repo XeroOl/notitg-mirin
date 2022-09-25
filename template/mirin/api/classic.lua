@@ -1,11 +1,11 @@
 local M = {}
 
-local commands = require('core.commands')
-local core = require('core')
-local max_pn = require('core.options').max_pn
+local commands = require('mirin.commands')
+local mirin = require('mirin')
+local max_pn = require('mirin.options').max_pn
 
-local utils = require('core.utils')
-local instant = require('mirin.eases').instant
+local utils = require('mirin.utils')
+local instant = require('mirin.api.eases').instant
 
 local song = GAMESTATE:GetCurrentSong()
 
@@ -304,11 +304,11 @@ function M.ease(self)
 		for i, pn in ipairs(plr) do
 			local new = utils.copy(self)
 			new.plr = pn
-			table.insert(core.eases, new)
+			table.insert(mirin.eases, new)
 		end
 	else
 		self.plr = plr
-		table.insert(core.eases, self)
+		table.insert(mirin.eases, self)
 	end
 	return M.ease
 end
@@ -447,10 +447,10 @@ function M.func(self)
 		end
 	end
 
-	self.priority = (self.defer and -1 or 1) * (#core.funcs + 1)
+	self.priority = (self.defer and -1 or 1) * (#mirin.funcs + 1)
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
 
-	table.insert(core.funcs, self)
+	table.insert(mirin.funcs, self)
 	return M.func
 end
 
@@ -477,7 +477,7 @@ function M.perframe(self, deny_poptions)
 			self.mods[pn] = {}
 		end
 	end
-	self.priority = (self.defer and -1 or 1) * (#core.funcs + 1)
+	self.priority = (self.defer and -1 or 1) * (#mirin.funcs + 1)
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
 
 	local persist = self.persist
@@ -494,7 +494,7 @@ function M.perframe(self, deny_poptions)
 		}
 	end
 
-	table.insert(core.funcs, self)
+	table.insert(mirin.funcs, self)
 	return M.perframe
 end
 
@@ -552,7 +552,7 @@ function M.alias(self)
 	end
 	local a, b = self[1], self[2]
 	a, b = string.lower(a), string.lower(b)
-	core.aliases[a] = b
+	mirin.aliases[a] = b
 	return M.alias
 end
 
@@ -564,7 +564,7 @@ function M.setdefault(self)
 		error(err, 2)
 	end
 	for i = 1, #self, 2 do
-		core.default_mods[self[i + 1]] = self[i]
+		mirin.default_mods[self[i + 1]] = self[i]
 	end
 	return M.setdefault
 end
@@ -578,7 +578,7 @@ function M.aux(self)
 	end
 	if type(self) == 'string' then
 		local v = self
-		core.auxes[v] = true
+		mirin.auxes[v] = true
 	elseif type(self) == 'table' then
 		for i = 1, #self do
 			M.aux(self[i])
@@ -623,8 +623,8 @@ function M.node(self)
 		i = i + 1
 	end
 	local result = { inputs = inputs, outputs = outputs, fn = fn }
-	result.priority = (self.defer and -1 or 1) * (#core.nodes + 1)
-	table.insert(core.nodes, result)
+	result.priority = (self.defer and -1 or 1) * (#mirin.nodes + 1)
+	table.insert(mirin.nodes, result)
 	return M.node
 end
 

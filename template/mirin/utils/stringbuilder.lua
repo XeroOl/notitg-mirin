@@ -1,4 +1,4 @@
-local iclear = require('core.utils').iclear
+local iclear = require('mirin.utils').iclear
 
 local M = {}
 

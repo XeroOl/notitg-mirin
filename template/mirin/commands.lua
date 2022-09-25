@@ -1,6 +1,6 @@
-local core = require('core')
-local options = require('core.options')
-local utils = require('core.utils')
+local mirin = require('mirin')
+local options = require('mirin.options')
+local utils = require('mirin.utils')
 
 local foreground = xero.foreground
 
@@ -46,7 +46,7 @@ function init(self)
 	end)
 
 	-- syntax error
-	require('core.setup')
+	require('mirin.setup')
 	if options.use_prelude then
 		require('prelude')
 	end
@@ -63,12 +63,12 @@ function init(self)
 end
 
 function on(self)
-	core.scan_named_actors()
+	mirin.scan_named_actors()
 	self:queuecommand('Ready')
 end
 
 function ready(self)
-	core.setup_players()
+	mirin.setup_players()
 	foreground:hidden(0)
 
 	-- loads both the plugins and the layout.xml due to propagation
@@ -77,13 +77,13 @@ function ready(self)
 	-- load the user code
 	xero(assert(loadfile(xero.dir .. options.lua_entry_path)))()
 
-	core.sort_tables()
-	core.resolve_aliases()
-	core.process_nodes()
+	mirin.sort_tables()
+	mirin.resolve_aliases()
+	mirin.process_nodes()
 
 	-- TODO can we remove this or move it into compile_nodes
 	for i = 1, options.max_pn do
-		utils.iclear(core.mod_buffer[i])
+		utils.iclear(mirin.mod_buffer[i])
 	end
 
 	-- load command has happened
@@ -91,8 +91,8 @@ function ready(self)
 	M.loaded = true
 
 	-- make sure nodes are up to date
-	core.runnodes()
-	core.runmods()
+	mirin.runnodes()
+	mirin.runmods()
 
 	self:luaeffect('Update')
 end
@@ -103,13 +103,13 @@ function update(self)
 	local beat = GAMESTATE:GetSongBeat()
 	local time = self:GetSecsIntoEffect()
 
-	core.runeases(beat, time)
-	core.runfuncs(beat, time)
-	core.runnodes()
-	core.runmods()
+	mirin.runeases(beat, time)
+	mirin.runfuncs(beat, time)
+	mirin.runnodes()
+	mirin.runmods()
 
 	if options.debug_print_mod_targets then
-		core.printtargets(beat)
+		mirin.printtargets(beat)
 	end
 
 	-- if no errors have occurred, unhide self

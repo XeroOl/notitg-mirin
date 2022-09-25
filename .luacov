@@ -1,5 +1,5 @@
 exclude = {
-    "template/core/utils/sort",
+    "template/mirin/utils/sort",
     "^spec", "^%./spec",
     "^/",
 }

@@ -1,8 +1,8 @@
-local options = require('core.options')
-local utils = require('core.utils')
-local sort = require('core.utils.sort')
-local stringbuilder = require('core.utils.stringbuilder')
-local perframedatastructure = require('core.utils.perframedatastructure')
+local options = require('mirin.options')
+local utils = require('mirin.utils')
+local sort = require('mirin.utils.sort')
+local stringbuilder = require('mirin.utils.stringbuilder')
+local perframedatastructure = require('mirin.utils.perframedatastructure')
 
 local foreground = xero.foreground
 local max_pn = options.max_pn
@@ -236,7 +236,7 @@ function M.scan_named_actors()
 	clear_viral_metatables(actors)
 
 	-- expose the list of actors as a package
-	package.loaded['mirin.actors'] = actors
+	package.loaded['mirin.api.actors'] = actors
 end
 
 local P = {}

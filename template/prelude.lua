@@ -1,7 +1,7 @@
 ---@diagnostic disable: lowercase-global
 -- stylua: ignore start
-local core = require('core')
-local template = require('mirin.template')
+local mirin = require('mirin')
+local template = require('mirin.api.classic')
 
 GAMESTATE:ApplyModifiers('clearall')
 
@@ -9,7 +9,7 @@ GAMESTATE:ApplyModifiers('clearall')
 template.definemod {
 	'zoom', 'zoomx', 'zoomy',
 	function(zoom, x, y, pn)
-		local buffer = core.mod_buffer[pn]
+		local buffer = mirin.mod_buffer[pn]
 		local m = zoom * 0.01
 		local zoomx, zoomy = m * x, m * y
 		buffer[#buffer+1] = string.format('*-1 %f zoomx', zoomx)
@@ -48,7 +48,7 @@ template.definemod {
 	'xmod',
 	'cmod',
 	function(xmod, cmod, pn)
-		local buffer = core.mod_buffer[pn]
+		local buffer = mirin.mod_buffer[pn]
 		if cmod == 0 then
 			buffer[#buffer + 1] = string.format('*-1 %fx', xmod)
 		else

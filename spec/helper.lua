@@ -60,7 +60,7 @@ function helper.init(v6)
 	initcommand(h.foreground)
 
 	h.template = mock.newactor()
-	h.template:addcommand('Init', xero.require('core.commands').init)
+	h.template:addcommand('Init', xero.require('mirin.commands').init)
 	h.template:playcommand('Init')
 
 	h.layout = mock.newactorframe()
@@ -77,12 +77,12 @@ function helper.init(v6)
 	mock.add_child(h.layout, pc2)
 	mock.add_child(h.layout, pj1)
 	mock.add_child(h.layout, pj2)
-	local copy = xero.require('core.utils').copy
-	copy(xero.require('mirin.eases'), xero)
+	local copy = xero.require('mirin.utils').copy
+	copy(xero.require('mirin.api.eases'), xero)
 	if not v6 then
-		copy(xero.require('mirin.template'), xero)
+		copy(xero.require('mirin.api.classic'), xero)
 	else
-		copy(xero.require('mirin.v6'), xero)
+		copy(xero.require('mirin.api'), xero)
 	end
 end
 
@@ -93,8 +93,8 @@ function helper.on()
 		end
 	end
 	mock.on_happened = true
-	local copy = xero.require('core.utils').copy
-	copy(xero.require('mirin.actors'), xero)
+	local copy = xero.require('mirin.utils').copy
+	copy(xero.require('mirin.api.actors'), xero)
 	helper.update(0)
 end
 

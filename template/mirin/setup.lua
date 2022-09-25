@@ -1,4 +1,4 @@
-local utils = require('core.utils')
+local utils = require('mirin.utils')
 
 -- Move global functions to the xero table, allowing for slightly faster
 -- performance due to not having to go back and forth between xero and _G.
@@ -22,7 +22,7 @@ xero.sh = SCREEN_HEIGHT
 xero.dw = DISPLAY:GetDisplayWidth()
 xero.dh = DISPLAY:GetDisplayHeight()
 
-xero.max_pn = require('core.options').max_pn
+xero.max_pn = require('mirin.options').max_pn
 
 xero()
 function sprite(self)
