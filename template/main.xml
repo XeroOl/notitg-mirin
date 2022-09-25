@@ -1,43 +1,36 @@
-<ActorFrame
-	InitCommand = "%function(self)
-		self:removecommand('Init')
-		-- `xero` is the only global variable written by this template
-		-- Everything, including the modder's variables are stored in it
-		xero = {
-			MIRIN_VERSION = '$VERSION',
-			foreground = self,
-			dir = GAMESTATE:GetCurrentSong():GetSongDir(),
-		}
+<ActorFrame InitCommand = "%function(self)
+	self:removecommand('Init')
 
-		-- Needed by StepMania, in order to not kill lua mods early
-		self:sleep(9e9)
+	-- Needed by StepMania, in order to not kill lua mods early
+	self:sleep(9e9)
 
-		-- Load all of the core .lua files
-		-- The order DOES matter here:
-		-- std.lua needs to be loaded first
-		-- template.lua needs to be last
-		loadfile(xero.dir..'template/std.lua')()
-		loadfile(xero.dir..'template/sort.lua')()
-		loadfile(xero.dir..'template/ease.lua')()
-		loadfile(xero.dir..'template/template.lua')()
-		
+	-- `xero` is the only global variable written by this template
+	-- Everything, including the modder's variables are stored in it
+	xero = {
+		MIRIN_VERSION = '$VERSION',
+		foreground = self,
+		dir = GAMESTATE:GetCurrentSong():GetSongDir(),
+	}
 
-	end"
->
+	-- prepare xero
+	setmetatable(xero, {
+		__index = _G,
+		__call = function(self, f) setfenv(f or 2, self); return f; end
+	})
+
+	-- prepare xero.require
+	xero(assert(loadfile(xero.dir..'template/require.lua')))()
+end">
 	<children>
 
-		<!-- Load the template onto an actor -->
-		<Layer InitCommand = "%xero.init_command"/>
+		<!-- Load the core onto an actor -->
+		<Layer InitCommand = "%xero.require('mirin.commands').init" />
 
-		<!-- Template plugins                              -->
-		<!--                                               -->
-		<!-- Handles the loading of any XML plugin present -->
-		<!-- in the `plugins/` directory.                  -->
-		<!-- .lua plugins are dealt with separately        -->
+		<!-- Template plugins -->
 		<Layer File = "plugins.xml" />
 
 		<!-- Load the User's actors -->
-		<Layer File = "../lua/layout.xml" />
+		<Layer File = "@'../'..xero.require('mirin.options').xml_entry_path" />
 
 	</children>
 </ActorFrame>

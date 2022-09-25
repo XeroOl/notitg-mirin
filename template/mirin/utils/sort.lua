@@ -21,7 +21,7 @@ used under license as follows:
 	DEALINGS IN THE SOFTWARE.
 
 (modifications by Max Cahill 2018, 2020)
-(modifications by XeroOl 2021)
+(aesthetic modifications by XeroOl 2021)
 
 Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
 ]]
@@ -31,11 +31,9 @@ local sort = {}
 -- Tunable threshold, deciding between the insertion sort and merge sort
 sort.max_chunk_size = 32
 
-
 -- ===================================================================== --
 
 -- Internal implementations
-
 
 -- Insertion sort on a section of an array
 function sort._insertion_sort_impl(array, first, last, less)
@@ -59,8 +57,8 @@ function sort._merge(array, workspace, low, middle, high, less)
 	local i, j, k
 	i = 1
 	-- copy first half of array to auxiliary array
-	for j = low, middle do
-		workspace[i] = array[j]
+	for m = low, middle do
+		workspace[i] = array[m]
 		i = i + 1
 	end
 	-- sieve through
@@ -71,7 +69,7 @@ function sort._merge(array, workspace, low, middle, high, less)
 		if (k >= j) or (j > high) then
 			break
 		end
-		if less(array[j], workspace[i])  then
+		if less(array[j], workspace[i]) then
 			array[k] = array[j]
 			j = j + 1
 		else
@@ -81,8 +79,8 @@ function sort._merge(array, workspace, low, middle, high, less)
 		k = k + 1
 	end
 	-- copy back any remaining elements of first half
-	for k = k, j - 1 do
-		array[k] = workspace[i]
+	for m = k, j - 1 do
+		array[m] = workspace[i]
 		i = i + 1
 	end
 end
@@ -123,30 +121,28 @@ end
 
 -- Public method: merge sort on an array. If the array length is
 -- less than `max_chunk_size`, an insertion sort will be done instead.
-function sort.stable_sort(array, less)
+function sort.stable_sort(array, less_)
 	--setup
-	local trivial, n, less = sort._sort_setup(array, less)
+	local trivial, n, less = sort._sort_setup(array, less_)
 	if not trivial then
 		--temp storage; allocate ahead of time
 		local workspace = {}
 		local middle = math.ceil(n / 2)
 		workspace[middle] = array[1]
 		--dive in
-		sort._merge_sort_impl( array, workspace, 1, n, less )
+		sort._merge_sort_impl(array, workspace, 1, n, less)
 	end
 	return array
 end
 
 -- Public method (currently not exposed): insertion sort
-function sort.insertion_sort(array, less)
+function sort.insertion_sort(array, less_)
 	--setup
-	local trivial, n, less = sort._sort_setup(array, less)
+	local trivial, n, less = sort._sort_setup(array, less_)
 	if not trivial then
 		sort._insertion_sort_impl(array, 1, n, less)
 	end
 	return array
 end
 
--- Exports
-xero.unstable_sort = table.sort
-xero.stable_sort = sort.stable_sort
+return sort
