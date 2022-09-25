@@ -561,7 +561,7 @@ if debug_print_applymodifier_input then
 	local old_apply_modifiers = apply_modifiers
 	apply_modifiers = function(str, pn)
 		if debug_print_applymodifier_input == true or debug_print_applymodifier_input < GAMESTATE:GetSongBeat() then
-			print('PLAYER ' .. pn .. ': ' .. str)
+			print('\nPLAYER ' .. pn .. ':\n    ' .. string.gsub(str, ',', '\n    '))
 			if debug_print_applymodifier_input ~= true then
 				apply_modifiers = old_apply_modifiers
 			end
