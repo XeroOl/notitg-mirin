@@ -599,7 +599,7 @@ function M.node(self)
 		local multipliers = {}
 		local i = 2
 		while self[i] do
-			local amt = string.format('p * %f', table.remove(self, i) * 0.01)
+			local amt = string.format('p * %f', table.remove(self, i))
 			table.insert(multipliers, amt)
 			i = i + 1
 		end
