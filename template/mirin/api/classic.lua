@@ -51,7 +51,11 @@ local function check_ease_errors(self, name)
 	end
 	local i = is_set and 2 or 4
 	while self[i] do
-		if type(self[i]) ~= 'number' then
+		if type(self[i]) == 'table' then
+			if #self[i] ~= 2 or type(self[i][1]) ~= 'number' or type(self[i][2]) ~= 'number' then
+				return 'invalid mod percent table'
+			end
+		elseif type(self[i]) ~= 'number' then
 			return 'invalid mod percent'
 		end
 		if type(self[i + 1]) ~= 'string' then
@@ -298,17 +302,38 @@ function M.ease(self)
 	-- convert the start beat into time and store it in start_time
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
 
+	local setentry
+	for i = 4, #self, 2 do
+		if type(self[i]) == 'table' then
+			if not setentry then
+				setentry = { self[1], 0, instant, start_time = self.start_time }
+			end
+			table.insert(setentry, self[i][1])
+			table.insert(setentry, self[i + 1])
+			self[i] = self.relative and self[i][2] - self[i][1] or self[i][2]
+		end
+	end
+
 	-- future steps assume that plr is a number, so if it's a table,
 	-- we need to duplicate the entry once for each player number
 	-- The table is then stored into `eases` for later
 	local plr = self.plr or get_plr()
 	if type(plr) == 'table' then
 		for i, pn in ipairs(plr) do
+			if setentry then
+				local newsetentry = utils.copy(setentry)
+				newsetentry.plr = pn
+				table.insert(mirin.eases, newsetentry)
+			end
 			local new = utils.copy(self)
 			new.plr = pn
 			table.insert(mirin.eases, new)
 		end
 	else
+		if setentry then
+			setentry.plr = plr
+			table.insert(mirin.eases, setentry)
+		end
 		self.plr = plr
 		table.insert(mirin.eases, self)
 	end
