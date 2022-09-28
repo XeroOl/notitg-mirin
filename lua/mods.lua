@@ -2,7 +2,7 @@ local copy = require('core.utils').copy
 copy(require('mirin.actors'), xero)
 copy(require('mirin.eases'), xero)
 copy(require('mirin.template'), xero)
-require('extra.hideoverlay')
+require('extra.overlay').hide()
 -- local card = require('card')
 
 -- judgment proxies
