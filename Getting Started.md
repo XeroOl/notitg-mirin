@@ -46,7 +46,7 @@ You probably don't want to make mods for the provided `Song.sm` and `Song.ogg`, 
 If you already have a `.sm` and audio file you want to use, you can delete the provided `Song.sm` and `Song.ogg`, and use your own file.
 Inside your `.sm`, you need to set `#FGCHANGES:` to the following:
 ```
-#FGCHANGES:0.000=template/main.xml=1.000=0=0=1=====,
+#FGCHANGES:-10.000=template/main.xml=1.000=0=0=1=====,
 ;
 ```
 Now you're ready to [move on to modding](#Default Mods).
