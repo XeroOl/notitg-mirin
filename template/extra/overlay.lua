@@ -2,6 +2,7 @@ local overlay = {}
 
 -- hide various actors that are placed by the theme
 function overlay.hide(list)
+	-- stylua: ignore
 	for _, name in ipairs(list or { -- improved layer list thanks @bun#1087
 		'Overlay', 'Underlay',
 		'ScoreP1', 'ScoreP2',
