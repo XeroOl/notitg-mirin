@@ -259,6 +259,7 @@ local function reset(self)
 	ease(self)
 end
 
+local compiled_funcs = {}
 -- func helper for scheduling a function
 local function func(self)
 	-- func {5, 'P1:xy', 2, 3}
@@ -268,15 +269,20 @@ local function func(self)
 			syms[i] = 'arg' .. i
 			args[i] = self[i + 2]
 		end
-		local symstring = table.concat(syms, ', ')
-		local code = 'return function('
-			.. symstring
-			.. ') return function() '
-			.. self[2]
-			.. '('
-			.. symstring
-			.. ') end end'
-		self[2] = xero(assert(loadstring(code, 'func_generated')))()(unpack(args))
+		compiled_funcs[self[2]] = compiled_funcs[self[2]] or {}
+		if not compiled_funcs[self[2]][#syms] then
+			local symstring = table.concat(syms, ', ')
+			local code = 'return function('
+				.. symstring
+				.. ') return function() '
+				.. self[2]
+				.. '('
+				.. symstring
+				.. ') end end'
+			compiled_funcs[self[2]][#syms] = xero(assert(loadstring(code, 'func_generated')))()(unpack(args))
+		end
+		self[2] = compiled_funcs[self[2]][#syms]
+
 		while self[3] do
 			table.remove(self)
 		end
@@ -344,6 +350,7 @@ local function perframe(self, deny_poptions)
 	table.insert(funcs, self)
 end
 
+local compiled_func_eases = {}
 -- func helper for function eases
 local function func_ease(self)
 	-- convert mode into a regular true or false
@@ -359,7 +366,11 @@ local function func_ease(self)
 	local end_beat = self[1] + self[2]
 
 	if type(fn) == 'string' then
-		fn = xero(assert(loadstring('return function(p) ' .. fn .. '(p) end', 'func_generated')))()
+		if not compiled_func_eases[fn] then
+			compiled_func_eases[fn] =
+				xero(assert(loadstring('return function(p) ' .. fn .. '(p) end', 'func_generated')))()
+		end
+		fn = compiled_func_eases[fn]
 	end
 
 	self[3] = function(beat)
@@ -1503,6 +1514,8 @@ local function export(fn, check_errors, name)
 		return inner
 	end
 	xero[name] = inner
+	xero[string.gsub(name, '_', '')] = inner
+	xero[string.gsub(name, '_(.)', string.upper)] = inner
 end
 
 export(ease, check_ease_errors, 'ease')
@@ -1511,13 +1524,13 @@ export(set, check_ease_errors, 'set')
 export(acc, check_ease_errors, 'acc')
 export(reset, check_reset_errors, 'reset')
 export(func, check_func_errors, 'func')
-export(perframe, check_perframe_errors, 'perframe')
+export(perframe, check_perframe_errors, 'per_frame')
 export(func_ease, check_func_ease_errors, 'func_ease')
 export(alias, check_alias_errors, 'alias')
-export(setdefault, check_setdefault_errors, 'setdefault')
+export(setdefault, check_setdefault_errors, 'set_default')
 export(aux, check_aux_errrors, 'aux')
 export(node, check_node_errors, 'node')
-export(definemod, check_node_errors, 'definemod')
+export(definemod, check_node_errors, 'define_mod')
 xero.get_plr = get_plr
 xero.touch_mod = touch_mod
 xero.touch_all_mods = touch_all_mods
