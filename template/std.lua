@@ -84,7 +84,7 @@ xero.strict = setmetatable({}, {
 	-- Allow access to _G elements, containing all game methods
 	__index = _G,
 	-- Prevent creating any variable
-	__newindex = function(s, t)
+	__newindex = function(_self, t)
 		error(t)
 	end,
 })
@@ -115,7 +115,7 @@ end
 -- (as in: contiguous numerical indexes from 1 to #table)
 function iclear(t)
 	for i = 1, #t do
-		table.remove(t)
+		t[i] = nil
 	end
 	return t
 end

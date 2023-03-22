@@ -23,7 +23,8 @@ local instant = xero.instant
 -- The global data structures used in the program
 -- These are declared early so that other functions can easily fill them in
 
--- eases :: list of {beat/time, len, ease_, *args, pn = number, start_time = number} and a couple of other optional string keys
+-- eases :: list of {beat/time, len, ease_, *args, pn = number, start_time = number}
+--          and a couple of other optional string keys
 -- table for eases/add/set/acc/reset
 --
 -- pn must be present, and must be a number.
@@ -329,14 +330,14 @@ local function perframe(self, deny_poptions)
 	local persist = self.persist
 	if persist then
 		if type(persist) == 'number' and self.mode then
-			persist = persist - self[1] - self[2]
+			persist = persist - self[2]
 		end
 		func {
 			self[1] + self[2],
 			function()
 				self[3](GAMESTATE:GetSongBeat(), disallowed_poptions_perframe_persist)
 			end,
-			persist = self.persist,
+			persist = persist,
 		}
 	end
 
@@ -1105,7 +1106,7 @@ local function run_mods()
 			-- then pass it to ApplyModifiers
 			if buffer[1] then
 				apply_modifiers(table.concat(buffer, ','), pn)
-				iclear(buffer)
+				xero.iclear(buffer)
 			end
 		end
 	end
@@ -1158,7 +1159,7 @@ local function ready_command(self)
 	compile_nodes()
 
 	for i = 1, max_pn do
-		iclear(mod_buffer[i])
+		xero.iclear(mod_buffer[i])
 	end
 
 	-- load command has happened
@@ -1335,18 +1336,6 @@ local function check_reset_errors(self, name)
 		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
-
-local valid_func_signatures = {
-	['number, function'] = true,
-	['number, number, function'] = true,
-	['number, number, ease, function'] = true,
-	['number, number, ease, string'] = true,
-	['number, number, ease, number, function'] = true,
-	['number, number, ease, number, string'] = true,
-	['number, number, ease, number, number, function'] = true,
-	['number, number, ease, number, number, string'] = true,
-	['number, string, ?'] = true,
-}
 
 local function check_func_errors(self, name)
 	if type(self) ~= 'table' then
@@ -1536,7 +1525,7 @@ xero.touch_all_mods = touch_all_mods
 xero.max_pn = max_pn
 
 xero()
-
+-- luacheck: push ignore
 scx = SCREEN_CENTER_X
 scy = SCREEN_CENTER_Y
 sw = SCREEN_WIDTH
@@ -1563,11 +1552,11 @@ function aft(self)
 	self:EnablePreserveTexture(true)
 	self:Create()
 end
+-- luacheck: pop
 
 -- UNDOCUMENTED
 xero.mod_buffer = mod_buffer
 
----@diagnostic disable-next-line: lowercase-global
 function xero.aftsprite(aft, sprite)
 	sprite:SetTexture(aft:GetTexture())
 end
