@@ -2,7 +2,6 @@
 -- See template/std.xml for more details
 setfenv(1, xero.strict)
 
-
 -- ===================================================================== --
 
 -- Convenience shortcuts / options
@@ -18,8 +17,6 @@ local stringbuilder = xero.stringbuilder
 local stable_sort = xero.stable_sort
 local perframe_data_structure = xero.perframe_data_structure
 local instant = xero.instant
-
-
 
 -- ===================================================================== --
 
@@ -83,9 +80,8 @@ setmetatable(default_mods, {
 	__index = function(self, i)
 		self[i] = 0
 		return 0
-	end
+	end,
 })
-
 
 local song = GAMESTATE:GetCurrentSong()
 
@@ -93,9 +89,8 @@ local song = GAMESTATE:GetCurrentSong()
 
 -- Functions
 
-
 -- the `plr=` system
-local default_plr = {1, 2}
+local default_plr = { 1, 2 }
 
 -- for reading the `plr` variable from the xero environment
 -- without falling back to the global table
@@ -104,7 +99,7 @@ local function get_plr()
 end
 
 local banned_chars = {}
-local banned_chars_string = '\'\\{}(),;* '
+local banned_chars_string = "'\\{}(),;* "
 for i = 1, #banned_chars_string do
 	banned_chars[string.sub(banned_chars_string, i, i)] = true
 end
@@ -116,22 +111,20 @@ end
 local function ensure_mod_name_is_valid(name)
 	if banned_chars[string.sub(name, 1, 1)] or banned_chars[string.sub(name, -1, -1)] then
 		error(
-			'You have a typo in your mod name. '..
-			'You wrote \''..name..'\', but you probably meant '..
-			'\''..string.gsub(name, '[\'\\{}(),;* ]', '')..'\''
+			'You have a typo in your mod name. '
+				.. "You wrote '"
+				.. name
+				.. "', but you probably meant "
+				.. "'"
+				.. string.gsub(name, "['\\{}(),;* ]", '')
+				.. "'"
 		)
 	end
 	if string.find(name, '^c[0-9]+$') then
-		error(
-			'You can\'t name your mod \''..name..'\'.\n'..
-			'Use \'cmod\' if you want to set a cmod.'
-		)
+		error("You can't name your mod '" .. name .. "'.\n" .. "Use 'cmod' if you want to set a cmod.")
 	end
 	if string.find(name, '^[0-9.]+x$') then
-		error(
-			'You can\'t name your mod \''..name..'\'.\n'..
-			'Use \'xmod\' if you want to set an xmod.'
-		)
+		error("You can't name your mod '" .. name .. "'.\n" .. "Use 'xmod' if you want to set an xmod.")
 	end
 end
 
@@ -142,15 +135,15 @@ end
 
 -- convert a mod to its lowercase dealiased name
 local function normalize_mod(name)
-	if not auxes[name] then ensure_mod_name_is_valid(name) end
+	if not auxes[name] then
+		ensure_mod_name_is_valid(name)
+	end
 	return normalize_mod_no_checks(name)
 end
-
 
 -- ease {start, len, eas, percent, 'mod'}
 -- adds an ease to the ease table
 local function ease(self)
-
 	-- Welcome to Ease!
 	--
 	-- -- Flags set by the user
@@ -199,7 +192,6 @@ local function ease(self)
 		self.plr = plr
 		table.insert(eases, self)
 	end
-
 end
 
 -- add {start, len, eas, percent, mod}
@@ -216,7 +208,6 @@ local function set(self)
 	table.insert(self, 3, instant)
 	ease(self)
 end
-
 
 -- acc {start, percent, mod}
 -- adds a relative set to the ease table
@@ -242,14 +233,14 @@ local function reset(self)
 		-- later code assumes this is a table if present, so here,
 		-- single values need to get wrapped in a table.
 		if type(self.only) == 'string' then
-			self.only = {self.only}
+			self.only = { self.only }
 		end
 	elseif self.exclude then
 		-- you can pass `exclude` to exclude a specific set of mods
 		-- later code assumes this is a table if present, so here,
 		-- single values need to get wrapped in a table.
 		if type(self.exclude) == 'string' then
-			self.exclude = {self.exclude}
+			self.exclude = { self.exclude }
 		end
 
 		-- When exclude is passed in, each mod is a value
@@ -277,7 +268,13 @@ local function func(self)
 			args[i] = self[i + 2]
 		end
 		local symstring = table.concat(syms, ', ')
-		local code = 'return function('..symstring..') return function() '..self[2]..'('..symstring..') end end'
+		local code = 'return function('
+			.. symstring
+			.. ') return function() '
+			.. self[2]
+			.. '('
+			.. symstring
+			.. ') end end'
 		self[2] = xero(assert(loadstring(code, 'func_generated')))()(unpack(args))
 		while self[3] do
 			table.remove(self)
@@ -308,9 +305,11 @@ local function func(self)
 	table.insert(funcs, self)
 end
 
-local disallowed_poptions_perframe_persist = setmetatable({}, {__index = function(_)
-	error('you cannot use poptions and persist at the same time. </3')
-end})
+local disallowed_poptions_perframe_persist = setmetatable({}, {
+	__index = function(_)
+		error('you cannot use poptions and persist at the same time. </3')
+	end,
+})
 
 -- func helper for scheduling a perframe
 local function perframe(self, deny_poptions)
@@ -359,7 +358,7 @@ local function func_ease(self)
 	local end_beat = self[1] + self[2]
 
 	if type(fn) == 'string' then
-		fn = xero(assert(loadstring('return function(p) '..fn..'(p) end', 'func_generated')))()
+		fn = xero(assert(loadstring('return function(p) ' .. fn .. '(p) end', 'func_generated')))()
 	end
 
 	self[3] = function(beat)
@@ -417,7 +416,6 @@ end
 -- node {'inputs', function(inputs) return outputs end, 'outputs'}
 -- create a listener that gets run whenever a mod value gets changed
 local function node(self)
-
 	if type(self[2]) == 'number' then
 		-- transform the shorthand into the full version
 		local multipliers = {}
@@ -428,7 +426,7 @@ local function node(self)
 			i = i + 1
 		end
 		local ret = table.concat(multipliers, ', ')
-		local code = 'return function(p) return '..ret..' end'
+		local code = 'return function(p) return ' .. ret .. ' end'
 		local fn = loadstring(code, 'node_generated')()
 		table.insert(self, 2, fn)
 	end
@@ -446,7 +444,7 @@ local function node(self)
 		table.insert(out, self[i])
 		i = i + 1
 	end
-	local result = {inputs, out, fn}
+	local result = { inputs, out, fn }
 	result.priority = (self.defer and -1 or 1) * (#nodes + 1)
 	table.insert(nodes, result)
 	return node
@@ -465,15 +463,13 @@ local function definemod(self)
 	return definemod
 end
 
-
 -- ===================================================================== --
 
 -- Runtime
 
-
 -- mod targets are the values that the mod would be at if the current eases finished
 local targets = {}
-local targets_mt = {__index = default_mods}
+local targets_mt = { __index = default_mods }
 for pn = 1, max_pn do
 	targets[pn] = setmetatable({}, targets_mt)
 end
@@ -482,14 +478,14 @@ end
 local mods = {}
 local mods_mt = {}
 for pn = 1, max_pn do
-	mods_mt[pn] = {__index = targets[pn]}
+	mods_mt[pn] = { __index = targets[pn] }
 	mods[pn] = setmetatable({}, mods_mt[pn])
 end
 
 -- a stringbuilder of the modstring that is being applied
 local mod_buffer = {}
 for pn = 1, max_pn do
-	mod_buffer[pn] = stringbuilder()
+	mod_buffer[pn] = {}
 end
 
 -- data structure for nodes
@@ -570,18 +566,18 @@ local function scan_named_actors()
 		end
 		local name = actor:GetName()
 		if name and name ~= '' then
-			if loadstring('t.'..name..'=t') then
+			if loadstring('t.' .. name .. '=t') then
 				table.insert(list, actor)
-				code'actors.'(name)' = list['(#list)']\n'
+				code('actors.')(name)(' = list[')(#list)(']\n')
 			else
-				SCREENMAN:SystemMessage('invalid actor name: \''..name..'\'')
+				SCREENMAN:SystemMessage("invalid actor name: '" .. name .. "'")
 			end
 		end
 	end
 
-	code'return function(list, actors)\n'
+	code('return function(list, actors)\n')
 	sweep(foreground, true)
-	code'end'
+	code('end')
 
 	local load_actors = xero(assert(loadstring(code:build())))()
 	load_actors(list, actors)
@@ -599,7 +595,6 @@ local function scan_named_actors()
 	for name, actor in pairs(actors) do
 		xero[name] = actor
 	end
-
 end
 
 local function on_command(self)
@@ -611,12 +606,17 @@ end
 -- hides various actors that are placed by the theme
 local function hide_theme_actors()
 	for _, element in ipairs {
-		'Overlay', 'Underlay',
-		'ScoreP1', 'ScoreP2',
-		'LifeP1', 'LifeP2',
+		'Overlay',
+		'Underlay',
+		'ScoreP1',
+		'ScoreP2',
+		'LifeP1',
+		'LifeP2',
 	} do
 		local child = SCREENMAN(element)
-		if child then child:hidden(1) end
+		if child then
+			child:hidden(1)
+		end
 	end
 end
 
@@ -699,8 +699,12 @@ local function resolve_aliases()
 	for _, node_entry in ipairs(nodes) do
 		local input = node_entry[1]
 		local output = node_entry[2]
-		for i = 1, #input do input[i] = normalize_mod(input[i]) end
-		for i = 1, #output do output[i] = normalize_mod(output[i]) end
+		for i = 1, #input do
+			input[i] = normalize_mod(input[i])
+		end
+		for i = 1, #output do
+			output[i] = normalize_mod(output[i])
+		end
 	end
 	-- default_mods
 	local old_default_mods = copy(default_mods)
@@ -724,7 +728,7 @@ local function compile_nodes()
 	end
 	local priority = -1 * (#nodes + 1)
 	for k, _ in pairs(terminators) do
-		table.insert(nodes, {{k}, {}, nil, nil, nil, nil, nil, true, priority = priority})
+		table.insert(nodes, { { k }, {}, nil, nil, nil, nil, nil, true, priority = priority })
 	end
 	local start = node_start
 	local locked = {}
@@ -774,19 +778,21 @@ local function compile_nodes()
 		for _, v in ipairs(out) do
 			if reverse_in[v] then
 				start[v][locked] = true
-				last[v] = {nd}
+				last[v] = { nd }
 			elseif not last[v] then
-				last[v] = {nd}
+				last[v] = { nd }
 			else
 				table.insert(last[v], nd)
 			end
 		end
 
 		local function escapestr(s)
-			return '\'' .. string.gsub(s, '[\\\']', '\\%1') .. '\''
+			return "'" .. string.gsub(s, "[\\']", '\\%1') .. "'"
 		end
 		local function list(code, i, sep)
-			if i ~= 1 then code(sep) end
+			if i ~= 1 then
+				code(sep)
+			end
 		end
 
 		local code = stringbuilder()
@@ -795,32 +801,35 @@ local function compile_nodes()
 				list(code, i, ',')
 				for j = 1, #parents[i] do
 					list(code, j, '+')
-					code'parents['(i)']['(j)'][pn]['(escapestr(mod))']'
+					code('parents[')(i)('][')(j)('][pn][')(escapestr(mod))(']')
 				end
 				if not parents[i][0] then
 					list(code, #parents[i] + 1, '+')
-					code'mods[pn]['(escapestr(mod))']'
+					code('mods[pn][')(escapestr(mod))(']')
 				end
 			end
 		end
 		local function emit_outputs()
 			for i, mod in ipairs(out) do
 				list(code, i, ',')
-				code'outputs[pn]['(escapestr(mod))']'
+				code('outputs[pn][')(escapestr(mod))(']')
 			end
 			return out[1]
 		end
-		code
-		'return function(outputs, parents, mods, fn)\n'
-			'return function(pn)\n'
-				if terminator then
-					code'mods[pn]['(escapestr(inputs[1]))'] = ' emit_inputs() code'\n'
-				else
-					if emit_outputs() then code' = ' end code 'fn(' emit_inputs() code', pn)\n'
-				end
-				code
-			'end\n'
-		'end\n'
+		code('return function(outputs, parents, mods, fn)\n')('return function(pn)\n')
+		if terminator then
+			code('mods[pn][')(escapestr(inputs[1]))('] = ')
+			emit_inputs()
+			code('\n')
+		else
+			if emit_outputs() then
+				code(' = ')
+			end
+			code('fn(')
+			emit_inputs()
+			code(', pn)\n')
+		end
+		code('end\n')('end\n')
 
 		local compiled = assert(loadstring(code:build(), 'node_generated'))()
 		nd[6] = compiled(outputs, parents, mods, fn)
@@ -869,7 +878,9 @@ local function run_eases(beat, time)
 		local measure = e.time and time or beat
 		-- if it's not ready, break out of the loop
 		-- the eases table is sorted, so none of the later eases will be done either
-		if measure < e[1] then break end
+		if measure < e[1] then
+			break
+		end
 
 		-- At this point, we've already decided we need to add the ease to the active_eases table
 		-- The next step is to prepare the entry to go into the `active_eases` table
@@ -904,14 +915,13 @@ local function run_eases(beat, time)
 				-- The goal is to normalize the reset into a regular ease entry
 				-- by just inserting the default values.
 				for mod in pairs(targets[plr]) do
-					if not(e.exclude and e.exclude[mod]) and targets[plr][mod] ~= default_mods[mod] then
+					if not (e.exclude and e.exclude[mod]) and targets[plr][mod] ~= default_mods[mod] then
 						table.insert(e, default_mods[mod])
 						table.insert(e, mod)
 					end
 				end
 			end
 		end
-
 
 		-- If the ease value ends with 0.5 or more, the ease should "stick".
 		-- Ie, if you use outExpo, the value should stay on until turned off.
@@ -989,7 +999,9 @@ local function run_funcs(beat, time)
 	while funcs_index <= #funcs do
 		local e = funcs[funcs_index]
 		local measure = e.time and time or beat
-		if measure < e[1] then break end
+		if measure < e[1] then
+			break
+		end
 		if not e[2] then
 			e[3](measure)
 		elseif measure < e[1] + e[2] then
@@ -1000,7 +1012,9 @@ local function run_funcs(beat, time)
 
 	while true do
 		local e = active_funcs:next()
-		if not e then break end
+		if not e then
+			break
+		end
 		local measure = e.time and time or beat
 		if measure < e[1] + e[2] then
 			poptions_logging_target = e.mods
@@ -1016,7 +1030,6 @@ local function run_funcs(beat, time)
 			active_funcs:remove()
 		end
 	end
-
 end
 
 local seen = 1
@@ -1084,15 +1097,15 @@ local function run_mods()
 			-- toss everything that isn't an aux into the buffer
 			for mod, percent in pairs(mods[pn]) do
 				if not auxes[mod] then
-					buffer('*-1 '..percent..' '..mod)
+					buffer[#buffer + 1] = '*-1 ' .. percent .. ' ' .. mod
 				end
 				mods[pn][mod] = nil
 			end
 			-- if the buffer has at least 1 item in it
 			-- then pass it to ApplyModifiers
 			if buffer[1] then
-				apply_modifiers(buffer:build(','), pn)
-				buffer:clear()
+				apply_modifiers(table.concat(buffer, ','), pn)
+				iclear(buffer)
 			end
 		end
 	end
@@ -1101,26 +1114,30 @@ end
 -- this if statement won't run unless you are mirin
 if debug_print_mod_targets then
 	-- luacov: disable
-	func {0, 9e9, function(beat)
-		if debug_print_mod_targets == true or debug_print_mod_targets < beat then
-			for pn = 1, max_pn do
-				if P[pn] and P[pn]:IsAwake() then
-					local outputs = {}
-					local i = 0
-					for k, v in pairs(targets[pn]) do
-						if v ~= default_mods[k] then
-							i = i + 1
-							outputs[i] = tostring(k)..': '..tostring(v)
+	func {
+		0,
+		9e9,
+		function(beat)
+			if debug_print_mod_targets == true or debug_print_mod_targets < beat then
+				for pn = 1, max_pn do
+					if P[pn] and P[pn]:IsAwake() then
+						local outputs = {}
+						local i = 0
+						for k, v in pairs(targets[pn]) do
+							if v ~= default_mods[k] then
+								i = i + 1
+								outputs[i] = tostring(k) .. ': ' .. tostring(v)
+							end
 						end
+						print('Player ' .. pn .. ' at beat ' .. beat .. ' --> ' .. table.concat(outputs, ', '))
+					else
+						print('Player ' .. pn .. ' is asleep or missing')
 					end
-					print('Player '..pn..' at beat '..beat..' --> '..table.concat(outputs, ', '))
-				else
-					print('Player '..pn..' is asleep or missing')
 				end
+				debug_print_mod_targets = (debug_print_mod_targets == true)
 			end
-			debug_print_mod_targets = (debug_print_mod_targets == true)
-		end
-	end}
+		end,
+	}
 	-- luacov: enable
 end
 
@@ -1134,14 +1151,14 @@ local function ready_command(self)
 	-- loads both the plugins and the layout.xml due to propagation
 	foreground:playcommand('Load')
 	-- loads mods.lua
-	xero.require 'mods'
+	xero.require('mods')
 
 	sort_tables()
 	resolve_aliases()
 	compile_nodes()
 
 	for i = 1, max_pn do
-		mod_buffer[i]:clear()
+		iclear(mod_buffer[i])
 	end
 
 	-- load command has happened
@@ -1174,62 +1191,74 @@ end
 ---------------------------------------------------------------------------------------
 GAMESTATE:ApplyModifiers('clearall')
 
-
 -- zoom
-aux 'zoom'
+aux('zoom')
 node {
-	'zoom', 'zoomx', 'zoomy',
+	'zoom',
+	'zoomx',
+	'zoomy',
 	function(zoom, x, y)
 		local m = zoom * 0.01
 		return m * x, m * y
 	end,
-	'zoomx', 'zoomy',
+	'zoomx',
+	'zoomy',
 	defer = true,
 }
 
 setdefault {
-	100, 'zoom',
-	100, 'zoomx',
-	100, 'zoomy',
-	100, 'zoomz',
+	100,
+	'zoom',
+	100,
+	'zoomx',
+	100,
+	'zoomy',
+	100,
+	'zoomz',
 }
 
-setdefault {400, 'grain'}
+setdefault { 400, 'grain' }
 
 -- movex
 local function repeat8(a)
 	return a, a, a, a, a, a, a, a
 end
 
-for _, a in ipairs {'x', 'y', 'z'} do
+for _, a in ipairs { 'x', 'y', 'z' } do
 	definemod {
 		'move' .. a,
 		repeat8,
-		'move'..a..'0', 'move'..a..'1', 'move'..a..'2', 'move'..a..'3',
-		'move'..a..'4', 'move'..a..'5', 'move'..a..'6', 'move'..a..'7',
+		'move' .. a .. '0',
+		'move' .. a .. '1',
+		'move' .. a .. '2',
+		'move' .. a .. '3',
+		'move' .. a .. '4',
+		'move' .. a .. '5',
+		'move' .. a .. '6',
+		'move' .. a .. '7',
 		defer = true,
 	}
 end
 
 -- xmod
-setdefault {1, 'xmod'}
+setdefault { 1, 'xmod' }
 definemod {
-	'xmod', 'cmod',
+	'xmod',
+	'cmod',
 	function(xmod, cmod, pn)
+		local buffer = mod_buffer[pn]
 		if cmod == 0 then
-			mod_buffer[pn](string.format('*-1 %fx', xmod))
+			buffer[#buffer + 1] = string.format('*-1 %fx', xmod)
 		else
-			mod_buffer[pn](string.format('*-1 %fx,*-1 c%f', xmod, cmod))
+			buffer[#buffer + 1] = string.format('*-1 %fx,*-1 c%f', xmod, cmod)
 		end
 	end,
 	defer = true,
 }
 
-
 -- ===================================================================== --
 
 -- Error checking
-
 
 local function is_valid_ease(eas)
 	local err = type(eas) ~= 'function' and (not getmetatable(eas) or not getmetatable(eas).__call)
@@ -1266,13 +1295,13 @@ local function check_ease_errors(self, name)
 		end
 		i = i + 2
 	end
-	assert(self[i + 1] == nil, 'invalid mod percent: '..tostring(self[i]))
+	assert(self[i + 1] == nil, 'invalid mod percent: ' .. tostring(self[i]))
 	local plr = self.plr or get_plr()
 	if type(plr) ~= 'number' and type(plr) ~= 'table' then
 		return 'invalid plr'
 	end
 	if is_beyond_load_command then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -1303,7 +1332,7 @@ local function check_reset_errors(self, name)
 		return 'exclude= and only= are mutually exclusive'
 	end
 	if is_beyond_load_command then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -1331,7 +1360,7 @@ local function check_func_errors(self, name)
 		return 'the second argument needs to be a function\n(maybe try using func_ease or perframe instead)'
 	end
 	if is_beyond_load_command then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -1359,7 +1388,7 @@ local function check_func_ease_errors(self, name)
 		return 'the second-to-last argument needs to be a number'
 	end
 	if is_beyond_load_command then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -1378,7 +1407,7 @@ local function check_perframe_errors(self, name)
 		return 'the third argument needs to be a function'
 	end
 	if is_beyond_load_command then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -1394,7 +1423,7 @@ local function check_alias_errors(self, name)
 		return 'argument 2 should be a string'
 	end
 	if is_beyond_load_command then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -1411,7 +1440,7 @@ local function check_setdefault_errors(self, name)
 		end
 	end
 	if is_beyond_load_command then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -1422,12 +1451,12 @@ local function check_aux_errrors(self, name)
 	if type(self) == 'table' then
 		for _, v in ipairs(self) do
 			if type(v) ~= 'string' then
-				return 'invalid mod to aux: '.. tostring(v)
+				return 'invalid mod to aux: ' .. tostring(v)
 			end
 		end
 	end
 	if is_beyond_load_command then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
 
@@ -1460,27 +1489,25 @@ local function check_node_errors(self, name)
 		i = i + 1
 		while self[i] do
 			if type(self[i]) ~= 'string' then
-				return 'unexpected argument '..tostring(self[i])..', expected a string'
+				return 'unexpected argument ' .. tostring(self[i]) .. ', expected a string'
 			end
 			i = i + 1
 		end
 	end
 	if is_beyond_load_command then
-		return 'cannot call '..name..' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after LoadCommand finished'
 	end
 end
-
 
 -- ===================================================================== --
 
 -- Exports
 
-
 local function export(fn, check_errors, name)
 	local function inner(self)
 		local err = check_errors(self, name)
 		if err then
-			error(name..': '..err, 2)
+			error(name .. ': ' .. err, 2)
 		else
 			fn(self)
 		end
@@ -1507,7 +1534,6 @@ xero.touch_mod = touch_mod
 xero.touch_all_mods = touch_all_mods
 
 xero.max_pn = max_pn
-
 
 xero()
 
@@ -1537,7 +1563,6 @@ function aft(self)
 	self:EnablePreserveTexture(true)
 	self:Create()
 end
-
 
 -- UNDOCUMENTED
 xero.mod_buffer = mod_buffer

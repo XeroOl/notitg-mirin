@@ -10,7 +10,7 @@ setmetatable(xero, {
 	__call = function(self, f)
 		setfenv(f or 2, self)
 		return f
-	end
+	end,
 })
 
 -- make require work
@@ -22,7 +22,7 @@ xero.package = {
 	loaders = {
 		function(modname)
 			local preload = xero.package.preload[modname]
-			return preload or 'no field xero.package.preload[\''..modname..'\']'
+			return preload or "no field xero.package.preload['" .. modname .. "']"
 		end,
 		function(modname)
 			local errors = {}
@@ -33,7 +33,7 @@ xero.package = {
 				local filepath = xero.dir .. string.gsub(path, '%?', filename)
 				-- check if file exists
 				if not GAMESTATE:GetFileStructure(filepath) then
-					table.insert(errors, 'no file \''..filepath..'\'')
+					table.insert(errors, "no file '" .. filepath .. "'")
 				else
 					local loader, err = loadfile(filepath)
 					-- check if file loads properly
@@ -52,7 +52,7 @@ xero.package = {
 function xero.require(modname)
 	local loaded = xero.package.loaded
 	if not loaded[modname] then
-		local errors = {'module \''..modname..'\' not found:'}
+		local errors = { "module '" .. modname .. "' not found:" }
 		local chunk
 		for _, loader in ipairs(xero.package.loaders) do
 			local result = loader(modname)
@@ -86,14 +86,12 @@ xero.strict = setmetatable({}, {
 	-- Prevent creating any variable
 	__newindex = function(s, t)
 		error(t)
-	end
+	end,
 })
-
 
 -- ===================================================================== --
 
 -- Utility functions
-
 
 --- Returns a shallow copy of the table `src`
 function copy(src)
@@ -136,7 +134,6 @@ xero.math = copy(_G.math)
 xero.table = copy(_G.table)
 xero.string = copy(_G.string)
 
-
 -- ===================================================================== --
 
 -- Data structure for all the `func` declarations.
@@ -144,7 +141,6 @@ xero.string = copy(_G.string)
 -- they're declared in mods.xml is respected no matter what.
 -- This data structure is generic enough to be used for any context, but
 -- that is not the case for now.
-
 
 local methods = {}
 
@@ -163,7 +159,9 @@ function methods:remove()
 end
 
 function methods:next()
-	if self.n == 0 then return end
+	if self.n == 0 then
+		return
+	end
 
 	local swap = self.swap
 	local stage = self.stage
@@ -209,21 +207,23 @@ function methods:next()
 	return swap[swap.n]
 end
 
-local mt = {__index = methods}
+local mt = { __index = methods }
 
 function perframe_data_structure(comparator)
 	return setmetatable({
 		comparator = comparator,
-		reverse_comparator = function(a, b) return comparator(b, a) end,
-		stage = {n = 0},
-		list = {n = 0},
-		swap = {n = 0},
+		reverse_comparator = function(a, b)
+			return comparator(b, a)
+		end,
+		stage = { n = 0 },
+		list = { n = 0 },
+		swap = { n = 0 },
 		n = 0,
 	}, mt)
 end
 
 -- the behavior of a stringbuilder
-local stringbuilder_mt =  {
+local stringbuilder_mt = {
 	__index = {
 		-- :build() method converts a stringbuilder into a string, with optional delimiter
 		build = table.concat,
@@ -245,4 +245,3 @@ local stringbuilder_mt =  {
 function stringbuilder()
 	return setmetatable({}, stringbuilder_mt)
 end
-
