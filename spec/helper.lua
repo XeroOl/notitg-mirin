@@ -7,6 +7,15 @@ local function dummyloadfile(filename)
     end
 end
 
+local rawloadfile = loadfile
+local cache = {}
+local function cachedloadfile(filename)
+    if not cache[filename] then
+        cache[filename] = rawloadfile(filename)
+    end
+    return setfenv(cache[filename], _G)
+end
+
 function helper.reset()
     mock = dofile('./spec/mock.lua')
     xero = nil
@@ -15,14 +24,15 @@ end
 function helper.get_mod(mod, pn)
     return mock.get_mod(mod, pn)
 end
+local body = io.open('./template/main.xml'):read('*a')
+local initcommand = 'return '..body:match('"%%(.-)"')
+initcommand = assert(loadstring(initcommand, "template/main.xml"))()
 
 function helper.init()
-    local body = io.open('./template/main.xml'):read('*a')
-    local initcommand = 'return '..body:match('"%%(.-)"')
     local h = helper
 
     h.foreground = mock.newactorframe()
-    initcommand = assert(loadstring(initcommand, "template/main.xml"))()
+    loadfile = cachedloadfile
     initcommand(h.foreground)
     xero.loadfile = dummyloadfile
     xero.package.preload.mods = function() end
