@@ -51,6 +51,18 @@ describe('ease', function()
         update(10) -- 10 beats later
         assert.equal('800', helper.get_mod('dizzy'))
     end)
+    it('should support table mod percentages', function()
+        xero.ease{1, 1, xero.linear, {100, 0}, 'bumpy'}
+        xero.ease{1, 1, xero.linear, {100, 0}, 'reverse', plr = {1, 3}}
+        update(1)
+        assert.equal('100', helper.get_mod('bumpy'))
+        assert.equal('100', helper.get_mod('reverse'))
+        assert.equal(nil, helper.get_mod('reverse', 2))
+        update(1)
+        assert.equal('0', helper.get_mod('bumpy'))
+        assert.equal('0', helper.get_mod('reverse'))
+        assert.equal(nil, helper.get_mod('reverse', 2))
+    end)
     it('should require curly braces', function()
         assert.errors(function() xero.ease('haha, no curly') end)
     end)

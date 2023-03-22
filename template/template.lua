@@ -380,7 +380,7 @@ local function func_ease(self)
 
 	-- it's a function-ease variant, so make it persist
 	if self.persist ~= false then
-		local final_percent = eas(1) > 0.5 and end_percent or start_percent
+		local final_percent = eas(1) >= 0.5 and end_percent or start_percent
 		func {
 			end_beat,
 			function()
@@ -946,14 +946,21 @@ local function run_eases(beat, time)
 			-- (ie, like 'add', not like 'ease')
 			-- Adjusted based on what the current target is set to
 			-- This is the reason why the sorting the eases table needs to be stable.
+
+			local mod = e[i + 1]
+			if type(e[i]) == 'table' then
+				-- If the percent is a table, then the targets need
+				-- to set e[i][1] instantly, and continue on with e[i][2] as normal
+				targets[plr][mod] = (e.relative and targets[plr][mod] or 0) + e[i][1]
+				e[i] = e[i][2]
+			end
+
 			if not e.relative then
-				local mod = e[i + 1]
 				e[i] = e[i] - targets[plr][mod]
 			end
 
 			-- Update the target if it needs to be updated
 			if ease_ends_at_different_position then
-				local mod = e[i + 1]
 				targets[plr][mod] = targets[plr][mod] + e[i]
 			end
 		end
@@ -1302,7 +1309,13 @@ local function check_ease_errors(self, name)
 	end
 	local i = is_set and 2 or 4
 	while self[i] do
-		if type(self[i]) ~= 'number' then
+		if type(self[i]) == 'table' and not is_set then
+			if #self[i] ~= 2 or type(self[i][1]) ~= 'number' or type(self[i][2]) ~= 'number' then
+				return 'invalid mod percent table'
+			elseif self[3](1) < 0.5 then
+				return 'mod percent table used with transient ease'
+			end
+		elseif type(self[i]) ~= 'number' then
 			return 'invalid mod percent'
 		end
 		if type(self[i + 1]) ~= 'string' then
