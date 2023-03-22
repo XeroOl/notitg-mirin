@@ -8,7 +8,7 @@ $(FILENAME).zip: lint test
 	mkdir -p build
 	cp -r Song.ogg Song.sm lua template build
 	sed 's/$$VERSION/'"$(VERSION)"'/' build/template/main.xml -i
-	zip "$(FILENAME)".zip build -r
+	(cd build && zip ../"$(FILENAME)".zip . -r)
 	rm build -rf
 
 format:
