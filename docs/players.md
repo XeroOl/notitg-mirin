@@ -1,3 +1,5 @@
+<head><title>Players | The Mirin Template</title></head>
+
 [Back to main page](..)
 # Player Specific Mods
 * This section is not done. Ask for @XeroOl in the [NotITG Discord](https://uksrt.heysora.net/discord).

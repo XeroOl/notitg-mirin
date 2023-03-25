@@ -1,3 +1,5 @@
+<head><title>Mods List | The Mirin Template</title></head>
+
 [Back to main page](..)
 # Mod List
 Here is a list of mods that are useful for making mod files. There may be some missing mods or duplicates or aliases, but the list is relatively complete.

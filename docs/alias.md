@@ -1,3 +1,5 @@
+<head><title>Alias | The Mirin Template</title></head>
+
 [Back to main page](..)
 # Alias
 ```lua

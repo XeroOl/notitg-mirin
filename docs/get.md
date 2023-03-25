@@ -1,3 +1,5 @@
+<head><title>Get | The Mirin Template</title></head>
+
 [Back to main page](..)
 # Get
 ```lua

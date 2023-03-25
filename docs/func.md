@@ -1,3 +1,5 @@
+<head><title>Func | The Mirin Template</title></head>
+
 [Back to main page](..)
 # Func
 ```lua

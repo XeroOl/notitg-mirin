@@ -1,3 +1,5 @@
+<head><title>SetDefault | The Mirin Template</title></head>
+
 [Back to main page](..)
 # SetDefault
 ```lua
