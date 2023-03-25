@@ -1,4 +1,4 @@
-<head><title>Aux | The Mirin Template</title></head>
+<html><head><title>Aux | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # Aux

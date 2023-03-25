@@ -1,3 +1,5 @@
+<html><head><title>Comparison | The Mirin Template</title></head></html>
+
 [Back](index)
 # Choosing a Template
 ## Mod Beginners

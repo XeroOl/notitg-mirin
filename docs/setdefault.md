@@ -1,4 +1,4 @@
-<head><title>Set Default | The Mirin Template</title></head>
+<html><head><title>Set Default | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # SetDefault

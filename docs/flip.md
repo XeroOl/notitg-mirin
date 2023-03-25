@@ -1,4 +1,4 @@
-<head><title>Flip | The Mirin Template</title></head>
+<html><head><title>Flip | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # Flip

@@ -1,4 +1,4 @@
-<head><title>Actors | The Mirin Template</title></head>
+<html><head><title>Actors | The Mirin Template</title></head></html>
 
 # Actors
 TODO

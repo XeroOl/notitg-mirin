@@ -1,4 +1,4 @@
-<head><title>Define Mods | The Mirin Template</title></head>
+<html><html><head><title>Define Mods | The Mirin Template</title></head></html></html>
 
 [Back to main page](..)
 # Defining Mods
