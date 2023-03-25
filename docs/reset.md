@@ -1,5 +1,6 @@
-<html><head><title>Reset | The Mirin Template</title></head></html>
-
+---
+title: Reset | The Mirin Template
+---
 [Back to main page](..)
 # Reset
 ```lua

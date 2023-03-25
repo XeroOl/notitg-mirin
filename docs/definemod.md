@@ -1,5 +1,6 @@
-<html><html><head><title>Define Mods | The Mirin Template</title></head></html></html>
-
+---
+title: Define Mods | The Mirin Template
+---
 [Back to main page](..)
 # Defining Mods
 ```lua

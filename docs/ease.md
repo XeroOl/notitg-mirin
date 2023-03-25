@@ -1,5 +1,6 @@
-<html><head><title>Eases | The Mirin Template</title></head></html>
-
+---
+title: Eases | The Mirin Template
+---
 [Back to main page](..)
 # Ease
 ```lua

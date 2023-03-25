@@ -1,5 +1,6 @@
-<html><head><title>For loops | The Mirin Template</title></head></html>
-
+---
+title: For loops | The Mirin Template
+---
 [Back to main page](..)
 # For loops
 At its core, a `for` loop is a "repeat" instruction, that means "do thing Y, X many times", with a few special rules about how it counts, defined by you.

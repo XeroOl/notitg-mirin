@@ -1,5 +1,6 @@
-<html><head><title>Get | The Mirin Template</title></head></html>
-
+---
+title: Get | The Mirin Template
+---
 [Back to main page](..)
 # Get
 ```lua

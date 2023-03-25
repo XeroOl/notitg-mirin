@@ -1,5 +1,6 @@
-<html><head><title>AFTs | The Mirin Template</title></head></html>
-
+---
+title: AFTs | The Mirin Template
+---
 [Back to main page](..)
 # AFT (ActorFrameTexture)
 

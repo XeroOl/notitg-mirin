@@ -1,5 +1,6 @@
-<html><head><title>Getting Started | The Mirin Template</title></head></html>
-
+---
+title: Getting Started | The Mirin Template
+---
 [Back](index.md)
 # Getting Started
 This document will walk you through how to begin modding using the Mirin Template.
