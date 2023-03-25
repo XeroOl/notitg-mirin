@@ -22,7 +22,7 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * [set](docs/set.md)
 * [ease](docs/ease.md)
 * [add](docs/ease.md#add)
-* for loop
+* [for loop](docs/for.md)
 * [actors](docs/actors.md)
 * [definemod](docs/definemod.md)
 * [reset](docs/reset.md)
@@ -58,4 +58,4 @@ ease {7, 1, outExpo, 0, 'invert'}
 ```
 
 
-Documentation by XeroOl, Chegg, Kirby5464
+Documentation by XeroOl, Chegg, Kirby5464, Spax
