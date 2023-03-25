@@ -1,4 +1,4 @@
-<head><title>Gradients | The Mirin Template</title></head>
+<html><head><title>Gradients | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # Gradients

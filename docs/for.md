@@ -1,4 +1,4 @@
-<head><title>For loops | The Mirin Template</title></head>
+<html><head><title>For loops | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # For loops

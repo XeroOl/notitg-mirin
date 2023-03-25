@@ -1,4 +1,4 @@
-<head><title>Reset | The Mirin Template</title></head>
+<html><head><title>Reset | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # Reset

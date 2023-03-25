@@ -1,4 +1,4 @@
-<head><title>Splines | The Mirin Template</title></head>
+<html><head><title>Splines | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # Splines

@@ -1,4 +1,4 @@
-<head><title>Get | The Mirin Template</title></head>
+<html><head><title>Get | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # Get

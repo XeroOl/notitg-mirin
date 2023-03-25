@@ -1,4 +1,4 @@
-<head><title>Ease List 2 | The Mirin Template</title></head>
+<html><head><title>Ease List 2 | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # Ease list

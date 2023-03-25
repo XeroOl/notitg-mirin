@@ -1,4 +1,4 @@
-<head><title>Func | The Mirin Template</title></head>
+<html><head><title>Func | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # Func

@@ -1,4 +1,4 @@
-<head><title>Alias | The Mirin Template</title></head>
+<html><head><title>Alias | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # Alias

@@ -1,4 +1,4 @@
-<head><title>Mods List | The Mirin Template</title></head>
+<html><head><title>Mods List | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # Mod List

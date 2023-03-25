@@ -1,4 +1,4 @@
-<head><title>Players | The Mirin Template</title></head>
+<html><head><title>Players | The Mirin Template</title></head></html>
 
 [Back to main page](..)
 # Player Specific Mods
