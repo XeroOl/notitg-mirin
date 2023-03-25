@@ -1,3 +1,5 @@
+<head><title>Eases | The Mirin Template</title></head>
+
 [Back to main page](..)
 # Ease
 ```lua

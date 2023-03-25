@@ -1,3 +1,5 @@
+<head><title>Ease List 2 | The Mirin Template</title></head>
+
 [Back to main page](..)
 # Ease list
 Here is a plot of each ease.
