@@ -1194,20 +1194,23 @@ local function ready_command(self)
 	end)
 end
 
+local update_finished_successfully = true
 local function update_command(self)
-	self:hidden(1)
+	-- guard logic so that if the template crashes,
+	-- we don't spam the user with error messages
+	if update_finished_successfully then
+		update_finished_successfully = false
 
-	local beat = GAMESTATE:GetSongBeat()
-	local time = self:GetSecsIntoEffect()
+		local beat = GAMESTATE:GetSongBeat()
+		local time = self:GetSecsIntoEffect()
 
-	run_eases(beat, time)
-	run_funcs(beat, time)
-	run_nodes()
-	run_mods()
+		run_eases(beat, time)
+		run_funcs(beat, time)
+		run_nodes()
+		run_mods()
 
-	-- if no errors have occurred, unhide self
-	-- to make the update_command run again next frame
-	self:hidden(0)
+		update_finished_successfully = true
+	end
 end
 
 ---------------------------------------------------------------------------------------
