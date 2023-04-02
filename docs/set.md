@@ -1,5 +1,6 @@
-<html><head><title>Set | The Mirin Template</title></head></html>
-
+---
+title: Set | The Mirin Template
+---
 [Back to main page](..)
 # Set
 ```lua

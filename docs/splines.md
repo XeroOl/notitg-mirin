@@ -1,5 +1,6 @@
-<html><head><title>Splines | The Mirin Template</title></head></html>
-
+---
+title: Splines | The Mirin Template
+---
 [Back to main page](..)
 # Splines
 Splines are a feature of NotITG, and aren't specific to the Mirin Template.

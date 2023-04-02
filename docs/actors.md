@@ -1,5 +1,6 @@
-<html><head><title>Actors | The Mirin Template</title></head></html>
-
+---
+title: Actors | The Mirin Template
+---
 # Actors
 TODO
 * XML vs Lua

@@ -1,5 +1,6 @@
-<html><head><title>The Mirin Template</title></head></html>
-
+---
+title: The Mirin Template
+---
 # Mirin Template
 [NotITG](https://notitg.heysora.net) is a fork of OpenITG that is designed for creating and playing mod files.
 

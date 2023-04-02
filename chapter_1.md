@@ -1,5 +1,6 @@
-<html><head><title>Table of Contents | The Mirin Template</title></head></html>
-
+---
+title: Table of Contents | The Mirin Template
+---
 # Mirin Template Documentation
 
 ## Table of Contents

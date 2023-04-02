@@ -1,5 +1,6 @@
-<html><head><title>Gradients | The Mirin Template</title></head></html>
-
+---
+title: Gradients | The Mirin Template
+---
 [Back to main page](..)
 # Gradients
 Gradients are a feature of NotITG, and aren't specific to the Mirin Template.

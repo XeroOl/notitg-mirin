@@ -1,5 +1,6 @@
-<html><head><title>Flip | The Mirin Template</title></head></html>
-
+---
+title: Flip | The Mirin Template
+---
 [Back to main page](..)
 # Flip
 ```lua

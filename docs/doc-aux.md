@@ -1,5 +1,6 @@
-<html><head><title>Aux | The Mirin Template</title></head></html>
-
+---
+title: Aux | The Mirin Template
+---
 [Back to main page](..)
 # Aux
 ```lua
