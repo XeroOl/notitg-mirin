@@ -3,7 +3,8 @@ title: For loops | The Mirin Template
 ---
 [Back to main page](..)
 # For loops
-At its core, a `for` loop is a "repeat" instruction, that means "do thing Y, X many times", with a few special rules about how it counts, defined by you.<br>
+At its core, a `for` loop is a "repeat" instruction, that means "do thing Y, X many times", with a few special rules about how it counts, defined by you.
+
 The general structure is this:
 ```lua
 for i = Start, End, StepSize do
@@ -13,14 +14,16 @@ for i = Start, End, StepSize do
   --with StepSize being the increment per "step"
 end
 ```
-The "`i`" part is the most important here. Everything within the `for` block is happening repeatedly for each value of `i`.<br>
+The "`i`" part is the most important here. Everything within the `for` block is happening repeatedly for each value of `i`.
+
 A quick example:
 ```lua
 for i = 0, 10, 2 do
   print('HELLO, THIS IS STEP '..i)
 end
 ```
-(Note: `..` is concatenation, which combines two [strings](https://en.wikipedia.org/wiki/String_(computer_science)))<br>
+(Note: `..` is concatenation, which combines two [strings](https://en.wikipedia.org/wiki/String_(computer_science)))
+
 This is going to print 6 things to the console.<span style="color:red;" title="(since the start and end values are inclusive)"><sup>[?]</sup></span>
 ```
 HELLO, THIS IS STEP 0
@@ -30,7 +33,8 @@ HELLO, THIS IS STEP 6
 HELLO, THIS IS STEP 8
 HELLO, THIS IS STEP 10
 ```
-The ability to do things multiple times has many applications in programming, but it's particularly useful in mods. If you're working in tables (as is the case with *every* modern template), you can add lots of things to a table at the same time. <br>
+The ability to do things multiple times has many applications in programming, but it's particularly useful in mods. If you're working in tables (as is the case with *every* modern template), you can add lots of things to a table at the same time.
+
 Let's say for example, you want to move players back and forth every **4** beats, starting at beat **200**:
 ```lua
 for i = 200, 231, 4 do
