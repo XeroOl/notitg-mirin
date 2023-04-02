@@ -42,8 +42,8 @@ for i = 200, 231, 4 do
   ease {i + 2, 2, outCubic, 0, 'z'}
 end
 ```
-Starting at beat 200, this is going to move the playfields 100 pixels towards the camera, then at beat 202 move back to the starting position
-Because of the `for` loop, this code will be run again, but with `i = 204`, making the playfields move forward again at 204 and back again at 206
+Starting at beat 200, this is going to move the playfields 100 pixels towards the camera, then at beat 202 move back to the starting position.
+Because of the `for` loop, this code will be run again, but with `i = 204`, making the playfields move forward again at 204 and back again at 206.
 This will carry on until `i` is greater than 231 (causing it to not run at beat 232, as the condition will have been satisfied by the time it reaches that point).
 
 This is a very basic overview on how a `for` loop works and what it can be used for. There are many other things, like for `i,v in pairs`/`ipairs` or [`while` loops](https://en.wikipedia.org/wiki/While_loop), but this should give you a good start.
