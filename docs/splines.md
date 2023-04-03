@@ -5,8 +5,7 @@ title: Splines | The Mirin Template
 # Splines
 Splines are a feature of NotITG, and aren't specific to the Mirin Template.
 
-tl;dr - list of points on the playfield (measured in time away from receptors, in beats)
-paired up with a list of mod values for those points.
+TL;DR - splines are a list of points on the playfield (measured in time away from receptors, in beats), that are paired up with a list of mod values for those points.
 
 Arrow properties/axes that can be spline'd:
 * X
