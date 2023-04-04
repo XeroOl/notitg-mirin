@@ -63,7 +63,7 @@ Alternatively, you can apply the mod "spline"..`axis`.."reset" or "spline"..`col
 Taro made a version of the hold renderer that plays much nicer with splines. 
 To use, activate the mod `spiralholds` (at 100%).
 
-* If you activate 50% `flip` and 50% `reverse`, you can have much more direct control of the motion path of arrows using splines, since .
+* If you activate 50% `flip` and 50% `reverse`, you can have much more direct control of the motion path of arrows using splines.
 
 * Splines have multiple different "join" types. 
 To change the join type, use `spline..axis..type`, where `axis` is one of the aforementioned axes. 
