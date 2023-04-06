@@ -17,7 +17,9 @@ setmetatable(xero, {
 xero.package = {
 	-- mirin template loader path
 	path = 'lua/?.lua;lua/?/init.lua;plugins/?.lua;plugins/?/init.lua',
-	preload = {},
+	preload = {
+		loadfile(xero.dir .. 'template/std.lua'),
+	},
 	loaded = {},
 	loaders = {
 		function(modname)

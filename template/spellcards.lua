@@ -25,7 +25,7 @@ end
 
 local function insert(t)
 	if not spellcards[1] then
-		func { 0, addspellcards }
+		xero.func { 0, addspellcards }
 	end
 	table.insert(spellcards, t)
 	return insert
