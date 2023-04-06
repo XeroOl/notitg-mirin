@@ -34,6 +34,7 @@ jobs:
       run: |
         luarocks install busted
         luarocks install cluacov
+        luarocks install luacheck
 
     # install stylua
     - uses: JohnnyMorganz/stylua-action@v2
