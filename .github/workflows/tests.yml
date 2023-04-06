@@ -29,11 +29,18 @@ jobs:
 
     - uses: leafo/gh-actions-luarocks@v4
 
-    - name: Prepare busted and luacov
+    - name: Prepare dependencies
       id: setup
       run: |
         luarocks install busted
         luarocks install cluacov
+
+    # install stylua
+    - uses: JohnnyMorganz/stylua-action@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        version: latest
+        args: --version
 
     - name: Run Tests with busted
       id: test
