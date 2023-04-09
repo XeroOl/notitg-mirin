@@ -2,11 +2,11 @@
 title: The Mirin Template
 ---
 # Mirin Template
-[NotITG](https://notitg.heysora.net) is a fork of OpenITG that is designed for creating and playing mod files.
+[NotITG](https://noti.tg/) is a fork of OpenITG that is designed for creating and playing mod files.
 
 [The Mirin Template](https://www.github.com/XeroOl/notitg-mirin) provides tools to allow mod file creators to implement their ideas.
 
-Join the [NotITG Discord](https://uksrt.heysora.net/discord) to learn more about NotITG.
+Join the [NotITG Discord](https://noti.tg/discord) to learn more about NotITG.
 
 The Mirin Template is designed to make easing as simple as possible, while remaining incredibly powerful.
 
@@ -20,6 +20,7 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 <br>
 <div style="display:flex">
 <div style="flex:50%" markdown="1">
+
 * [How to set up the template](Getting Started.md)
 * [setdefault](docs/setdefault.md)
 * [set](docs/set.md)
@@ -34,6 +35,7 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * [alias](docs/alias.md)
 </div>
 <div style="flex:50%" markdown="1">
+
 * [extra players](docs/players.md)
 * mode='end'
 * [flip](docs/flip.md)
@@ -47,6 +49,7 @@ The Mirin Template is designed to make easing as simple as possible, while remai
 * [list of ease functions](docs/eases.md)
 </div>
 </div>
+
 Bonus:
 * [learn Lua](https://www.lua.org/manual/5.1/)
 * [gradients](docs/gradients.md)
