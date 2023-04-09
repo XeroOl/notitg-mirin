@@ -20,7 +20,7 @@ A table of proxies for the combo object. `PC[1]` holds P1's combo, and `PC[2]` h
 ### PJ
 A table of proxies for the judgment object. `PJ[1]` holds P1's judgment, and `PJ[2]` holds P2's combo.
 ### PP
-A table of player proxies. `PP[1]` holds a P1 proxy, and `PP2` holds a P2 proxy.
+A table of player proxies. `PP[1]` holds a P1 proxy, and `PP[2]` holds a P2 proxy.
 ### setupJudgeProxy
 This function helps set up the proxies for the judgment and combo.
 
