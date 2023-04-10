@@ -15,6 +15,7 @@ for i = Start, End, StepSize do
 end
 ```
 The "`i`" part is the most important here. Everything within the `for` block is happening repeatedly for each value of `i`.
+Note: if `StepSize` is `1`, it doesn't have to be declared.
 
 A quick example:
 ```lua
@@ -24,7 +25,7 @@ end
 ```
 (Note: `..` is concatenation, which combines two [strings](https://en.wikipedia.org/wiki/String_(computer_science)))
 
-This is going to print 6 things to the console.<span style="color:red;" title="(since the start and end values are inclusive)"><sup>[?]</sup></span>
+This is going to print 6 things to the console.
 ```
 HELLO, THIS IS STEP 0
 HELLO, THIS IS STEP 2
@@ -33,11 +34,28 @@ HELLO, THIS IS STEP 6
 HELLO, THIS IS STEP 8
 HELLO, THIS IS STEP 10
 ```
+Note: The start and end values are __inclusive__, which is why this prints 6 times instead of 5.
+
+Another example:
+```lua
+for i = 0, 5 do
+  print('2 to the power of '..i..' is '..math.pow(2, i))
+end
+```
+This will print the following:
+```
+2 to the power of 0 is 1
+2 to the power of 1 is 2
+2 to the power of 2 is 4
+2 to the power of 3 is 8
+2 to the power of 4 is 16
+2 to the power of 5 is 32
+```
 The ability to do things multiple times has many applications in programming, but it's particularly useful in mods. If you're working in tables (as is the case with *every* modern template), you can add lots of things to a table at the same time.
 
 Let's say for example, you want to move players back and forth every **4** beats, starting at beat **200**:
 ```lua
-for i = 200, 231, 4 do
+for i = 200, 232, 4 do
   ease {i, 2, outCubic, 100, 'z'}
   ease {i + 2, 2, outCubic, 0, 'z'}
 end

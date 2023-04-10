@@ -4,6 +4,8 @@ title: Mods List | The Mirin Template
 [Back to main page](..)
 # Mod List
 Here is a list of mods that are useful for making mod files. There may be some missing mods or duplicates or aliases, but the list is relatively complete.
+
+Mods that have column-specific variants will have a visual indicator in the future.
 ```
 xmod
 cmod
