@@ -7,17 +7,17 @@ Gradients are a feature of NotITG, and aren't specific to the Mirin Template.
 
 ## Set Num Points
 ```lua
-Player:SetNumPathGradientPoints(column,amount)
-Player:SetNumArrowGradientPoints(column,amount)
-Player:SetNumStealthGradientPoints(column,amount)
+   Player:SetNumPathGradientPoints(column, amount)
+  Player:SetNumArrowGradientPoints(column, amount)
+Player:SetNumStealthGradientPoints(column, amount)
 ```
-These tell the game how many points/stops there are in the gradient. (Much like Photoshop gradients where you can set a color at each point)
+These tell the game how many points/stops there are in the gradient (much like Photoshop gradients where you can set a color at each point).
 
 ## Set Gradient Points
 ```lua
-Player:SetPathGradientPoint(point,column,where)
-Player:SetArrowGradientPoint(point,column,where)
-Player:SetStealthGradientPoint(point,column,where)
+   Player:SetPathGradientPoint(point, column, where)
+  Player:SetArrowGradientPoint(point, column, where)
+Player:SetStealthGradientPoint(point, column, where)
 ```
 These position those points on the column provided. (1 = 1 arrow -or- 64 pixels)
 
@@ -30,9 +30,9 @@ P1:SetArrowGradientPoint(0,0,1)
 
 ## Set Gradient Color
 ```lua
-Player:SetPathGradientColor(point,column,r,g,b,a)
-Player:SetArrowGradientColor(point,column,r,g,b,a)
-Player:SetStealthGradientColor(point,column,r,g,b,a)
+   Player:SetPathGradientColor(point, column, r, g, b, a)
+  Player:SetArrowGradientColor(point, column, r, g, b, a)
+Player:SetStealthGradientColor(point, column, r, g, b, a)
 ```
 These will set the color of the point provided.
 ### Example:

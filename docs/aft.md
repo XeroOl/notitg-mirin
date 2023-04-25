@@ -37,4 +37,4 @@ Type = "ActorFrame"
 	<Layer Type = "ActorFrameTexture" Name = "myaft" />
 </children></Mods>
 ```
-From here, try moving / rotating mysprite, or place the AFT and Sprite at different positions in the scene.
+From here, try moving / rotating `mysprite`, or place the AFT and Sprite at different positions in the scene.

@@ -1,6 +1,7 @@
 ---
 title: Actors | The Mirin Template
 ---
+[Back to main page](..)
 # Actors
 An actor basically says that a thing is a thing. In other words, it is an object. 
 They are declared as follows (in `layout.xml`):

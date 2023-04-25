@@ -3,21 +3,21 @@ title: Mods List | The Mirin Template
 ---
 [Back to main page](..)
 # Mod List
-Here is a list of mods that are useful for making mod files. There may be some missing mods or duplicates or aliases, but the list is relatively complete.
+Here is a list of mods that are useful for making modfiles. There may be some missing mods or duplicates or aliases, but the list is relatively complete.
 
-Mods that have column-specific variants will have a visual indicator in the future.
+Mods that have column-specific variants are indicated with a `*`. To use them in modding, add the column number (0 indexed) to the end of the mod name. For instance, `arrowpath2` would be arrowpath on the "up" column.
 ```
-xmod
-cmod
+*xmod
+*cmod
 
-brake
-boost
+*brake
+*boost
 boomerang
 
-wave
-waveperiod
-waveoffset
-wavesize
+*wave
+*waveperiod
+*waveoffset
+*wavesize
 
 expand
 expandsize
@@ -27,14 +27,14 @@ tanexpand
 tanexpandsize
 tanexpandperiod
 
-arrowpath
-arrowpathgirth
-arrowpathwidth
-arrowpathsize
+*arrowpath
+*arrowpathgirth
+*arrowpathwidth
+*arrowpathsize
 
-arrowpathgrain
-arrowpathdrawsize/arrowpathdrawsizefront
-arrowpathdrawsizeback
+*arrowpathgrain
+*arrowpathdrawsize/arrowpathdrawsizefront
+*arrowpathdrawsizeback
 
 grain
 drawsize/drawsizefront
@@ -74,26 +74,26 @@ spiralz
 spiralzperiod
 spiralzoffset
 
-beat
-beatperiod
-beatoffset
-beatmult
-beatsize
-beatcap
+*beat
+*beatperiod
+*beatoffset
+*beatmult
+*beatsize
+*beatcap
 
-beaty
-beatyperiod
-beatyoffset
-beatymult
-beatysize
-beatcapy
+*beaty
+*beatyperiod
+*beatyoffset
+*beatymult
+*beatysize
+*beatcapy
 
-beatz
-beatzperiod
-beatzoffset
-beatzmult
-beatzsize
-beatcapz
+*beatz
+*beatzperiod
+*beatzoffset
+*beatzmult
+*beatzsize
+*beatcapz
 
 tipsy
 tipsyoffset
@@ -152,9 +152,8 @@ tantornadoz
 tantornadozperiod
 tantornadozoffset
 
-noteskew
-noteskewx
-noteskewy
+*noteskew/noteskewx
+*noteskewy
 noteskewtype/skewtype
 
 digital
@@ -193,107 +192,107 @@ squarez
 squarezperiod
 squarezoffset
 
-sawtooth
-sawtoothperiod
-sawtoothoffset
-sawtoothsize
+*sawtooth
+*sawtoothperiod
+*sawtoothoffset
+*sawtoothsize
 
-sawtoothz
-sawtoothzperiod
-sawtoothzoffset
-sawtoothzsize
+*sawtoothz
+*sawtoothzperiod
+*sawtoothzoffset
+*sawtoothzsize
 
-zigzag
-zigzagperiod
-zigzagoffset
-zigzagsize
+*zigzag
+*zigzagperiod
+*zigzagoffset
+*zigzagsize
 
-zigzagz
-zigzagzperiod
-zigzagzoffset
-zigzagzsize
+*zigzagz
+*zigzagzperiod
+*zigzagzoffset
+*zigzagzsize
 
-drunk
-drunkperiod
-drunkoffset
-drunkspacing
-drunkspeed
-drunksize
+*drunk
+*drunkperiod
+*drunkoffset
+*drunkspacing
+*drunkspeed
+*drunksize
 
-drunky
-drunkyperiod
-drunkyoffset
-drunkyspacing
-drunkyspeed
-drunkysize
+*drunky
+*drunkyperiod
+*drunkyoffset
+*drunkyspacing
+*drunkyspeed
+*drunkysize
 
-drunkz
-drunkzperiod
-drunkzoffset
-drunkzspacing
-drunkzspeed
-drunkzsize
+*drunkz
+*drunkzperiod
+*drunkzoffset
+*drunkzspacing
+*drunkzspeed
+*drunkzsize
 
-tandrunk
-tandrunkperiod
-tandrunkoffset
-tandrunkspacing
-tandrunkspeed
-tandrunksize
+*tandrunk
+*tandrunkperiod
+*tandrunkoffset
+*tandrunkspacing
+*tandrunkspeed
+*tandrunksize
 
-tandrunky
-tandrunkyperiod
-tandrunkyoffset
-tandrunkyspacing
-tandrunkyspeed
-tandrunkysize
+*tandrunky
+*tandrunkyperiod
+*tandrunkyoffset
+*tandrunkyspacing
+*tandrunkyspeed
+*tandrunkysize
 
-tandrunkz
-tandrunkzperiod
-tandrunkzoffset
-tandrunkzspacing
-tandrunkzspeed
-tandrunkzsize
+*tandrunkz
+*tandrunkzperiod
+*tandrunkzoffset
+*tandrunkzspacing
+*tandrunkzspeed
+*tandrunkzsize
 
-bumpy
-bumpyperiod
-bumpyoffset
-bumpysize
+*bumpy
+*bumpyperiod
+*bumpyoffset
+*bumpysize
 
-bumpyx
-bumpyxperiod
-bumpyxoffset
-bumpyxsize
+*bumpyx
+*bumpyxperiod
+*bumpyxoffset
+*bumpyxsize
 
-bumpyy
-bumpyyperiod
-bumpyyoffset
-bumpyysize
+*bumpyy
+*bumpyyperiod
+*bumpyyoffset
+*bumpyysize
 
-bumpyz
-bumpyzperiod
-bumpyzoffset
-bumpyzsize
+*bumpyz
+*bumpyzperiod
+*bumpyzoffset
+*bumpyzsize
 
-tanbumpy
-tanbumpyperiod
-tanbumpyoffset
-tanbumpysize
+*tanbumpy
+*tanbumpyperiod
+*tanbumpyoffset
+*tanbumpysize
 
-tanbumpyx
-tanbumpyxperiod
-tanbumpyxoffset
-tanbumpyxsize
+*tanbumpyx
+*tanbumpyxperiod
+*tanbumpyxoffset
+*tanbumpyxsize
 
-tanbumpyy
-tanbumpyyperiod
-tanbumpyyoffset
-tanbumpyysize
+*tanbumpyy
+*tanbumpyyperiod
+*tanbumpyyoffset
+*tanbumpyysize
 
-tanbumpyz
-tanbumpyzperiod
-tanbumpyzoffset
-tanbumpyzsize
+*tanbumpyz
+*tanbumpyzperiod
+*tanbumpyzoffset
+*tanbumpyzsize
 
 cover
 blind
@@ -306,18 +305,21 @@ centered2
 split
 cross
 alternate
-reverse
+*reverse
 reversetype
 
-hidenoteflash/hidenoteflashes
+*hidenoteflash/hidenoteflashes
+*hidenotepress/manualnoteflash
 hideholds/holdstealth
 hidemines/minestealth
 
 invert
 flip
+
 mini
-twirl
-roll
+*dizzy
+*twirl
+*roll
 
 dizzyholds
 holdtype
@@ -344,26 +346,26 @@ timermult/modtimermult/globalmodtimermult
 
 clearall
 
-wireframe
-wireframegirth
-wireframewidth
+*wireframe
+*wireframegirth
+*wireframewidth
 
-tiny
-tinyx
-tinyy
-tinyz
+*tiny
+*tinyx
+*tinyy
+*tinyz
 
-confusionoffset
-confusionxoffset
-confusionyoffset
-confusionzoffset
+*confusionoffset
+*confusionxoffset
+*confusionyoffset
+*confusionzoffset
 
 confusion
 confusionx
 confusiony
 confusionz
 
-dark
+*dark
 
 stealth
 stealthpastreceptors
