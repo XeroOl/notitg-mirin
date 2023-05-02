@@ -7,8 +7,8 @@ Here is a list of mods that are useful for making modfiles. There may be some mi
 
 Mods that have column-specific variants are indicated with a `*`. To use them in modding, add the column number (0 indexed) to the end of the mod name. For instance, `arrowpath2` would be arrowpath on the "up" column.
 ```
-*xmod
-*cmod
+xmod
+cmod
 
 *brake
 *boost
@@ -367,7 +367,7 @@ confusionz
 
 *dark
 
-stealth
+*stealth
 stealthpastreceptors
 stealthtype
 
