@@ -133,7 +133,7 @@ func {start, len, function}
 # Mirin Template v3.0.0
 Oops I accidentally an update!
 
-## New features ##
+## New Features ##
 * New `func` variation for function eases for when you have a small function
 ```lua
 func {0, 1, inOutExpo, 0, scx, 'P1:x'}
@@ -177,7 +177,7 @@ func {0, 1, inOutExpo, 0, scx, 'P1:x'}
 # Mirin Template v2
 It's time! Here's the new version of the template! It adds some new functions.
 
-## New features ##
+## New Features ##
 * `definemod` now is an easy way to use `aux` and `node`
 * `flip` function to flip your eases
 * `get` function, to read mod percentages
@@ -191,7 +191,7 @@ It's time! Here's the new version of the template! It adds some new functions.
 
 # Mirin Template v1
 
-## New features ##
+## New Features ##
 * case-insensitivity for mods
 * `alias` has been split into `aux` and `alias`
 * `func` has a `func-ease` mode thing
