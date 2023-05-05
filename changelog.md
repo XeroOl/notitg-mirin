@@ -186,7 +186,7 @@ It's time! Here's the new version of the template! It adds some new functions.
 
 ## Bug Fixes ##
 * `zoom` on extra players being jank
-* fixed: strange behavior with one of the debug variables
+* strange behavior with one of the debug variables
 
 
 # Mirin Template v1
