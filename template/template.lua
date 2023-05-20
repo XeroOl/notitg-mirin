@@ -171,7 +171,7 @@ local function ease(self)
 	-- convert mode into a regular true or false
 	self.mode = self.mode == 'end' or self.m == 'e'
 
-	-- convert the ease into relative
+	-- convert the ease into "len" instead of "end"
 	if self.mode then
 		self[2] = self[2] - self[1]
 	end
