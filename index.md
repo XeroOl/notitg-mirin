@@ -13,7 +13,6 @@ It is is designed to make easing as simple as possible, while remaining incredib
 
 ## Getting Started:
 
-* [Choosing a template](comparison.md)
 * [How to set up the template](Getting-Started.md)
 
 ## Documentation
