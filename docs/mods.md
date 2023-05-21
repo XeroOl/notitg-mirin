@@ -10,6 +10,8 @@ Mods that have column-specific variants are indicated with a `*`. To use them in
 xmod
 cmod
 
+*scrollspeedmult
+
 *brake
 *boost
 boomerang
@@ -17,7 +19,6 @@ boomerang
 *wave
 *waveperiod
 *waveoffset
-*wavesize
 
 expand
 expandsize
@@ -28,13 +29,13 @@ tanexpandsize
 tanexpandperiod
 
 *arrowpath
-*arrowpathgirth
-*arrowpathwidth
-*arrowpathsize
+arrowpathgirth
+arrowpathwidth
+arrowpathsize
 
-*arrowpathgrain
-*arrowpathdrawsize/arrowpathdrawsizefront
-*arrowpathdrawsizeback
+arrowpathgrain
+arrowpathdrawsize/arrowpathdrawsizefront
+arrowpathdrawsizeback
 
 grain
 drawsize/drawsizefront
@@ -95,15 +96,15 @@ spiralzoffset
 *beatzsize
 *beatcapz
 
-tipsy
-tipsyoffset
-tipsyspacing
-tipsyspeed
+*tipsy
+*tipsyoffset
+*tipsyspacing
+*tipsyspeed
 
-tantipsy
-tantipsyoffset
-tantipsyspacing
-tantipsyspeed
+*tantipsy
+*tantipsyoffset
+*tantipsyspacing
+*tantipsyspeed
 
 asymptote
 asymptotesize
@@ -152,7 +153,7 @@ tantornadoz
 tantornadozperiod
 tantornadozoffset
 
-*noteskew/noteskewx
+*noteskew/*noteskewx
 *noteskewy
 noteskewtype/skewtype
 
@@ -308,8 +309,8 @@ alternate
 *reverse
 reversetype
 
-*hidenoteflash/hidenoteflashes
-*hidenotepress/manualnoteflash
+*hidenoteflash/*hidenoteflashes
+*hidenotepress/*manualnoteflash
 hideholds/holdstealth
 hidemines/minestealth
 
@@ -321,16 +322,21 @@ mini
 *twirl
 *roll
 
+approachtype
+
 dizzyholds
 holdtype
 spiralholds
-orient
-gayholds
-straightholds
+*straightholds
 longholds
-holdgirth
-holdtiny
+*holdgirth
+*holdtiny
 
+orient
+noreorient
+orientoffset
+
+*gayholds
 hide
 arrowcull
 holdcull
@@ -402,9 +408,19 @@ hiddenredoffset
 hiddengreenoffset
 hiddenblueoffset
 
-movex
-movey
-movez
+vanish
+vanishoffset
+vanishsize
+
+zbuffer
+
+sinclip
+cosclip
+tanclip
+
+*movex
+*movey
+*movez
 
 x
 y
