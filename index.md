@@ -37,9 +37,10 @@ It is is designed to make easing as simple as possible, while remaining incredib
 * [flip](docs/flip.md)
 * [get](docs/get.md)
 * [aux](docs/doc-aux.md)
-  * [node](docs/doc-aux.md#node)
+* [node](docs/doc-aux.md#node)
 * [func](docs/func.md)
-  * [function eases](docs/func.md#func_for_function_eases)
+  * [perframe](docs/func.md#perframe)
+  * [func_ease](docs/func.md#func_ease)
   * [poptions](docs/func.md#poptions)
 * mode='end'
 
