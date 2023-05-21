@@ -40,7 +40,7 @@ It is is designed to make easing as simple as possible, while remaining incredib
 * [node](docs/doc-aux.md#node)
 * [func](docs/func.md)
   * [perframe](docs/func.md#perframe)
-  * [func_ease](docs/func.md#func_ease)
+  * [func_ease](docs/func.md#func-ease)
   * [poptions](docs/func.md#poptions)
 * mode='end'
 
