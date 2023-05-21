@@ -27,7 +27,7 @@ coverage:
 	busted --coverage --suppress-pending || true
 	luacov
 	awk 't&&(--l<0){print}/Summary/{t=1;l=1}' luacov.report.out
-	awk '/Total/{print "##[set-output name=coverage;]" int($$NF)}' luacov.report.out >> $GITHUB_OUTPUT
+	awk '/Total/{print(int($$NF))}' luacov.report.out >> $GITHUB_OUTPUT
 	rm luacov.report.out
 	rm luacov.stats.out
 
