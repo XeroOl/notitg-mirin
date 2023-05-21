@@ -7,13 +7,13 @@ title: Func | The Mirin Template
 -- Scheduled Function:
 func {beat, function(b)}
 -- Perframe:
-func {beat, len, function(b, poptions)}
+perframe {beat, len, function(b, poptions)}
 -- Function Eases:
-func {beat, len, ease_fn, function(p)}
-func {beat, len, ease_fn, percent, function(p)}
-func {beat, len, ease_fn, begin_percent, end_percent, function(p)}
-func {beat, len, ease_fn, percent, 'actor:method'}
-func {beat, len, ease_fn, begin_percent, end_percent, 'actor:method'}
+func_ease {beat, len, ease_fn, function(p)}
+func_ease {beat, len, ease_fn, percent, function(p)}
+func_ease {beat, len, ease_fn, begin_percent, end_percent, function(p)}
+func_ease {beat, len, ease_fn, percent, 'actor:method'}
+func_ease {beat, len, ease_fn, begin_percent, end_percent, 'actor:method'}
 ```
 The `func` function is used to run lua functions at certain beats in the song. `func` can be used to run a function once, or run a function at every frame in a range of beats.
 
