@@ -59,6 +59,8 @@ It is is designed to make easing as simple as possible, while remaining incredib
 
 ## Lua Tutorials
 * [for loop](docs/for.md)
-* [learn Lua](https://www.lua.org/manual/5.1/)
+
+## External Resources
+* [The Lua Manual](https://www.lua.org/manual/5.1/)
 
 Documentation by XeroOl, Chegg, Kirby5464, Spax
