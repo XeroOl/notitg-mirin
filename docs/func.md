@@ -28,7 +28,7 @@ func {32, function()
 end}
 ```
 
-# `perframe` for Per-frames
+# Perframe
 ```lua
 perframe {beat, len, function(b, poptions)}
 ```
@@ -43,7 +43,7 @@ Arguments:
 
 The `perframe` function runs the function on every single frame starting at the `beat`. It lasts for `len` beats. The inner function is given the current beat, and also the [poptions](#poptions) table which can be used to read/write the state of the mods.
 
-# `func_ease` for Function Eases
+# Func Ease
 ```lua
 func_ease {beat, len, ease_fn, function(p)}
 func_ease {beat, len, ease_fn, percent, function(p)}
