@@ -179,17 +179,39 @@ local function ease(self)
 	-- convert the start beat into time and store it in start_time
 	self.start_time = self.time and self[1] or song:GetElapsedTimeFromBeat(self[1])
 
+	-- parse out table percentages from the mods
+	local start_mods = nil
+	for i = 4, #self, 2 do
+		if type(self[i]) == 'table' then
+			start_mods = start_mods or { self[1], 0, instant, start_time = self.start_time }
+			table.insert(start_mods, self[i][1])
+			table.insert(start_mods, self[i + 1])
+			self[i] = self[i][2]
+		end
+	end
+
+	-- future steps assume that plr is a number, so if it's a table,
+
 	-- future steps assume that plr is a number, so if it's a table,
 	-- we need to duplicate the entry once for each player number
 	-- The table is then stored into `eases` for later
 	local plr = self.plr or get_plr()
 	if type(plr) == 'table' then
 		for _, plr in ipairs(plr) do
+			if start_mods then
+				local new_start_mods = copy(start_mods)
+				new_start_mods.plr = plr
+				table.insert(eases, new_start_mods)
+			end
 			local new = copy(self)
 			new.plr = plr
 			table.insert(eases, new)
 		end
 	else
+		if start_mods then
+			start_mods.plr = plr
+			table.insert(eases, start_mods)
+		end
 		self.plr = plr
 		table.insert(eases, self)
 	end
@@ -564,6 +586,7 @@ local function scan_named_actors()
 		self[k] = setmetatable({}, mt)
 		return self[k]
 	end
+
 	local actors = setmetatable({}, mt)
 	local list = {}
 	local code = stringbuilder()
@@ -1062,6 +1085,7 @@ function propagateAll(nodes_to_propagate)
 		end
 	end
 end
+
 function propagate(nd)
 	if nd[9] ~= seen then
 		nd[9] = seen
@@ -1584,6 +1608,7 @@ function aft(self)
 	self:EnablePreserveTexture(true)
 	self:Create()
 end
+
 -- luacheck: pop
 
 -- UNDOCUMENTED
