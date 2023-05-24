@@ -1,18 +1,16 @@
 ---@diagnostic disable: undefined-global
-local helper = require('spec.helper')
+local helper = require("spec.helper")
 local update = helper.update
 
-describe('setdefault', function()
+describe("setdefault", function()
+	before_each(function()
+		helper.reset()
+		helper.init()
+	end)
 
-    before_each(function()
-        helper.reset()
-        helper.init()
-    end)
+	after_each(function()
+		xero = nil
+	end)
 
-    after_each(function()
-        xero = nil
-    end)
-
-    -- TODO
-
+	-- TODO
 end)
