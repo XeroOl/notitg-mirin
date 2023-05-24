@@ -24,6 +24,22 @@ describe("add", function()
 		assert.equal("300", helper.get_mod("dizzy", 1))
 		assert.equal("100", helper.get_mod("dizzy", 2))
 	end)
+
+	it("should support table mod percentages", function()
+		xero.add {0, 0, xero.instant, 100, "bumpy"}
+		xero.add {0, 0, xero.instant, 100, "reverse", plr = {1, 3}}
+		xero.add {1, 1, xero.linear, {100, 0}, "bumpy"}
+		xero.add {1, 1, xero.linear, {100, 0}, "reverse", plr = {1, 3}}
+		update(1)
+		assert.equal("200", helper.get_mod("bumpy"))
+		assert.equal("200", helper.get_mod("reverse"))
+		assert.equal(nil, helper.get_mod("reverse", 2))
+		update(1)
+		assert.equal("100", helper.get_mod("bumpy"))
+		assert.equal("100", helper.get_mod("reverse"))
+		assert.equal(nil, helper.get_mod("reverse", 2))
+	end)
+
 	it("should detect missing beats", function()
 		assert.errors(function() xero.add {nil, 4, xero.inOutExpo, 100, "bumpyx"} end)
 	end)

@@ -30,13 +30,11 @@ coverage:
 ifdef GITHUB_OUTPUT
 	awk '/Total/{print "coverage=" int($$NF)}' luacov.report.out >> $(GITHUB_OUTPUT)
 endif
-	rm luacov.report.out
-	rm luacov.stats.out
 
 clean:
 	# from the default target
 	rm -rf build
-	rm -rf $(FILENAME)
+	rm -rf "$(FILENAME).zip"
 	# from coverage
 	rm -rf luacov.report.out
 	rm -rf luacov.stats.out

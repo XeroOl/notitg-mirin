@@ -183,14 +183,12 @@ local function ease(self)
 	local start_mods = nil
 	for i = 4, #self, 2 do
 		if type(self[i]) == 'table' then
-			start_mods = start_mods or { self[1], 0, instant, start_time = self.start_time }
+			start_mods = start_mods or { self[1], 0, instant, start_time = self.start_time, relative = self.relative }
 			table.insert(start_mods, self[i][1])
 			table.insert(start_mods, self[i + 1])
-			self[i] = self[i][2]
+			self[i] = self.relative and self[i][2] - self[i][1] or self[i][2]
 		end
 	end
-
-	-- future steps assume that plr is a number, so if it's a table,
 
 	-- future steps assume that plr is a number, so if it's a table,
 	-- we need to duplicate the entry once for each player number
