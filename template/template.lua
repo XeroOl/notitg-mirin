@@ -587,7 +587,7 @@ local function scan_named_actors()
 
 	local actors = setmetatable({}, mt)
 	local list = {}
-	local code = stringbuilder()
+	local code = {}
 	local function sweep(actor, skip)
 		if actor.GetNumChildren then
 			for i = 0, actor:GetNumChildren() - 1 do
@@ -601,18 +601,18 @@ local function scan_named_actors()
 		if name and name ~= '' then
 			if loadstring('t.' .. name .. '=t') then
 				table.insert(list, actor)
-				code('actors.')(name)(' = list[')(#list)(']\n')
+				table.insert(code, 'actors.' .. name .. ' = list[' .. #list .. ']\n')
 			else
 				SCREENMAN:SystemMessage("invalid actor name: '" .. name .. "'")
 			end
 		end
 	end
 
-	code('return function(list, actors)\n')
+	table.insert(code, 'return function(list, actors)\n')
 	sweep(foreground, true)
-	code('end')
+	table.insert(code, 'end')
 
-	local load_actors = xero(assert(loadstring(code:build())))()
+	local load_actors = xero(assert(loadstring(table.concat(code))))()
 	load_actors(list, actors)
 
 	local function clear_metatables(tab)
