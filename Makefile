@@ -31,6 +31,10 @@ ifdef GITHUB_OUTPUT
 	awk '/Total/{print "coverage=" int($$NF)}' luacov.report.out >> $(GITHUB_OUTPUT)
 endif
 
+lcov:
+	busted --coverage --suppress-pending || true
+	luacov -r lcov
+
 clean:
 	# from the default target
 	rm -rf build
