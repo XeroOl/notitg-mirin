@@ -1565,13 +1565,13 @@ export(set, check_ease_errors, 'set')
 export(acc, check_ease_errors, 'acc')
 export(reset, check_reset_errors, 'reset')
 export(func, check_func_errors, 'func')
-export(perframe, check_perframe_errors, 'per_frame')
+export(perframe, check_perframe_errors, 'perframe')
 export(func_ease, check_func_ease_errors, 'func_ease')
 export(alias, check_alias_errors, 'alias')
-export(setdefault, check_setdefault_errors, 'set_default')
+export(setdefault, check_setdefault_errors, 'setdefault')
 export(aux, check_aux_errrors, 'aux')
 export(node, check_node_errors, 'node')
-export(definemod, check_node_errors, 'define_mod')
+export(definemod, check_node_errors, 'definemod')
 xero.get_plr = get_plr
 xero.touch_mod = touch_mod
 xero.touch_all_mods = touch_all_mods
@@ -1630,10 +1630,10 @@ end
 -- luacheck: pop
 ---@diagnostic enable
 
-xero.perFrame = xero.per_frame
+xero.perframe = xero.perframe
 xero.funcEase = xero.func_ease
-xero.setDefault = xero.set_default
-xero.defineMod = xero.define_mod
+xero.setDefault = xero.setdefault
+xero.defineMod = xero.definemod
 xero.blendEase = xero.blendease
 
 xero.stableSort = xero.stable_sort
