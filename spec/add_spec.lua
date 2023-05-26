@@ -28,8 +28,8 @@ describe("add", function()
 	it("should support table mod percentages", function()
 		xero.add {0, 0, xero.instant, 100, "bumpy"}
 		xero.add {0, 0, xero.instant, 100, "reverse", plr = {1, 3}}
-		xero.add {1, 1, xero.linear, {100, 0}, "bumpy"}
-		xero.add {1, 1, xero.linear, {100, 0}, "reverse", plr = {1, 3}}
+		xero.add {1, 1, xero.linear, {100, -100}, "bumpy"}
+		xero.add {1, 1, xero.linear, {100, -100}, "reverse", plr = {1, 3}}
 		update(1)
 		assert.equal("200", helper.get_mod("bumpy"))
 		assert.equal("200", helper.get_mod("reverse"))

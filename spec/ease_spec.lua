@@ -30,12 +30,12 @@ describe("ease", function()
 		assert.equal(tostring(0), helper.get_mod("invert", 2))
 	end)
 	it("should add eases", function()
-		xero.ease {0, 1, xero.outExpo, 10000, "bumpy"}
-		xero.ease {0.5, 1, xero.outExpo, 3000, "bumpy"}
+		xero.ease {0, 1, xero.inBounce, 10000, "bumpy"}
+		xero.ease {0.5, 1, xero.inBounce, 3000, "bumpy"}
 		for _ = 1, 30 do update(1 / 60) end
-		assert.equal(tostring(xero.outExpo(.5) * 10000), helper.get_mod("bumpy"))
+		assert.equal(tostring(xero.inBounce(.5) * 10000), helper.get_mod("bumpy"))
 		for _ = 1, 30 do update(1 / 60) end
-		assert.equal(tostring(10000 - xero.outExpo(.5) * 7000), helper.get_mod("bumpy"))
+		assert.equal(tostring(10000 - xero.inBounce(.5) * 7000), helper.get_mod("bumpy"))
 		for _ = 1, 30 do update(1 / 60) end
 		assert.equal(tostring(3000), helper.get_mod("bumpy"))
 	end)
@@ -55,13 +55,17 @@ describe("ease", function()
 	it("should support table mod percentages", function()
 		xero.ease {1, 1, xero.linear, {100, 0}, "bumpy"}
 		xero.ease {1, 1, xero.linear, {100, 0}, "reverse", plr = {1, 3}}
+		xero.ease {1, 1, xero.linear, {100, 0}, "invert", plr = 2}
 		update(1)
 		assert.equal("100", helper.get_mod("bumpy"))
 		assert.equal("100", helper.get_mod("reverse"))
 		assert.equal(nil, helper.get_mod("reverse", 2))
+		assert.equal("100", helper.get_mod("invert", 2))
+		assert.equal(nil, helper.get_mod("invert", 1))
 		update(1)
 		assert.equal("0", helper.get_mod("bumpy"))
 		assert.equal("0", helper.get_mod("reverse"))
+		assert.equal("0", helper.get_mod("invert", 2))
 		assert.equal(nil, helper.get_mod("reverse", 2))
 	end)
 	it("should require curly braces", function()

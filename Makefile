@@ -24,6 +24,8 @@ test:
 	luacheck template
 
 coverage:
+	rm -rf luacov.report.out
+	rm -rf luacov.stats.out
 	busted --coverage --suppress-pending || true
 	luacov
 	awk 't&&(--l<0){print}/Summary/{t=1;l=1}' luacov.report.out
@@ -32,6 +34,8 @@ ifdef GITHUB_OUTPUT
 endif
 
 lcov:
+	rm -rf luacov.report.out
+	rm -rf luacov.stats.out
 	busted --coverage --suppress-pending || true
 	luacov -r lcov
 

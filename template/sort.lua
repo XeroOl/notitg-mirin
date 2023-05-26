@@ -22,6 +22,7 @@ used under license as follows:
 
 (modifications by Max Cahill 2018, 2020)
 (modifications by XeroOl 2021)
+(modifications by ChocoboGamer 2023)
 
 Found at: https://github.com/1bardesign/batteries/blob/master/sort.lua
 ]]
@@ -56,6 +57,11 @@ end
 function sort._merge(array, workspace, low, middle, high, less)
 	local i, j, k
 	i = 1
+
+	if low < middle + 1 and middle + 1 <= high and less(array[middle], array[middle + 1]) then
+		return
+	end
+
 	-- copy first half of array to auxiliary array
 	for j = low, middle do
 		workspace[i] = array[j]
@@ -112,7 +118,7 @@ function sort._sort_setup(array, less)
 	if not trivial then
 		--check less
 		if less(array[1], array[1]) then
-			error('invalid order function for sorting; less(v, v) should not be true for any v.')
+			error("invalid order function for sorting; less(v, v) should not be true for any v.")
 		end
 	end
 	--setup complete
@@ -131,16 +137,6 @@ function sort.stable_sort(array, less)
 		workspace[middle] = array[1]
 		--dive in
 		sort._merge_sort_impl(array, workspace, 1, n, less)
-	end
-	return array
-end
-
--- Public method (currently not exposed): insertion sort
-function sort.insertion_sort(array, less)
-	--setup
-	local trivial, n, less = sort._sort_setup(array, less)
-	if not trivial then
-		sort._insertion_sort_impl(array, 1, n, less)
 	end
 	return array
 end
