@@ -1578,8 +1578,13 @@ xero.touch_all_mods = touch_all_mods
 
 xero.max_pn = max_pn
 
+xero.mod_buffer = mod_buffer
+
 xero()
+
+---@diagnostic disable
 -- luacheck: push ignore
+
 scx = SCREEN_CENTER_X
 scy = SCREEN_CENTER_Y
 sw = SCREEN_WIDTH
@@ -1590,33 +1595,54 @@ dh = DISPLAY:GetDisplayHeight()
 
 e = 'end'
 
-function sprite(self)
-	self:basezoomx(sw / dw)
-	self:basezoomy(-sh / dh)
-	self:x(scx)
-	self:y(scy)
-end
+do
+	local function setupsprite(self)
+		self:basezoomx(sw / dw)
+		self:basezoomy(-sh / dh)
+		self:x(scx)
+		self:y(scy)
+	end
 
-function aft(self)
-	self:SetWidth(dw)
-	self:SetHeight(dh)
-	self:EnableDepthBuffer(false)
-	self:EnableAlphaBuffer(false)
-	self:EnableFloat(false)
-	self:EnablePreserveTexture(true)
-	self:Create()
+	local function setupaft(self)
+		self:SetWidth(dw)
+		self:SetHeight(dh)
+		self:EnableDepthBuffer(false)
+		self:EnableAlphaBuffer(false)
+		self:EnableFloat(false)
+		self:EnablePreserveTexture(true)
+		self:Create()
+	end
+
+	local seen = {}
+	function setupAftSprite(aft, sprite)
+		if not seen[aft] then
+			setupaft(aft)
+			seen[aft] = true
+		end
+		if not seen[sprite] then
+			setupaftsprite(sprite)
+			seen[sprite] = true
+		end
+		sprite:SetTexture(aft:GetTexture())
+	end
 end
 
 -- luacheck: pop
+---@diagnostic enable
 
--- UNDOCUMENTED
-xero.mod_buffer = mod_buffer
+xero.perFrame = xero.per_frame
+xero.funcEase = xero.func_ease
+xero.setDefault = xero.set_default
+xero.defineMod = xero.define_mod
+xero.blendEase = xero.blendease
 
-function xero.aftsprite(aft, sprite)
-	sprite:SetTexture(aft:GetTexture())
-end
+xero.stableSort = xero.stable_sort
 
--- end UNDOCUMENTED
+xero.getPlr = xero.get_plr
+xero.touchMod = xero.touch_mod
+xero.touchAllMods = xero.touch_all_mods
+
+xero.maxpn = xero.max_pn
 
 -- This is the entry point of the template.
 -- It sets up all of the commands used to run the template.
