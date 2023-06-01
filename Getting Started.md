@@ -5,4 +5,4 @@ redirect_to:
 ---
 
 This page has been moved
-# (Click this link to go to the new one)[Getting-Started]
+# [Click this link to go to the new one](/Getting-Started)
