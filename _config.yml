@@ -2,3 +2,5 @@ theme: jekyll-theme-midnight
 title: The Mirin Template
 kramdown:
     coderay_tab_width: 4
+plugins:
+  - jekyll-redirect-from
