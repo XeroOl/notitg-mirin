@@ -1,7 +1,7 @@
 ---
 title: Getting Started | The Mirin Template
 redirect_to: 
-  - Getting-Started.md
+  - Getting-Started
 ---
 
 This page has been moved
