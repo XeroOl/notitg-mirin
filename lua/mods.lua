@@ -4,6 +4,7 @@ if not P1 or not P2 then
 	foreground:hidden(1) -- Hide the foreground to disable update loop
 	return
 end
+foreground:SetFarDist(10000)
 
 -- player proxies
 for pn = 1, #PP do
