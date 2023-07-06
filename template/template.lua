@@ -13,7 +13,6 @@ local debug_print_mod_targets = false -- default: `false`
 local foreground = xero.foreground
 local copy = xero.copy
 local clear = xero.clear
-local stringbuilder = xero.stringbuilder
 local stable_sort = xero.stable_sort
 local perframe_data_structure = xero.perframe_data_structure
 local instant = xero.instant
@@ -501,7 +500,7 @@ for pn = 1, max_pn do
 	mods[pn] = setmetatable({}, mods_mt[pn])
 end
 
--- a stringbuilder of the modstring that is being applied
+-- a table of modstrings to be applied this frame
 local mod_buffer = {}
 for pn = 1, max_pn do
 	mod_buffer[pn] = {}
@@ -811,47 +810,47 @@ local function compile_nodes()
 		end
 		local function list(code, i, sep)
 			if i ~= 1 then
-				code(sep)
+				table.insert(code, sep)
 			end
 		end
 
-		local code = stringbuilder()
+		local code = {}
 		local function emit_inputs()
 			for i, mod in ipairs(inputs) do
 				list(code, i, ',')
 				for j = 1, #parents[i] do
 					list(code, j, '+')
-					code('parents[')(i)('][')(j)('][pn][')(escapestr(mod))(']')
+					table.insert(code, 'parents[' .. i .. '][' .. j .. '][pn][' .. escapestr(mod) .. ']')
 				end
 				if not parents[i][0] then
 					list(code, #parents[i] + 1, '+')
-					code('mods[pn][')(escapestr(mod))(']')
+					table.insert(code, 'mods[pn][' .. escapestr(mod) .. ']')
 				end
 			end
 		end
 		local function emit_outputs()
 			for i, mod in ipairs(out) do
 				list(code, i, ',')
-				code('outputs[pn][')(escapestr(mod))(']')
+				table.insert(code, 'outputs[pn][' .. escapestr(mod) .. ']')
 			end
 			return out[1]
 		end
-		code('return function(outputs, parents, mods, fn)\n')('return function(pn)\n')
+		table.insert(code, 'return function(outputs, parents, mods, fn)\nreturn function(pn)\n')
 		if terminator then
-			code('mods[pn][')(escapestr(inputs[1]))('] = ')
+			table.insert(code, 'mods[pn][' .. escapestr(inputs[1]) .. '] = ')
 			emit_inputs()
-			code('\n')
+			table.insert(code, '\n')
 		else
 			if emit_outputs() then
-				code(' = ')
+				table.insert(code, ' = ')
 			end
-			code('fn(')
+			table.insert(code, 'fn(')
 			emit_inputs()
-			code(', pn)\n')
+			table.insert(code, ', pn)\n')
 		end
-		code('end\n')('end\n')
+		table.insert(code, 'end\nend\n')
 
-		local compiled = assert(loadstring(code:build(), 'node_generated'))()
+		local compiled = assert(loadstring(table.concat(code), 'node_generated'))()
 		nd[6] = compiled(outputs, parents, mods, fn)
 		if not terminator then
 			for pn = 1, max_pn do
