@@ -363,6 +363,13 @@ local function func_ease(self)
 	local eas = self[3]
 	local start_percent = #self >= 5 and table.remove(self, 4) or 0
 	local end_percent = #self >= 4 and table.remove(self, 4) or 1
+
+	if type(end_percent) == 'table' then
+		local percents = end_percent
+		start_percent = percents[1]
+		end_percent = percents[2]
+	end
+
 	local end_beat = self[1] + self[2]
 
 	if type(fn) == 'string' then
@@ -1399,14 +1406,27 @@ local function check_func_ease_errors(self, name)
 	if not is_valid_ease(eas) then
 		return 'the third argument needs to be an ease'
 	end
-	if #self > 5 and type(self[4]) ~= 'number' then
-		return 'the fourth argument needs to be a percentage'
-	end
 	if type(fn) ~= 'function' and type(fn) ~= 'string' then
 		return 'the last argument needs to be a function to be eased'
 	end
-	if #self > 4 and type(self[#self - 1]) ~= 'number' then
-		return 'the second-to-last argument needs to be a number'
+	if #self == 6 then
+		if type(self[4]) ~= 'number' then
+			return 'the fourth argument needs to be a percentage'
+		end
+		if type(self[5]) ~= 'number' then
+			return 'the fifth argument needs to be a percentage'
+		end
+	elseif #self == 5 then
+		if type(self[4]) ~= 'number' and type(self[4]) ~= 'table' then
+			return 'the fourth argument needs to be a percentage (or a table of two percentages)'
+		end
+		if type(self[4]) == 'table' then
+			if type(self[4][1]) ~= 'number' or type(self[4][2]) ~= 'number' then
+				return 'when the fourth argument is a table, it needs to have two percentages'
+			end
+		end
+	elseif #self ~= 4 then
+		return 'too many arguments'
 	end
 	if is_beyond_load_command then
 		return 'cannot call ' .. name .. ' after LoadCommand finished'

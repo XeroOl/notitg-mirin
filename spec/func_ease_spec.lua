@@ -21,6 +21,8 @@ describe("func_ease", function()
 		xero.func_ease {0, 1, xero.outExpo, 10, "a_function"}
 		xero.func_ease {0, 1, xero.outExpo, 100, 0, function() end}
 		xero.func_ease {0, 1, xero.outExpo, 100, 0, "a_function"}
+		xero.func_ease {0, 1, xero.outExpo, {100, 0}, function() end}
+		xero.func_ease {0, 1, xero.outExpo, {100, 0}, "a_function"}
 		for i = 1, 10 do
 			update(0.1)
 		end
