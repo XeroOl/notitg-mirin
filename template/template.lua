@@ -1564,13 +1564,13 @@ export(set, check_ease_errors, 'set')
 export(acc, check_ease_errors, 'acc')
 export(reset, check_reset_errors, 'reset')
 export(func, check_func_errors, 'func')
-export(perframe, check_perframe_errors, 'perframe')
+export(perframe, check_perframe_errors, 'per_frame')
 export(func_ease, check_func_ease_errors, 'func_ease')
 export(alias, check_alias_errors, 'alias')
-export(setdefault, check_setdefault_errors, 'setdefault')
+export(setdefault, check_setdefault_errors, 'set_default')
 export(aux, check_aux_errrors, 'aux')
 export(node, check_node_errors, 'node')
-export(definemod, check_node_errors, 'definemod')
+export(definemod, check_node_errors, 'define_mod')
 xero.get_plr = get_plr
 xero.touch_mod = touch_mod
 xero.touch_all_mods = touch_all_mods
