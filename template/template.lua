@@ -1340,7 +1340,7 @@ local function check_ease_errors(self, name)
 		return 'invalid plr'
 	end
 	if is_beyond_load_command then
-		return 'cannot call ' .. name .. ' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after the song has loaded'
 	end
 end
 
@@ -1371,7 +1371,7 @@ local function check_reset_errors(self, name)
 		return 'exclude= and only= are mutually exclusive'
 	end
 	if is_beyond_load_command then
-		return 'cannot call ' .. name .. ' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after the song has loaded'
 	end
 end
 
@@ -1387,7 +1387,7 @@ local function check_func_errors(self, name)
 		return 'the second argument needs to be a function\n(maybe try using func_ease or perframe instead)'
 	end
 	if is_beyond_load_command then
-		return 'cannot call ' .. name .. ' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after the song has loaded'
 	end
 end
 
@@ -1428,7 +1428,7 @@ local function check_func_ease_errors(self, name)
 		return 'too many arguments'
 	end
 	if is_beyond_load_command then
-		return 'cannot call ' .. name .. ' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after the song has loaded'
 	end
 end
 
@@ -1447,7 +1447,7 @@ local function check_perframe_errors(self, name)
 		return 'the third argument needs to be a function'
 	end
 	if is_beyond_load_command then
-		return 'cannot call ' .. name .. ' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after the song has loaded'
 	end
 end
 
@@ -1463,7 +1463,7 @@ local function check_alias_errors(self, name)
 		return 'argument 2 should be a string'
 	end
 	if is_beyond_load_command then
-		return 'cannot call ' .. name .. ' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after the song has loaded'
 	end
 end
 
@@ -1480,7 +1480,7 @@ local function check_setdefault_errors(self, name)
 		end
 	end
 	if is_beyond_load_command then
-		return 'cannot call ' .. name .. ' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after the song has loaded'
 	end
 end
 
@@ -1496,7 +1496,7 @@ local function check_aux_errrors(self, name)
 		end
 	end
 	if is_beyond_load_command then
-		return 'cannot call ' .. name .. ' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after the song has loaded'
 	end
 end
 
@@ -1535,7 +1535,7 @@ local function check_node_errors(self, name)
 		end
 	end
 	if is_beyond_load_command then
-		return 'cannot call ' .. name .. ' after LoadCommand finished'
+		return 'cannot call ' .. name .. ' after the song has loaded'
 	end
 end
 
