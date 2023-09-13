@@ -78,8 +78,13 @@ return {
 			table.insert(t, v)
 		end
 		table.insert(t, fn)
-		for _, v in ipairs(outputs) do
-			table.insert(t, v)
+		if outputs and not opts and not outputs[1] then
+			outputs, opts = nil, outputs
+		end
+		if outputs then
+			for _, v in ipairs(outputs) do
+				table.insert(t, v)
+			end
 		end
 		opts = opts or {}
 		for k, v in pairs(opts) do
@@ -93,8 +98,13 @@ return {
 			table.insert(t, v)
 		end
 		table.insert(t, fn)
-		for _, v in ipairs(outputs) do
-			table.insert(t, v)
+		if outputs and not opts and not outputs[1] then
+			outputs, opts = nil, outputs
+		end
+		if outputs then
+			for _, v in ipairs(outputs) do
+				table.insert(t, v)
+			end
 		end
 		opts = opts or {}
 		for k, v in pairs(opts) do
