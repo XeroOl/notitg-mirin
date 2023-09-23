@@ -24,7 +24,7 @@ It is is designed to make easing as simple as possible, while remaining incredib
 * [setdefault](docs/setdefault.md)
 * [set](docs/set.md)
 * [ease](docs/ease.md)
-  * [add](docs/ease.md#add)
+* [add](docs/ease.md#add)
 * [definemod](docs/definemod.md)
 * [reset](docs/reset.md)
 * [alias](docs/alias.md)

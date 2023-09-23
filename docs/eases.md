@@ -51,16 +51,16 @@ title: Ease List | The Mirin Template
 
 On some specific eases, there are parameters you can tweak to change the shape of the ease.
 Here's the list of parameterized eases, with the default parameters.
-* popElastic.params(1.4, 6)
-* tapElastic.params(1.4, 6)
-* pulseElastic.params(1.4, 6)
-* impulse.params(0.9)
-* inElastic.params(1, 0.3)
-* outElastic.params(1, 0.3)
-* inOutElastic.params(1, 0.3)
-* inBack.params(1.70158)
-* outBack.params(1.70158)
-* inOutBack.params(1.70158)
+* popElastic:params(1.4, 6)
+* tapElastic:params(1.4, 6)
+* pulseElastic:params(1.4, 6)
+* impulse:params(0.9)
+* inElastic:params(1, 0.3)
+* outElastic:params(1, 0.3)
+* inOutElastic:params(1, 0.3)
+* inBack:params(1.70158)
+* outBack:params(1.70158)
+* inOutBack:params(1.70158)
 
 Here is a plot of each ease
 
