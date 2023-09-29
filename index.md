@@ -35,7 +35,6 @@ It is is designed to make easing as simple as possible, while remaining incredib
 
 * [player-specific](docs/players.md)
 * [flip](docs/flip.md)
-* [get](docs/get.md)
 * [aux](docs/doc-aux.md)
 * [node](docs/doc-aux.md#node)
 * [func](docs/func.md)
