@@ -47,7 +47,7 @@ definemod {mymod, function(percent, pn)
     -- implementation
 end}
 ```
-Although it is rare, there are sometimes cases when a defined mod to be player specific: ie, it behaves differently depending on which player it's been applied to. To accomplish this, the callback function can take in an extra argument, which is the player number.
+Although it is rare, there are sometimes cases when a defined mod to be player specific: ie, it behaves differently depending on which player it's been applied to. To accomplish this, the callback function can take in an extra argument, which is the player number. Keep in mind this will iterate for **all eight players**, including non-awake ones, so restrict any calls that wouldn't work on non-awake players to currently-active ones with an `if` block.
 
 # Write to mods
 Sometimes, mod definitions need to write back to other mods. This can be done by adding return values to the function. Here's an example that implements blacksphere in terms of `invert`, `alternate`, and `reverse`.
