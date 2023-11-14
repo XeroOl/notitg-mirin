@@ -412,7 +412,7 @@ end
 -- set the default value of a mod
 local function setdefault(self)
 	for i = 1, #self, 2 do
-		default_mods[self[i + 1]] = self[i]
+		default_mods[string.lower(self[i + 1])] = self[i]
 	end
 	return setdefault
 end
