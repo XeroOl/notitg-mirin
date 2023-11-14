@@ -53,13 +53,17 @@ Although it is rare, there are sometimes cases when a defined mod to be player s
 Sometimes, mod definitions need to write back to other mods. This can be done by adding return values to the function. Here's an example that implements blacksphere in terms of `invert`, `alternate`, and `reverse`.
 ```lua
 definemod {
-    'blacksphere',
-    function(blacksphere)
-        local invert = 50 - 50 * math.cos(blacksphere * math.pi / 180)
-        local alternate = 25 * math.sin(blacksphere * math.pi / 180)
-        local reverse = -12.5 * math.sin(blacksphere * math.pi / 180)
+    'blacksphereoffset',
+    function(offset)
+        local invert = 50 - 50 * math.cos(blacksphereoffset * math.pi / 180)
+        local alternate = 25 * math.sin(blacksphereoffset * math.pi / 180)
+        local reverse = -12.5 * math.sin(blacksphereoffset * math.pi / 180)
         return invert, alternate, reverse
     end,
     'invert', 'alternate', 'reverse',
 }
+```
+If you merely want to create a shorthand for writing to other mods, use a set-style table with each target mod amount as the value when your newly-defined mod is at 100.
+```lua
+definemod {'mods', 100, 'brake', 100, 'drunk'}
 ```
